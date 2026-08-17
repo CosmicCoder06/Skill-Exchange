@@ -24,6 +24,12 @@ const registerUser = async (req, res) => {
       });
     }
 
+    if (role && !["learner", "mentor"].includes(role)) {
+      return res.status(400).json({
+        message: "Choose either learner or mentor",
+      });
+    }
+
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -36,7 +42,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role,
+      role: role || "learner",
     });
 
     const accessToken = generateAccessToken(user._id, user.role);

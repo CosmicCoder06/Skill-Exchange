@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
     // =========================
     // PROFILE FIELDS
     // =========================

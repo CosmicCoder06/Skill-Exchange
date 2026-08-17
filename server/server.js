@@ -34,6 +34,9 @@ const profileRoutes = require("./routes/profileRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const initializeChatSocket = require("./sockets/chatSocket");
 
+// Admin
+const adminRoutes = require("./routes/adminRoutes");
+
 
 // =========================
 // Middleware
@@ -89,6 +92,9 @@ app.use("/api", profileRoutes);
 
 // Chat API
 app.use("/api", chatRoutes);
+
+// Admin API
+app.use("/api", adminRoutes);
 
 
 

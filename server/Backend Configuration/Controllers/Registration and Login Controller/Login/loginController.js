@@ -30,6 +30,12 @@ const loginUser = async (req, res) => {
       });
     }
 
+    if (user.isActive === false) {
+      return res.status(403).json({
+        message: 'Your account has been suspended. Contact an administrator.',
+      });
+    }
+
     const accessToken = generateAccessToken(user._id, user.role);
     const refreshToken = generateRefreshToken(user._id);
 
