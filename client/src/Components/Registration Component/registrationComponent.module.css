@@ -1,0 +1,166 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: #f5f7f2;
+}
+
+.card {
+    width: 100%;
+    max-width: 520px;
+    background: #ffffff;
+    padding: 42px;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(20, 70, 50, 0.12);
+}
+
+.backButton {
+    border: none;
+    background: transparent;
+    color: #56766a;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 28px;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: #d8edc6;
+    color: #174d3a;
+    font-weight: 800;
+    font-size: 20px;
+}
+
+.eyebrow {
+    margin-top: 26px;
+    color: #28785b;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.card h1 {
+    margin: 8px 0;
+    color: #10261d;
+    font-size: 38px;
+    line-height: 1.1;
+}
+
+.subtitle {
+    color: #72847d;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.card form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.card label {
+    margin-top: 8px;
+    color: #17382c;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.card input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    border: 1px solid #dce4df;
+    border-radius: 12px;
+    outline: none;
+    font-size: 15px;
+    background: #fbfcfa;
+}
+
+.card input:focus {
+    border-color: #28785b;
+    box-shadow: 0 0 0 3px rgba(40, 120, 91, 0.1);
+}
+
+.roleGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.role,
+.roleActive {
+    text-align: left;
+    padding: 18px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.role {
+    border: 1px solid #dce4df;
+    background: #fff;
+}
+
+.roleActive {
+    border: 2px solid #28785b;
+    background: #edf7ef;
+}
+
+.role strong,
+.roleActive strong {
+    display: block;
+    color: #15392c;
+    margin-bottom: 6px;
+}
+
+.role span,
+.roleActive span {
+    display: block;
+    color: #71827b;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.registerButton {
+    margin-top: 18px;
+    padding: 17px;
+    border: none;
+    border-radius: 12px;
+    background: #164c39;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.registerButton:hover {
+    background: #20654c;
+}
+
+.registerButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.loginText {
+    text-align: center;
+    margin-top: 25px;
+    color: #71827b;
+    font-size: 14px;
+}
+
+.loginText button {
+    border: none;
+    background: transparent;
+    color: #176044;
+    font-weight: 700;
+    cursor: pointer;
+}
