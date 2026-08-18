@@ -45,11 +45,6 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-
     // =========================
     // PROFILE FIELDS
     // =========================
@@ -81,13 +76,22 @@ const userSchema = new mongoose.Schema(
       min: 0,
     },
 
+    // Profile picture
     avatarUrl: {
       type: String,
       default: "",
+      trim: true,
     },
 
-    // Stored after the completion form is successfully saved. This keeps the
-    // completion state stable across future login sessions.
+    // Large profile cover / collage image
+    coverImageUrl: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    // Keeps profile completion status
+    // across future login sessions
     profileCompleted: {
       type: Boolean,
       default: false,
@@ -108,15 +112,24 @@ userSchema.pre("save", async function () {
   }
 
   const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+
+  this.password = await bcrypt.hash(
+    this.password,
+    salt
+  );
 });
 
 // =========================
 // PASSWORD COMPARISON
 // =========================
 
-userSchema.methods.comparePassword = async function (enteredPassword) {
-  return bcrypt.compare(enteredPassword, this.password);
+userSchema.methods.comparePassword = async function (
+  enteredPassword
+) {
+  return bcrypt.compare(
+    enteredPassword,
+    this.password
+  );
 };
 
 // =========================
@@ -124,4 +137,5 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
 // =========================
 
 module.exports =
-  mongoose.models.User || mongoose.model("User", userSchema);
+  mongoose.models.User ||
+  mongoose.model("User", userSchema);
