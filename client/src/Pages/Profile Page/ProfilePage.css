@@ -1,25 +1,43 @@
+/* =========================================================
+   SKILL EXCHANGE — MY PROFILE
+   VISUAL MATCH: OTHER PROFILE
+   Sidebar intentionally kept separate.
+========================================================= */
+
 :root {
-    --profile-bg: #f7f8f3;
-    --profile-white: #ffffff;
-    --profile-text: #15231f;
-    --profile-muted: #6d7d76;
-    --profile-line: #dce5df;
+    --profile-bg: #f7faf7;
+    --profile-surface: #ffffff;
     --profile-green: #176b4e;
-    --profile-green-dark: #105b41;
-    --profile-green-soft: #dff1e6;
-    --profile-yellow: #f3e7b9;
-    --profile-danger: #a3432c;
+    --profile-green-dark: #0d5940;
+    --profile-green-soft: #dff5e9;
+    --profile-text: #15231f;
+    --profile-muted: #6f7e78;
+    --profile-line: #dfe8e3;
+    --profile-gold: #d99b00;
+    --profile-yellow: #f8eec9;
+    --profile-danger: #b84b42;
 }
 
-
-/* =====================================================
-   BASE
-===================================================== */
+.profile-page,
+.profile-page * {
+    box-sizing: border-box;
+}
 
 .profile-page {
     min-height: 100vh;
-    background: var(--profile-bg);
+    background:
+        radial-gradient(circle at 5% 10%, #d8f1e2, transparent 28%),
+        radial-gradient(circle at 95% 90%, #e9edc9, transparent 25%),
+        #f7faf7;
     color: var(--profile-text);
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 
 .profile-page button {
@@ -27,179 +45,158 @@
     cursor: pointer;
 }
 
+.profile-page img {
+    display: block;
+    max-width: 100%;
+}
 
-/* =====================================================
-   SIDEBAR
-===================================================== */
+
+/* =========================================================
+   SIDEBAR — ONLY THIS PART REMAINS DIFFERENT
+========================================================= */
 
 .profile-sidebar {
     position: fixed;
     z-index: 1000;
-
-    top: 0;
-    left: 0;
-    bottom: 0;
-
-    width: 76px;
+    inset: 0 auto 0 0;
+    width: 98px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
 
-    padding: 22px 12px;
+    padding: 16px 12px;
 
-    background: #f0f6f1;
-    border-right: 1px solid var(--profile-line);
+    background: #eef5f1;
+    border-right: 1px solid #dce8e1;
 
     overflow: hidden;
-
-    transition:
-        width 0.25s ease,
-        box-shadow 0.25s ease;
+    transition: none;
 }
 
 .profile-sidebar:hover {
-    width: 220px;
-    align-items: stretch;
-
-    box-shadow:
-        12px 0 40px rgba(23, 107, 78, 0.1);
+    width: 98px;
+    align-items: center;
+    box-shadow: none;
 }
 
-
-/* LOGO */
-
 .sidebar-logo {
-    width: 44px;
-    height: 44px;
-
-    flex-shrink: 0;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
 
     display: grid;
     place-items: center;
 
-    margin-left: 4px;
-
     border: 0;
-    border-radius: 50%;
+    border-radius: 17px;
 
     background: var(--profile-green);
-    color: white;
+    color: #fff;
 
-    font-size: 23px;
-    font-weight: 800;
-
-    transition:
-        transform 0.2s ease,
-        margin 0.25s ease;
+    font-size: 0;
+    font-weight: 900;
 }
 
-.sidebar-logo:hover {
-    transform: rotate(-8deg) scale(1.05);
+.sidebar-logo::after {
+    content: "SE";
+    font-size: 18px;
+    letter-spacing: -.04em;
 }
-
-.profile-sidebar:hover .sidebar-logo {
-    margin-left: 0;
-}
-
-
-/* NAVIGATION */
 
 .sidebar-navigation {
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 9px;
-
-    margin-top: 65px;
+    align-items: center;
+    gap: 8px;
+    margin-top: 58px;
 }
 
-.sidebar-item {
-    width: 52px;
-    min-width: 52px;
-    height: 46px;
+.sidebar-item,
+.profile-sidebar:hover .sidebar-item {
+    width: 72px;
+    min-width: 72px;
+    height: 68px;
 
     display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
 
-    gap: 16px;
-
-    padding: 0 14px;
+    gap: 6px;
+    padding: 7px 4px;
 
     border: 0;
-    border-radius: 10px;
+    border-radius: 16px;
 
     background: transparent;
-    color: #688079;
+    color: #5f766d;
 
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 800;
-
     white-space: nowrap;
 
     transition:
-        width 0.25s ease,
-        background 0.2s ease,
-        color 0.2s ease;
-}
-
-.profile-sidebar:hover .sidebar-item {
-    width: 100%;
+        background .18s ease,
+        color .18s ease,
+        transform .18s ease;
 }
 
 .sidebar-item:hover {
-    background: #e0eee5;
+    background: #e2eee8;
     color: var(--profile-green);
+    transform: translateY(-1px);
 }
 
 .sidebar-item.active {
-    background: var(--profile-green);
-    color: white;
+    background: #dcefe5;
+    color: var(--profile-green);
 }
 
 .sidebar-icon {
-    width: 24px;
-    min-width: 24px;
-
+    width: 26px;
+    height: 24px;
     display: grid;
     place-items: center;
-
-    font-size: 16px;
+    color: currentColor;
+    font-size: 17px;
+    line-height: 1;
 }
 
-.sidebar-text {
-    opacity: 0;
-
-    transform: translateX(-8px);
-
-    transition:
-        opacity 0.18s ease,
-        transform 0.18s ease;
-}
-
+.sidebar-text,
 .profile-sidebar:hover .sidebar-text {
     opacity: 1;
-    transform: translateX(0);
+    transform: none;
+    color: currentColor;
+    font-size: 10px;
+    line-height: 1.1;
 }
 
 .sidebar-logout {
+    width: 72px;
+    min-width: 72px;
     margin-top: auto;
 }
 
 
-/* =====================================================
+/* =========================================================
    WORKSPACE
-===================================================== */
+========================================================= */
 
 .profile-workspace {
     min-height: 100vh;
-    margin-left: 76px;
     min-width: 0;
+    margin-left: 98px;
 }
 
 
-/* =====================================================
+/* =========================================================
    HEADER
-===================================================== */
+   Kept because it belongs to the logged-in app shell.
+   It is visually flattened so the actual profile starts like
+   the Other Profile page.
+========================================================= */
 
 .profile-header {
     min-height: 76px;
@@ -210,28 +207,25 @@
 
     padding: 0 42px;
 
-    background: white;
+    background: rgba(255,255,255,.96);
     border-bottom: 1px solid var(--profile-line);
+
+    position: relative;
+    z-index: 10;
 }
 
 .profile-brand strong {
     display: block;
-
     color: var(--profile-green);
-
     font-size: 15px;
     font-weight: 900;
-
-    letter-spacing: 0.1em;
+    letter-spacing: .1em;
 }
 
 .profile-brand span {
     display: block;
-
     margin-top: 3px;
-
     color: var(--profile-muted);
-
     font-size: 11px;
 }
 
@@ -243,219 +237,92 @@
 .profile-header-actions button {
     border: 0;
     background: transparent;
-
     color: var(--profile-green);
-
     font-size: 13px;
     font-weight: 800;
 }
 
 
-/* =====================================================
+/* =========================================================
    COVER
-===================================================== */
+   Other Profile has no cover, so hide it completely.
+========================================================= */
 
 .profile-cover {
-    position: relative;
-
-    height: 280px;
-
-    overflow: hidden;
-
-    background:
-        linear-gradient(
-            110deg,
-            #d9eee0 0%,
-            #edf5ed 52%,
-            #f3efd5 100%
-        );
-
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-
-    border-bottom: 1px solid var(--profile-line);
-}
-
-.profile-cover.custom-cover {
-    background-color: #dfeee4;
-}
-
-.cover-overlay {
-    position: absolute;
-    inset: 0;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(7, 35, 25, 0.02),
-            rgba(7, 35, 25, 0.16)
-        );
-
-    transition:
-        background 0.25s ease;
-}
-
-.profile-cover.custom-cover:hover .cover-overlay {
-    background:
-        linear-gradient(
-            180deg,
-            rgba(7, 35, 25, 0.02),
-            rgba(7, 35, 25, 0.28)
-        );
+    display: none !important;
 }
 
 
-/* CHANGE COVER BUTTON */
-
-.cover-edit-button {
-    position: absolute;
-
-    right: 32px;
-    bottom: 25px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    padding: 10px 14px;
-
-    border: 0;
-    border-radius: 7px;
-
-    background: rgba(255, 255, 255, 0.88);
-
-    color: var(--profile-green);
-
-    font-size: 11px;
-    font-weight: 900;
-
-    letter-spacing: 0.08em;
-
-    backdrop-filter: blur(8px);
-
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease;
-}
-
-.cover-edit-button:hover {
-    transform: translateY(-2px);
-
-    background: white;
-}
-
-.cover-empty-message {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 7px;
-
-    transform: translate(-50%, -50%);
-
-    text-align: center;
-
-    color: var(--profile-green);
-}
-
-.cover-empty-message strong {
-    font-size: 13px;
-    letter-spacing: 0.1em;
-}
-
-.cover-empty-message span {
-    color: #668078;
-    font-size: 12px;
-}
-
-
-/* =====================================================
-   PROFILE IDENTITY
-===================================================== */
+/* =========================================================
+   IDENTITY — DIRECT MATCH TO OTHER PROFILE HERO
+========================================================= */
 
 .profile-identity {
     position: relative;
     z-index: 5;
 
-    display: flex;
+    width: min(1180px, calc(100% - 80px));
+    min-height: 0;
+
+    display: grid;
+    grid-template-columns: 112px minmax(280px, 1fr) auto;
     align-items: center;
 
-    gap: 25px;
+    gap: 28px;
 
-    min-height: 185px;
+    margin: 38px auto 0;
+    padding: 0 0 45px;
 
-    padding: 28px 42px 28px;
-
-    background: white;
-
+    background: transparent;
     border-bottom: 1px solid var(--profile-line);
 }
 
-
-/* BIG AVATAR */
-
 .profile-photo-wrapper {
-    flex-shrink: 0;
-
-    align-self: flex-start;
-
-    margin-top: -92px;
+    align-self: center;
+    margin: 0;
 }
 
 .profile-photo {
-    width: 168px;
-    height: 168px;
+    width: 112px;
+    height: 112px;
+
+    flex: 0 0 112px;
 
     display: block;
 
     object-fit: cover;
+    object-position: center;
 
+    border: 6px solid #e7f3ec;
     border-radius: 50%;
 
-    border: 8px solid white;
+    background: linear-gradient(135deg, #0d4534, #33a277);
 
-    background: var(--profile-green-soft);
+    box-shadow: 0 10px 28px rgba(23,107,78,.12);
 
-    box-shadow:
-        0 14px 38px rgba(21, 53, 43, 0.2);
-
-    transition:
-        transform 0.3s cubic-bezier(
-            0.2,
-            0.8,
-            0.2,
-            1
-        ),
-        box-shadow 0.3s ease;
+    transition: none;
 }
 
 .profile-photo:hover {
-    transform: scale(1.08);
-
-    box-shadow:
-        0 22px 48px rgba(23, 107, 78, 0.28);
+    transform: none;
+    box-shadow: 0 10px 28px rgba(23,107,78,.12);
 }
 
 .profile-photo-fallback {
     display: grid;
     place-items: center;
 
-    color: var(--profile-green);
-
-    font-size: 58px;
+    color: #fff;
+    font-size: 42px;
     font-weight: 800;
+
+    background: linear-gradient(135deg, #0d4534, #33a277);
 }
 
 
-/* MAIN INFO */
+/* =========================================================
+   MAIN INFO
+========================================================= */
 
 .profile-main-info {
     min-width: 0;
@@ -464,193 +331,214 @@
 .profile-status-row {
     display: flex;
     align-items: center;
-
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 8px;
 }
 
 .profile-status {
-    color: #a25b10;
+    display: inline-flex;
+    align-items: center;
 
-    font-size: 10px;
+    min-height: 27px;
+    padding: 6px 11px;
+
+    border-radius: 999px;
+
+    background: #dff5e9;
+    color: var(--profile-green);
+
+    font-size: 11px;
     font-weight: 900;
-
-    letter-spacing: 0.13em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
 }
 
 .profile-status.complete {
+    background: #dff5e9;
     color: var(--profile-green);
 }
 
 .profile-role {
     color: var(--profile-muted);
-
     font-size: 12px;
+    font-weight: 700;
 }
 
 .profile-main-info h1 {
-    margin: 5px 0 4px;
+    margin: 10px 0 4px;
 
-    font-size: clamp(
-        38px,
-        5vw,
-        58px
-    );
+    color: var(--profile-text);
 
-    line-height: 0.95;
-
-    letter-spacing: -0.06em;
+    font-size: clamp(36px, 5vw, 58px);
+    line-height: 1;
+    letter-spacing: -.06em;
 }
 
-.profile-main-info p {
+.profile-main-info > p {
     margin: 0;
-
     color: var(--profile-muted);
+    font-size: 17px;
+}
 
+
+/* =========================================================
+   RATING UNDER USER NAME
+   Same as Other Profile.
+========================================================= */
+
+.profile-main-info .profile-rating-summary,
+.profile-rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    color: var(--profile-text);
     font-size: 14px;
 }
 
+.profile-rating-summary .rating-star {
+    color: var(--profile-gold);
+    font-size: 18px;
+    line-height: 1;
+}
 
-/* ACTIONS */
+.profile-rating-summary strong {
+    font-size: 16px;
+}
+
+.profile-rating-summary span:last-child {
+    color: #777;
+}
+
+
+/* =========================================================
+   ACTIONS — SAME AS OTHER PROFILE
+========================================================= */
 
 .profile-actions {
     display: flex;
     align-items: center;
-
-    gap: 9px;
-
-    margin-left: auto;
-
-    flex-wrap: wrap;
+    gap: 10px;
+    justify-self: end;
 }
 
 .secondary-action,
-.primary-action {
-    padding: 12px 16px;
+.primary-action,
+.profile-message,
+.profile-booking {
+    min-height: 48px;
 
-    border-radius: 7px;
+    border-radius: 10px;
 
-    font-size: 12px;
+    padding: 0 20px;
+
+    font-size: 14px;
     font-weight: 800;
+
+    white-space: nowrap;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease,
+        border-color .2s ease;
 }
 
-.secondary-action {
-    border: 1px solid var(--profile-line);
-
-    background: white;
-
+.secondary-action,
+.profile-message,
+.profile-booking {
+    border: 1px solid #cfe3d8;
+    background: #eef7f2;
     color: var(--profile-green);
+    box-shadow: none;
 }
 
 .primary-action {
-    border: 0;
-
+    border: 1px solid var(--profile-green);
     background: var(--profile-green);
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(23,107,78,.16);
+}
 
-    color: white;
+.secondary-action:hover,
+.profile-message:hover,
+.profile-booking:hover,
+.primary-action:hover {
+    transform: translateY(-2px);
+}
+
+.secondary-action:hover,
+.profile-message:hover,
+.profile-booking:hover {
+    background: #e1f1e9;
+    border-color: #b9d8c9;
+    box-shadow: 0 8px 20px rgba(23,107,78,.10);
 }
 
 .primary-action:hover {
-    background: var(--profile-green-dark);
+    background: #125b43;
+    box-shadow: 0 14px 28px rgba(23,107,78,.21);
 }
 
 
-/* =====================================================
+/* =========================================================
    STATS
-===================================================== */
+   Other Profile doesn't have the dashboard stat strip.
+   Hide it so the page remains visually identical.
+========================================================= */
 
 .profile-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-
-    background: white;
-
-    border-bottom: 1px solid var(--profile-line);
-}
-
-.stat-item {
-    padding: 24px 30px;
-
-    border-right: 1px solid var(--profile-line);
-}
-
-.stat-item:first-child {
-    padding-left: 42px;
-}
-
-.stat-item:last-child {
-    border-right: 0;
-}
-
-.stat-item strong {
-    display: block;
-
-    font-size: 25px;
-
-    letter-spacing: -0.04em;
-}
-
-.stat-item span {
-    display: block;
-
-    margin-top: 4px;
-
-    color: var(--profile-muted);
-
-    font-size: 11px;
+    display: none !important;
 }
 
 
-/* =====================================================
+/* =========================================================
    CONTENT
-===================================================== */
+   Same 1180px editorial width as Other Profile.
+========================================================= */
 
 .profile-content {
-    display: grid;
+    width: min(1180px, calc(100% - 80px));
+    margin: 0 auto;
 
-    grid-template-columns:
-        minmax(0, 1fr)
-        310px;
+    display: block;
+
+    padding-top: 60px;
+
+    background: transparent;
 }
 
 .profile-content-main {
+    width: 100%;
     min-width: 0;
-
-    padding: 55px 50px 80px 42px;
-}
-
-.profile-side-content {
-    padding: 55px 40px;
-
-    background: #f3f7f3;
-
-    border-left: 1px solid var(--profile-line);
+    padding: 0;
 }
 
 
-/* =====================================================
-   SECTIONS
-===================================================== */
+/* =========================================================
+   ABOUT SECTION
+========================================================= */
 
 .profile-section {
-    display: grid;
+    display: block;
 
-    grid-template-columns:
-        175px
-        minmax(0, 1fr);
+    width: 100%;
 
-    padding-bottom: 55px;
-    margin-bottom: 55px;
+    padding: 0;
+    margin: 0;
 
-    border-bottom: 1px solid var(--profile-line);
+    border: 0;
 }
 
 .section-label {
-    color: #4d896f;
+    margin: 0 0 16px;
 
-    font-size: 10px;
+    color: var(--profile-green);
+
+    font-size: 11px;
     font-weight: 900;
-
-    letter-spacing: 0.16em;
+    letter-spacing: .14em;
 }
 
 .section-body {
@@ -658,275 +546,386 @@
 }
 
 .section-body h2 {
-    margin: 0;
+    margin: 0 0 18px;
 
-    font-size: clamp(
-        28px,
-        3vw,
-        42px
-    );
+    color: var(--profile-text);
 
-    line-height: 1;
-
-    letter-spacing: -0.055em;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.05;
+    letter-spacing: -.05em;
 }
 
 .profile-bio {
-    max-width: 700px;
+    max-width: 720px;
 
-    margin: 20px 0 0;
+    margin: 0;
 
-    color: #53645d;
+    color: #4b5c55;
 
-    font-size: 16px;
-    line-height: 1.8;
+    font-size: 17px;
+    line-height: 1.85;
 }
 
 .inline-link {
-    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 
+    margin-top: 17px;
     padding: 0;
 
     border: 0;
-
     background: transparent;
 
     color: var(--profile-green);
 
-    font-size: 13px;
-    font-weight: 800;
+    font-size: 12px;
+    font-weight: 900;
 }
 
 
-/* =====================================================
-   SKILLS
-===================================================== */
+/* =========================================================
+   SKILLS — SAME AS OTHER PROFILE
+========================================================= */
 
 .skills-columns {
     display: grid;
-
     grid-template-columns: 1fr 1fr;
 
-    gap: 40px;
+    gap: 45px;
 
-    margin-top: 35px;
+    margin-top: 65px;
+    padding-top: 35px;
+
+    border-top: 1px solid var(--profile-line);
 }
 
 .skill-column + .skill-column {
-    padding-left: 40px;
-
-    border-left: 1px solid var(--profile-line);
+    padding-left: 0;
+    border-left: 0;
 }
 
 .skill-column > p {
-    margin: 0 0 15px;
+    margin: 0 0 13px;
 
     color: var(--profile-muted);
 
     font-size: 10px;
     font-weight: 900;
-
-    letter-spacing: 0.13em;
+    letter-spacing: .11em;
 }
 
 .skill-list {
     display: flex;
     flex-wrap: wrap;
-
-    gap: 8px;
+    gap: 9px;
 }
 
 .skill-pill {
-    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 32px;
+    padding: 9px 13px;
 
     border-radius: 999px;
 
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
 }
 
 .skill-pill.teaching {
-    background: #dff1e6;
-    color: #155c43;
+    color: #155b42;
+    background: #e0f3e8;
 }
 
 .skill-pill.learning {
-    background: var(--profile-yellow);
-    color: #765919;
+    color: #775719;
+    background: #f8eec9;
 }
 
 .empty-text {
-    color: var(--profile-muted);
-
+    color: #888;
     font-size: 13px;
 }
 
 
-/* =====================================================
-   REVIEWS
-===================================================== */
+/* =========================================================
+   REVIEWS / COMMUNITY FEEDBACK
+   Exact visual language of Other Profile:
+   heading + rating on left, chart on right, reviews below.
+========================================================= */
+
+.profile-reviews-section {
+    width: 100%;
+
+    margin: 65px 0 0;
+    padding: 48px 0 20px;
+
+    border: 0;
+    border-top: 1px solid var(--profile-line);
+
+    min-width: 0;
+}
 
 .reviews-heading {
-    display: flex;
+    width: 100%;
 
-    align-items: flex-end;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr) 180px;
+
+    align-items: start;
 
     gap: 30px;
 
-    margin-bottom: 32px;
+    margin: 0 0 28px;
+}
+
+.reviews-heading > div:first-child {
+    grid-column: 1;
+}
+
+.reviews-heading > div:first-child h2 {
+    margin: 0;
+
+    font-size: clamp(30px, 3vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -.05em;
 }
 
 .reviews-heading p {
     margin: 10px 0 0;
-
     color: var(--profile-muted);
-
     font-size: 13px;
 }
 
+
+/* Overall rating */
 .overall-rating {
+    grid-column: 3;
     text-align: right;
+
+    min-width: 180px;
 }
 
 .overall-rating strong {
     display: block;
 
-    font-size: 40px;
+    color: var(--profile-text);
+
+    font-size: 46px;
+    line-height: 1;
+    letter-spacing: -.06em;
 }
 
 .overall-rating span {
-    color: #e2a62c;
+    display: block;
 
+    margin-top: 8px;
+
+    color: var(--profile-gold);
+
+    font-size: 15px;
     letter-spacing: 2px;
 }
 
-.rating-breakdown {
-    max-width: 600px;
+.overall-rating small {
+    display: block;
 
-    margin-bottom: 35px;
+    margin-top: 5px;
+
+    color: #777;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RATING BREAKDOWN — RIGHT SIDE
+========================================================= */
+
+.rating-breakdown {
+    width: 100%;
+
+    margin: 0 0 32px;
+    padding: 0 0 28px;
+
+    border-bottom: 1px solid var(--profile-line);
 }
 
 .rating-row {
     display: grid;
 
-    grid-template-columns:
-        15px
-        minmax(100px, 1fr)
-        25px;
+    grid-template-columns: 42px minmax(0, 1fr) 34px;
 
     align-items: center;
 
-    gap: 10px;
+    gap: 12px;
 
-    margin: 8px 0;
+    width: 100%;
 
-    color: var(--profile-muted);
+    margin: 0 0 13px;
 
-    font-size: 11px;
+    color: #52635b;
+    font-size: 12px;
+}
+
+.rating-row:last-child {
+    margin-bottom: 0;
+}
+
+.rating-row > span {
+    color: #52635b;
+}
+
+.rating-row > span:last-child {
+    color: #777;
+    text-align: right;
 }
 
 .rating-track {
-    height: 5px;
+    width: 100%;
+    height: 9px;
 
     overflow: hidden;
 
     border-radius: 999px;
 
-    background: #dfe7e2;
+    background: #e5e7e2;
 }
 
-.rating-track div {
+.rating-track > div {
     height: 100%;
+    min-width: 0;
 
     border-radius: inherit;
 
-    background: #e2a62c;
+    background: #1c1c1c;
+
+    transition: width .4s ease;
 }
 
+
+/* =========================================================
+   REVIEWS LIST — LINEAR, NO CARDS
+========================================================= */
+
 .reviews-list {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 0;
+
+    margin: 0;
+
     border-top: 1px solid var(--profile-line);
 }
 
 .review-item {
+    width: 100%;
+
     display: grid;
+    grid-template-columns: 190px minmax(0, 1fr) auto;
 
-    grid-template-columns:
-        190px
-        minmax(0, 1fr);
+    gap: 26px;
+    align-items: start;
 
-    gap: 30px;
+    padding: 22px 0;
 
-    padding: 25px 0;
-
+    border: 0;
     border-bottom: 1px solid var(--profile-line);
+
+    background: transparent;
+}
+
+.review-item:first-child {
+    padding-top: 24px;
+}
+
+.review-item:last-child {
+    border-bottom: 0;
 }
 
 .review-user {
     display: flex;
-
     align-items: center;
-
     gap: 10px;
 }
 
 .review-avatar {
     width: 38px;
     height: 38px;
+    flex: 0 0 38px;
 
     display: grid;
     place-items: center;
 
-    flex-shrink: 0;
-
     border-radius: 50%;
 
-    background: var(--profile-green-soft);
+    background: var(--profile-green);
+    color: #fff;
 
-    color: var(--profile-green);
-
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
 }
 
 .review-user strong {
     display: block;
-
-    font-size: 13px;
+    color: var(--profile-text);
+    font-size: 14px;
 }
 
 .review-user span {
     display: block;
+    margin-top: 2px;
+    color: #777;
+    font-size: 11px;
+}
 
-    margin-top: 3px;
-
-    color: var(--profile-muted);
-
-    font-size: 10px;
+.review-content {
+    min-width: 0;
 }
 
 .review-stars {
-    color: #e2a62c;
+    margin: 0 0 7px;
 
-    letter-spacing: 1px;
+    color: var(--profile-gold);
+
+    font-size: 14px;
+    letter-spacing: 1.5px;
 }
 
 .review-stars span {
-    color: #d5ddd8;
+    color: #d9ddd9;
 }
 
 .review-content p {
-    margin: 10px 0 0;
+    margin: 0;
 
-    color: #53635c;
+    color: #45534e;
 
     font-size: 13px;
-
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
+
+/* =========================================================
+   RIGHT SIDE CONTENT
+   Keep functionality but make it flat and quiet.
+========================================================= */
+
+.profile-side-content {
+    display: none !important;
+}
+
+
+/* =========================================================
+   EMPTY REVIEWS
+========================================================= */
+
 .reviews-empty {
-    padding: 45px 0;
+    padding: 30px 0;
 
     text-align: center;
 
@@ -935,117 +934,29 @@
 
 .reviews-empty > span {
     display: block;
-
     margin-bottom: 8px;
-
-    color: #e2a62c;
-
-    font-size: 36px;
+    color: var(--profile-gold);
+    font-size: 28px;
 }
 
 .reviews-empty strong {
     display: block;
-
     color: var(--profile-text);
-
     font-size: 17px;
 }
 
 .reviews-empty p {
     max-width: 400px;
-
-    margin: 8px auto;
-
-    font-size: 12px;
-}
-
-
-/* =====================================================
-   RIGHT PANEL
-===================================================== */
-
-.side-section {
-    padding-bottom: 32px;
-    margin-bottom: 32px;
-
-    border-bottom: 1px solid var(--profile-line);
-}
-
-.side-label {
-    margin: 0 0 18px;
-
-    color: #4d896f;
-
-    font-size: 10px;
-    font-weight: 900;
-
-    letter-spacing: 0.15em;
-}
-
-.detail-row {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 5px;
-
-    padding: 15px 0;
-
-    border-bottom: 1px solid var(--profile-line);
-}
-
-.detail-row:first-of-type {
-    padding-top: 0;
-}
-
-.detail-row span {
-    color: var(--profile-muted);
-
-    font-size: 11px;
-}
-
-.detail-row strong {
+    margin: 6px auto 0;
+    color: #777;
     font-size: 13px;
-}
-
-.side-action {
-    width: 100%;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 14px 0;
-
-    border: 0;
-    border-bottom: 1px solid var(--profile-line);
-
-    background: transparent;
-
-    color: var(--profile-green);
-
-    text-align: left;
-
-    font-size: 13px;
-    font-weight: 800;
-
-    transition:
-        padding 0.2s ease;
-}
-
-.side-action:hover {
-    padding-left: 6px;
-}
-
-.side-action.danger {
-    color: var(--profile-danger);
+    line-height: 1.5;
 }
 
 
-/* =====================================================
+/* =========================================================
    LOADING
-===================================================== */
+========================================================= */
 
 .profile-loading {
     min-height: 100vh;
@@ -1053,71 +964,810 @@
     display: grid;
     place-items: center;
 
-    background: var(--profile-bg);
-
+    background: #f7faf7;
     color: var(--profile-green);
 
     font-weight: 800;
 }
 
 
-/* =====================================================
-   TABLET
-===================================================== */
+/* =========================================================
+   BUTTON INTERACTION
+========================================================= */
 
-@media (max-width: 1100px) {
+.profile-header-actions button,
+.secondary-action,
+.primary-action,
+.profile-message,
+.profile-booking {
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background-color .2s ease,
+        border-color .2s ease;
+}
+
+.secondary-action:active,
+.primary-action:active,
+.profile-message:active,
+.profile-booking:active {
+    transform: scale(.97);
+}
+
+.profile-header-actions button:focus-visible,
+.secondary-action:focus-visible,
+.primary-action:focus-visible,
+.profile-message:focus-visible,
+.profile-booking:focus-visible {
+    outline: 2px solid var(--profile-green);
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 980px) {
 
     .profile-identity {
+        width: calc(100% - 60px);
+
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 24px;
+
+        margin-top: 32px;
+        padding-bottom: 40px;
+    }
+
+    .profile-photo {
+        width: 96px;
+        height: 96px;
+    }
+
+    .profile-actions {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .profile-content {
+        width: calc(100% - 60px);
+        padding-top: 50px;
+    }
+
+    .skills-columns {
+        margin-top: 55px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 55px;
+    }
+
+    .reviews-heading {
+        display: grid;
+
+        grid-template-columns: minmax(0, 1fr) 170px;
+
+        gap: 24px;
+    }
+
+    .reviews-heading > div:first-child {
+        grid-column: 1;
+    }
+
+    .overall-rating {
+        grid-column: 2;
+        min-width: 0;
+    }
+
+    .rating-breakdown {
+        margin-top: 10px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .profile-sidebar {
+        position: fixed;
+        inset: auto 12px 12px 12px;
+
+        width: auto;
+        height: 66px;
+
+        flex-direction: row;
+        justify-content: center;
+
+        padding: 7px 10px;
+
+        border: 1px solid var(--profile-line);
+        border-radius: 18px;
+
+        box-shadow: 0 12px 40px rgba(23,107,78,.15);
+    }
+
+    .profile-sidebar:hover {
+        width: auto;
+        align-items: center;
+        box-shadow: 0 12px 40px rgba(23,107,78,.15);
+    }
+
+    .sidebar-logo {
+        display: none;
+    }
+
+    .sidebar-navigation {
+        width: 100%;
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+
+        margin: 0;
+    }
+
+    .sidebar-item,
+    .profile-sidebar:hover .sidebar-item {
+        width: 100%;
+        min-width: 0;
+        height: 52px;
+
+        justify-content: center;
+
+        padding: 4px 0;
+    }
+
+    .sidebar-text,
+    .profile-sidebar:hover .sidebar-text {
+        display: none;
+    }
+
+    .sidebar-logout {
+        display: none;
+    }
+
+    .profile-workspace {
+        margin-left: 0;
+        padding-bottom: 90px;
+    }
+
+    .profile-header {
+        min-height: 68px;
+        padding: 0 20px;
+    }
+
+    .profile-brand span,
+    .profile-header-actions {
+        display: none;
+    }
+
+    .profile-identity {
+        width: calc(100% - 40px);
+
+        display: flex;
         flex-wrap: wrap;
+        align-items: flex-start;
+
+        gap: 18px;
+
+        margin-top: 28px;
+        padding-bottom: 30px;
+    }
+
+    .profile-photo-wrapper {
+        flex: 0 0 auto;
+    }
+
+    .profile-photo {
+        width: 86px;
+        height: 86px;
+    }
+
+    .profile-main-info {
+        flex: 1 1 220px;
+    }
+
+    .profile-main-info h1 {
+        font-size: 42px;
+    }
+
+    .profile-main-info > p {
+        font-size: 15px;
     }
 
     .profile-actions {
         width: 100%;
 
-        margin-left: 193px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+        gap: 10px;
+    }
+
+    .secondary-action,
+    .primary-action,
+    .profile-message,
+    .profile-booking {
+        width: 100%;
+        min-width: 0;
+        min-height: 48px;
+        padding: 0 12px;
+        font-size: 13px;
     }
 
     .profile-content {
-        grid-template-columns: 1fr;
+        width: calc(100% - 40px);
+        padding-top: 45px;
     }
 
-    .profile-side-content {
-        display: grid;
+    .section-label {
+        margin-bottom: 14px;
+    }
 
-        grid-template-columns: 1fr 1fr;
+    .section-body h2 {
+        font-size: 30px;
+    }
 
-        gap: 40px;
+    .profile-bio {
+        font-size: 16px;
+        line-height: 1.75;
+    }
 
-        border-top: 1px solid var(--profile-line);
-        border-left: 0;
+    .skills-columns {
+        grid-template-columns: 1fr;
+
+        gap: 32px;
+
+        margin-top: 45px;
+        padding-top: 30px;
+    }
+
+    .skill-pill {
+        font-size: 13px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 45px;
+        padding-top: 40px;
+    }
+
+    .reviews-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+    }
+
+    .reviews-heading > div:first-child {
+        min-width: 0;
+    }
+
+    .reviews-heading > div:first-child h2 {
+        font-size: 29px;
+    }
+
+    .overall-rating {
+        min-width: 110px;
+        text-align: right;
+    }
+
+    .overall-rating strong {
+        font-size: 40px;
+    }
+
+    .rating-breakdown {
+        margin-top: 28px;
+        padding-bottom: 24px;
+    }
+
+    .rating-row {
+        grid-template-columns: 38px minmax(0, 1fr) 30px;
+        gap: 10px;
+    }
+
+    .review-item {
+        grid-template-columns: 1fr;
+        gap: 12px;
+
+        padding: 20px 0;
     }
 }
 
 
-/* =====================================================
-   MOBILE
-===================================================== */
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .profile-identity {
+        width: calc(100% - 32px);
+    }
+
+    .profile-content {
+        width: calc(100% - 32px);
+    }
+
+    .profile-main-info h1 {
+        font-size: 36px;
+    }
+
+    .profile-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .reviews-heading {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .overall-rating {
+        text-align: left;
+    }
+
+    .rating-row {
+        grid-template-columns: 34px minmax(0, 1fr) 24px;
+        gap: 8px;
+    }
+}
+
+/* =========================================================
+   FINAL COMMUNITY FEEDBACK — MATCH OTHER PROFILE EXACTLY
+   Structure:
+   LEFT  -> Community Feedback / Ratings & Reviews / 3.7 / stars / count
+   RIGHT -> 5★ ... chart ... count
+   BELOW -> linear reviews, no cards
+========================================================= */
+
+.profile-reviews-section {
+    width: 100% !important;
+    margin: 65px 0 0 !important;
+    padding: 48px 0 25px !important;
+    border: 0 !important;
+    border-top: 1px solid #dfe8e3 !important;
+    min-width: 0 !important;
+}
+
+.profile-eyebrow {
+    margin: 0 0 16px !important;
+    color: #176b4e !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    letter-spacing: .14em !important;
+}
+
+.profile-reviews-header {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr) !important;
+    column-gap: 70px !important;
+    align-items: start !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Make the two header children become the two visual columns. */
+.profile-reviews-header > div:first-child {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+}
+
+.profile-reviews-header > div:first-child h2 {
+    margin: 0 !important;
+    max-width: none !important;
+    color: #15231f !important;
+    font-size: clamp(30px, 3vw, 42px) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -.05em !important;
+}
+
+.big-rating {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    justify-self: start !important;
+    align-self: start !important;
+    min-width: 0 !important;
+    margin-top: 20px !important;
+    text-align: left !important;
+}
+
+.big-rating strong {
+    display: block !important;
+    color: #15231f !important;
+    font-size: 52px !important;
+    line-height: .95 !important;
+    letter-spacing: -.06em !important;
+}
+
+.big-rating span {
+    display: block !important;
+    margin-top: 10px !important;
+    color: #d99b00 !important;
+    font-size: 17px !important;
+    line-height: 1 !important;
+    letter-spacing: 2px !important;
+    white-space: nowrap !important;
+}
+
+.big-rating small {
+    display: block !important;
+    margin-top: 7px !important;
+    color: #777 !important;
+    font-size: 13px !important;
+}
+
+/* Rating chart occupies the complete RIGHT half. */
+.rating-distribution {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: center !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+.rating-row {
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) 34px !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin: 0 0 13px !important;
+    color: #52635b !important;
+    font-size: 12px !important;
+}
+
+.rating-row:last-child {
+    margin-bottom: 0 !important;
+}
+
+.rating-row > span {
+    color: #52635b !important;
+}
+
+.rating-row small {
+    display: block !important;
+    color: #777 !important;
+    text-align: right !important;
+    font-size: 12px !important;
+}
+
+.rating-bar {
+    width: 100% !important;
+    height: 9px !important;
+    overflow: hidden !important;
+    border-radius: 999px !important;
+    background: #e5e7e2 !important;
+}
+
+.rating-bar-fill {
+    height: 100% !important;
+    min-width: 0 !important;
+    border-radius: inherit !important;
+    background: #1c1c1c !important;
+    transition: width .4s ease !important;
+}
+
+/* Reviews start BELOW both columns and stay completely linear. */
+.reviews-list {
+    width: 100% !important;
+    margin: 40px 0 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    border-top: 1px solid #dfe8e3 !important;
+}
+
+.review-card {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 22px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #dfe8e3 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.review-card:first-child {
+    padding-top: 24px !important;
+}
+
+.review-card:last-child {
+    border-bottom: 0 !important;
+}
+
+.review-card-top {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.reviewer-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 50% !important;
+    background: #176b4e !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+}
+
+.review-card-top strong {
+    display: block !important;
+    color: #15231f !important;
+    font-size: 14px !important;
+}
+
+.reviewer-role {
+    display: block !important;
+    margin-top: 2px !important;
+    color: #777 !important;
+    font-size: 11px !important;
+    text-transform: capitalize !important;
+}
+
+.review-date {
+    margin-left: auto !important;
+    color: #888 !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+}
+
+.review-stars {
+    margin: 13px 0 8px !important;
+    color: #d99b00 !important;
+    font-size: 14px !important;
+    letter-spacing: 1.5px !important;
+}
+
+.review-stars span {
+    color: #d9ddd9 !important;
+}
+
+.review-comment {
+    margin: 0 !important;
+    color: #45534e !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.no-reviews {
+    width: 100% !important;
+    padding: 35px 0 !important;
+    border: 0 !important;
+    border-top: 1px solid #dfe8e3 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    text-align: center !important;
+}
+
+.no-reviews div {
+    margin-bottom: 8px !important;
+    font-size: 28px !important;
+}
+
+.no-reviews h3 {
+    margin: 0 0 6px !important;
+    color: #15231f !important;
+}
+
+.no-reviews p {
+    margin: 0 !important;
+    color: #777 !important;
+    font-size: 14px !important;
+}
+
+.reviews-loading {
+    width: 100% !important;
+    padding: 30px 0 !important;
+    color: #777 !important;
+    text-align: center !important;
+}
+
+@media (max-width: 980px) {
+    .profile-reviews-header {
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: space-between !important;
+        gap: 20px !important;
+    }
+
+    .profile-reviews-header > div:first-child {
+        min-width: 0 !important;
+    }
+
+    .big-rating {
+        margin-top: 0 !important;
+        text-align: right !important;
+    }
+
+    .big-rating strong {
+        font-size: 40px !important;
+    }
+
+    .rating-distribution {
+        width: 100% !important;
+        margin-top: 28px !important;
+    }
+
+    .reviews-list {
+        margin-top: 30px !important;
+    }
+}
 
 @media (max-width: 700px) {
+    .profile-reviews-section {
+        margin-top: 45px !important;
+        padding-top: 40px !important;
+    }
+
+    .profile-reviews-header {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px !important;
+    }
+
+    .big-rating {
+        text-align: left !important;
+    }
+
+    .review-date {
+        display: none !important;
+    }
+}
+
+/* =========================================================
+   FINAL RESPONSIVE POLISH
+   - Only Edit Profile remains beside the identity
+   - Header/sidebar stay functional
+   - Identity, skills, ratings and reviews reflow cleanly
+========================================================= */
+
+.profile-edit-only {
+    min-width: 150px;
+}
+
+/* Medium desktop / tablets */
+@media (max-width: 1100px) {
+
+    .profile-header {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .profile-identity,
+    .profile-content {
+        width: calc(100% - 60px);
+    }
+
+    .profile-identity {
+        grid-template-columns: 100px minmax(0, 1fr) auto;
+        gap: 22px;
+    }
+
+    .profile-photo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-main-info h1 {
+        font-size: clamp(38px, 6vw, 52px);
+    }
+
+    .profile-actions {
+        justify-self: end;
+    }
+
+    .profile-content {
+        padding-top: 52px;
+    }
+
+    .skills-columns {
+        gap: 34px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+
+    .profile-header {
+        min-height: 72px;
+    }
+
+    .profile-header-actions {
+        gap: 18px;
+    }
+
+    .profile-identity {
+        grid-template-columns: 96px minmax(0, 1fr);
+        align-items: center;
+        gap: 20px;
+        padding-bottom: 34px;
+    }
+
+    .profile-photo {
+        width: 96px;
+        height: 96px;
+        border-width: 5px;
+    }
+
+    .profile-photo-fallback {
+        font-size: 34px;
+    }
+
+    .profile-main-info h1 {
+        font-size: clamp(34px, 7vw, 48px);
+    }
+
+    .profile-main-info > p {
+        font-size: 15px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-actions {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: 2px;
+    }
+
+    .profile-edit-only {
+        min-height: 46px;
+    }
+
+    .profile-content {
+        padding-top: 48px;
+    }
+
+    .skills-columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 48px !important;
+    }
+
+    .profile-reviews-header {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start !important;
+        gap: 24px !important;
+    }
+
+    .big-rating {
+        min-width: 115px;
+    }
+}
+
+/* Phones */
+@media (max-width: 700px) {
+
+    .profile-page {
+        overflow-x: hidden;
+    }
 
     .profile-sidebar {
-        top: auto;
-        right: 12px;
-        bottom: 12px;
-        left: 12px;
-
+        position: fixed;
+        inset: auto 12px 12px 12px;
         width: auto;
-        height: 64px;
-
+        height: 66px;
+        padding: 7px 10px;
         flex-direction: row;
-
-        padding: 8px 12px;
-
-        border: 1px solid var(--profile-line);
+        justify-content: center;
+        border: 1px solid #dce8e1;
         border-radius: 18px;
-
-        box-shadow:
-            0 12px 40px rgba(23, 107, 78, 0.15);
+        box-shadow: 0 12px 40px rgba(23,107,78,.14);
     }
 
     .profile-sidebar:hover {
@@ -1130,26 +1780,24 @@
 
     .sidebar-navigation {
         width: 100%;
-
-        display: grid;
-
-        grid-template-columns:
-            repeat(4, 1fr);
-
         margin: 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2px;
     }
 
     .sidebar-item,
     .profile-sidebar:hover .sidebar-item {
         width: 100%;
         min-width: 0;
-
+        height: 52px;
+        padding: 4px 0;
         justify-content: center;
-
-        padding: 0;
+        border-radius: 14px;
     }
 
-    .sidebar-text {
+    .sidebar-text,
+    .profile-sidebar:hover .sidebar-text {
         display: none;
     }
 
@@ -1159,721 +1807,1867 @@
 
     .profile-workspace {
         margin-left: 0;
-
-        padding-bottom: 90px;
+        padding-bottom: 92px;
     }
 
     .profile-header {
-        padding: 0 20px;
+        min-height: 68px;
+        padding: 0 18px;
     }
 
+    .profile-brand strong {
+        font-size: 14px;
+    }
+
+    .profile-brand span,
     .profile-header-actions {
         display: none;
     }
 
-    .profile-cover {
-        height: 190px;
-    }
-
-    .cover-edit-button {
-        right: 15px;
-        bottom: 15px;
-    }
-
-    .cover-edit-button span {
-        display: none;
-    }
-
     .profile-identity {
-        align-items: flex-start;
-
-        padding: 0 20px 25px;
-    }
-
-    .profile-photo-wrapper {
-        margin-top: -68px;
+        width: calc(100% - 36px);
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        align-items: start;
+        gap: 16px;
+        margin-top: 28px;
+        padding-bottom: 30px;
     }
 
     .profile-photo {
-        width: 125px;
-        height: 125px;
+        width: 82px;
+        height: 82px;
+        border-width: 5px;
+    }
 
-        border-width: 6px;
+    .profile-photo-fallback {
+        font-size: 29px;
+    }
+
+    .profile-status-row {
+        gap: 7px;
+        margin-bottom: 7px;
+    }
+
+    .profile-status {
+        min-height: 24px;
+        padding: 5px 9px;
+        font-size: 9px;
+    }
+
+    .profile-role {
+        font-size: 11px;
     }
 
     .profile-main-info h1 {
-        font-size: 37px;
+        margin-top: 7px;
+        font-size: clamp(30px, 9vw, 42px);
+        line-height: .98;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-main-info > p {
+        margin-top: 4px;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-rating-summary {
+        margin-top: 10px;
+        gap: 6px;
+        font-size: 12px;
+    }
+
+    .profile-rating-summary .rating-star {
+        font-size: 15px;
+    }
+
+    .profile-rating-summary strong {
+        font-size: 14px;
     }
 
     .profile-actions {
+        grid-column: 1 / -1;
         width: 100%;
-        margin-left: 0;
-
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-
-        gap: 10px;
+        margin-top: 4px;
+        justify-self: stretch;
     }
 
-    .secondary-action,
-    .primary-action {
+    .profile-edit-only {
         width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        white-space: nowrap;
+        min-height: 48px;
     }
 
-    .profile-stats {
-        grid-template-columns: 1fr 1fr;
+    .profile-content {
+        width: calc(100% - 36px);
+        padding-top: 40px;
     }
 
-    .stat-item,
-    .stat-item:first-child {
-        padding: 18px 20px;
+    .section-label {
+        margin-bottom: 13px;
+        font-size: 10px;
     }
 
-    .profile-content-main {
-        padding: 40px 20px;
+    .section-body h2 {
+        font-size: clamp(28px, 8vw, 36px);
+        line-height: 1.08;
     }
 
-    .profile-section {
-        grid-template-columns: 1fr;
-
-        gap: 18px;
-
-        padding-bottom: 40px;
-        margin-bottom: 40px;
+    .profile-bio {
+        max-width: none;
+        font-size: 15px;
+        line-height: 1.75;
     }
 
     .skills-columns {
         grid-template-columns: 1fr;
+        gap: 30px;
+        margin-top: 42px;
     }
 
     .skill-column + .skill-column {
-        padding-top: 30px;
+        padding-top: 28px;
         padding-left: 0;
-
         border-top: 1px solid var(--profile-line);
         border-left: 0;
     }
 
+    .skill-pill {
+        font-size: 12px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 42px !important;
+        padding-top: 34px !important;
+    }
+
+    .profile-reviews-header {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .profile-reviews-header h2 {
+        font-size: 29px !important;
+        line-height: 1.08;
+    }
+
+    .big-rating {
+        min-width: 0;
+        text-align: left !important;
+    }
+
+    .big-rating strong {
+        font-size: 40px !important;
+    }
+
+    .rating-distribution {
+        margin-top: 22px !important;
+    }
+
+    .rating-row {
+        grid-template-columns: 34px minmax(0, 1fr) 28px !important;
+        gap: 9px !important;
+        font-size: 11px !important;
+    }
+
+    .review-card {
+        padding: 18px 0 !important;
+    }
+
+    .review-card-top {
+        min-width: 0;
+    }
+
+    .review-date {
+        display: none !important;
+    }
+
+    .review-comment {
+        font-size: 14px !important;
+        overflow-wrap: anywhere;
+    }
+
     .profile-side-content {
-        display: block;
+        display: none !important;
+    }
+}
 
-        padding: 35px 20px;
+/* Small phones */
+@media (max-width: 480px) {
+
+    .profile-header {
+        padding: 0 15px;
     }
 
-    .reviews-heading {
-        flex-direction: column;
-
-        align-items: flex-start;
+    .profile-identity {
+        width: calc(100% - 30px);
+        grid-template-columns: 70px minmax(0, 1fr);
+        gap: 13px;
     }
 
-    .overall-rating {
-        text-align: left;
+    .profile-photo {
+        width: 70px;
+        height: 70px;
+        border-width: 4px;
     }
 
-    .review-item {
-        grid-template-columns: 1fr;
+    .profile-photo-fallback {
+        font-size: 24px;
+    }
+
+    .profile-main-info h1 {
+        font-size: clamp(28px, 9vw, 36px);
+    }
+
+    .profile-main-info > p {
+        font-size: 13px;
+    }
+
+    .profile-status {
+        font-size: 8px;
+        letter-spacing: .08em;
+    }
+
+    .profile-content {
+        width: calc(100% - 30px);
+        padding-top: 34px;
+    }
+
+    .section-body h2 {
+        font-size: 27px;
+    }
+
+    .profile-bio {
+        font-size: 14px;
+    }
+
+    .skills-columns {
+        margin-top: 36px;
+    }
+
+    .profile-reviews-header h2 {
+        font-size: 27px !important;
+    }
+
+    .big-rating strong {
+        font-size: 36px !important;
+    }
+
+    .rating-row {
+        grid-template-columns: 30px minmax(0, 1fr) 24px !important;
+        gap: 7px !important;
+    }
+
+    .rating-bar {
+        height: 8px !important;
+    }
+
+    .review-card-top {
+        gap: 8px !important;
+    }
+
+    .reviewer-avatar {
+        width: 36px !important;
+        height: 36px !important;
+        flex-basis: 36px !important;
+        font-size: 13px !important;
+    }
+
+    .review-card-top strong {
+        font-size: 13px !important;
+    }
+
+    .review-comment {
+        font-size: 13px !important;
+        line-height: 1.55 !important;
+    }
+}
+
+/* Very narrow phones */
+@media (max-width: 360px) {
+
+    .profile-identity {
+        width: calc(100% - 24px);
+        grid-template-columns: 62px minmax(0, 1fr);
+        gap: 11px;
+    }
+
+    .profile-photo {
+        width: 62px;
+        height: 62px;
+    }
+
+    .profile-content {
+        width: calc(100% - 24px);
+    }
+
+    .profile-main-info h1 {
+        font-size: 28px;
+    }
+
+    .profile-main-info > p {
+        font-size: 12px;
+    }
+
+    .profile-edit-only {
+        min-height: 46px;
+        font-size: 13px;
     }
 }
 
 
-/* =====================================================
-   SMALL MOBILE
-===================================================== */
+/* =========================================================
+   CLEAN FINAL OVERRIDES
+   Matches the final JSX structure and keeps the profile
+   responsive without changing the desktop visual language.
+========================================================= */
 
-@media (max-width: 430px) {
+.profile-reviews-section {
+    min-width: 0;
+}
+
+.reviews-heading {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr) 180px;
+    align-items: start;
+    gap: 30px;
+    margin: 0 0 28px;
+}
+
+.reviews-heading > div:first-child {
+    grid-column: 1;
+}
+
+.overall-rating {
+    grid-column: 3;
+    text-align: right;
+    min-width: 180px;
+}
+
+.rating-breakdown {
+    width: 100%;
+    margin: 0 0 32px;
+    padding: 0 0 28px;
+    border-bottom: 1px solid var(--profile-line);
+}
+
+.reviews-empty {
+    padding: 30px 0;
+    text-align: center;
+    color: var(--profile-muted);
+}
+
+@media (max-width: 900px) {
+    .reviews-heading {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 22px;
+    }
+
+    .reviews-heading > div:first-child {
+        grid-column: 1;
+    }
+
+    .overall-rating {
+        grid-column: 2;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 700px) {
+    .reviews-heading {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .overall-rating {
+        min-width: 0;
+        text-align: left;
+    }
+
+    .rating-breakdown {
+        margin-top: 4px;
+    }
+
+    .profile-content {
+        width: calc(100% - 36px);
+    }
+
+    .profile-identity {
+        width: calc(100% - 36px);
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-content,
+    .profile-identity {
+        width: calc(100% - 30px);
+    }
+
+    .rating-row {
+        grid-template-columns: 30px minmax(0, 1fr) 24px;
+        gap: 7px;
+    }
+}
+
+
+/* =========================================================
+   FINAL POLISH — HEADER ACTIONS / BIO / RESPONSIVENESS
+========================================================= */
+
+/* The top-right navigation was intentionally restored. */
+.profile-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 28px;
+    flex-shrink: 0;
+}
+
+.profile-header-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 9px 2px;
+
+    border: 0;
+    background: transparent;
+
+    color: var(--profile-green);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 850;
+    letter-spacing: -.01em;
+
+    cursor: pointer;
+
+    transition:
+        color .18s ease,
+        transform .18s ease,
+        opacity .18s ease;
+}
+
+.profile-header-link span {
+    display: inline-block;
+    transition: transform .18s ease;
+}
+
+.profile-header-link:hover {
+    color: var(--profile-green-dark);
+    transform: translateY(-1px);
+}
+
+.profile-header-link:hover span {
+    transform: translateX(4px);
+}
+
+.profile-header-link:focus-visible {
+    outline: 2px solid var(--profile-green);
+    outline-offset: 5px;
+    border-radius: 6px;
+}
+
+/* Long bios must NEVER escape the content column. */
+.profile-content,
+.profile-content-main,
+.profile-section,
+.section-body,
+.profile-bio {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.profile-bio {
+    width: 100%;
+    max-width: 820px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+    hyphens: auto;
+}
+
+/* Failed avatar image: keep the same visual circle and show initials. */
+.profile-photo-wrapper {
+    position: relative;
+}
+
+.profile-photo-fallback-letter {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+    background: linear-gradient(145deg, #dff2e7, #c9e7d7);
+    color: var(--profile-green);
+
+    font-size: 34px;
+    font-weight: 900;
+    z-index: 0;
+}
+
+.profile-photo {
+    position: relative;
+    z-index: 1;
+}
+
+.profile-photo-failed {
+    display: none !important;
+}
+
+/* Smoother interaction across the profile without making it cardy. */
+.sidebar-item,
+.sidebar-logo,
+.profile-header-link,
+.cover-edit-button,
+.profile-edit-only,
+.skill-pill,
+.inline-link,
+.side-action {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.skill-pill {
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background-color .18s ease;
+}
+
+.skill-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 18px rgba(22, 94, 68, .10);
+}
+
+.profile-edit-only {
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background-color .18s ease;
+}
+
+.profile-edit-only:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(23, 107, 78, .18);
+}
+
+.profile-edit-only:active,
+.profile-header-link:active,
+.sidebar-item:active {
+    transform: translateY(0);
+}
+
+/* Better medium-screen behavior. */
+@media (max-width: 1050px) {
+    .profile-header {
+        padding: 0 28px;
+    }
+
+    .profile-header-actions {
+        gap: 20px;
+    }
+
+    .profile-content,
+    .profile-identity {
+        width: min(100% - 48px, 1180px);
+    }
+
+    .profile-bio {
+        max-width: 100%;
+    }
+}
+
+/* Tablet: keep header actions but allow them to breathe. */
+@media (max-width: 760px) {
+    .profile-header {
+        min-height: 70px;
+        padding: 0 18px;
+        gap: 14px;
+    }
+
+    .profile-brand strong {
+        font-size: 13px;
+    }
+
+    .profile-brand span {
+        font-size: 10px;
+    }
+
+    .profile-header-actions {
+        gap: 13px;
+    }
+
+    .profile-header-link {
+        font-size: 11px;
+        padding: 8px 0;
+    }
+
+    .profile-header-link span {
+        display: none;
+    }
+
+    .profile-bio {
+        font-size: 15px;
+        line-height: 1.75;
+    }
+}
+
+/* Phone: navigation stays usable instead of disappearing. */
+@media (max-width: 560px) {
+    .profile-header {
+        min-height: 64px;
+    }
 
     .profile-brand span {
         display: none;
     }
 
-    .profile-cover {
-        height: 155px;
+    .profile-header-actions {
+        gap: 8px;
     }
 
-    .profile-main-info h1 {
-        font-size: 31px;
+    .profile-header-link {
+        min-height: 38px;
+        padding: 7px 10px;
+
+        border: 1px solid var(--profile-line);
+        border-radius: 999px;
+
+        background: rgba(255,255,255,.72);
+        font-size: 10px;
     }
 
-    .profile-photo {
-        width: 110px;
-        height: 110px;
+    .profile-header-link:hover {
+        background: var(--profile-green-soft);
     }
 
-    .profile-photo-wrapper {
-        margin-top: -58px;
+    .profile-bio {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+}
+
+/* Very small phones: compact navigation labels. */
+@media (max-width: 390px) {
+    .profile-header {
+        padding: 0 12px;
     }
 
-    .stat-item strong {
-        font-size: 20px;
+    .profile-brand strong {
+        font-size: 11px;
+        letter-spacing: .1em;
     }
 
-    .stat-item span {
+    .profile-header-actions {
+        gap: 5px;
+    }
+
+    .profile-header-link {
+        padding: 6px 8px;
         font-size: 9px;
     }
 }
 
-/* =====================================================
-   PROFILE ACTIONS - SMALL PHONES
-===================================================== */
 
-@media (max-width: 420px) {
-    .profile-actions {
-        grid-template-columns: 1fr;
-    }
+/* =========================================================
+   PREMIUM PROFILE POLISH — FINAL OVERRIDES
+   Keeps existing JSX + functionality intact.
+========================================================= */
+
+.profile-page {
+    --profile-shadow-soft: 0 18px 55px rgba(20, 75, 53, .08);
+    --profile-shadow-hover: 0 22px 65px rgba(20, 75, 53, .14);
+    overflow-x: hidden;
 }
 
-/* =====================================================
-   LIVE BUTTON FEEDBACK
-   Keeps the existing visual design
-===================================================== */
-
-/* Header + profile action buttons feel clickable */
-.profile-header-actions button,
-.secondary-action,
-.primary-action {
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        background-color 0.2s ease,
-        border-color 0.2s ease;
-}
-
-/* Desktop / pointer devices */
-@media (hover: hover) and (pointer: fine) {
-    .profile-header-actions button:hover {
-        transform: translateY(-2px);
-    }
-
-    .secondary-action:hover {
-        transform: translateY(-2px);
-        border-color: var(--profile-green);
-        box-shadow: 0 7px 18px rgba(23, 107, 78, 0.10);
-    }
-
-    .primary-action:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 7px 18px rgba(23, 107, 78, 0.20);
-    }
-
-    .profile-header-actions button:active,
-    .secondary-action:active,
-    .primary-action:active {
-        transform: translateY(0) scale(0.97);
-    }
-}
-
-/* Keyboard accessibility */
-.profile-header-actions button:focus-visible,
-.secondary-action:focus-visible,
-.primary-action:focus-visible {
-    outline: 2px solid var(--profile-green);
-    outline-offset: 3px;
-}
-
-/* Touch devices: subtle press feedback */
-@media (hover: none) {
-    .secondary-action:active,
-    .primary-action:active,
-    .profile-header-actions button:active {
-        transform: scale(0.97);
-    }
-}
-
-/* Better spacing on smaller screens without changing button design */
-@media (max-width: 700px) {
-    .profile-header-actions {
-        gap: 18px;
-    }
-
-    .profile-header-actions button {
-        padding: 8px 2px;
-    }
-
-    .secondary-action,
-    .primary-action {
-        min-height: 44px;
-    }
-}
-
-/* =====================================================
-   FINAL LIVE BUTTON INTERACTION FIX
-===================================================== */
-
-.profile-message,
-.profile-booking,
-.secondary-action,
-.primary-action {
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        background-color 0.2s ease,
-        border-color 0.2s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .profile-message:hover,
-    .profile-booking:hover,
-    .secondary-action:hover,
-    .primary-action:hover {
-        transform: translateY(-2px);
-    }
-
-    .profile-message:hover,
-    .profile-booking:hover {
-        box-shadow: 0 7px 18px rgba(0, 0, 0, 0.10);
-    }
-
-    .secondary-action:hover {
-        box-shadow: 0 7px 18px rgba(23, 107, 78, 0.10);
-    }
-
-    .primary-action:hover {
-        box-shadow: 0 7px 18px rgba(23, 107, 78, 0.20);
-    }
-
-    .profile-message:active,
-    .profile-booking:active,
-    .secondary-action:active,
-    .primary-action:active {
-        transform: translateY(0) scale(0.97);
-    }
-}
-
-@media (hover: none) {
-    .profile-message:active,
-    .profile-booking:active,
-    .secondary-action:active,
-    .primary-action:active {
-        transform: scale(0.97);
-    }
-}
-
-.profile-message:focus-visible,
-.profile-booking:focus-visible,
-.secondary-action:focus-visible,
-.primary-action:focus-visible {
-    outline: 2px solid var(--profile-green);
-    outline-offset: 3px;
-}
-
-@media (max-width: 700px) {
-    .profile-message,
-    .profile-booking {
-        min-height: 42px;
-    }
-}
-
-/* =====================================================
-   COMPLETE PROFILE PAGE — PREMIUM
-===================================================== */
-
-.completion-page {
-    min-height: 100vh;
+/* Make the brand feel integrated with the page instead of a detached bar. */
+.profile-header {
     background:
-        radial-gradient(circle at 12% 8%, rgba(223, 241, 230, 0.75), transparent 32%),
-        linear-gradient(135deg, #f7f8f3 0%, #f2f6f1 100%);
-    color: var(--profile-text);
+        linear-gradient(
+            90deg,
+            rgba(247,250,247,.96),
+            rgba(255,255,255,.88)
+        );
+    border-bottom-color: rgba(223,232,227,.78);
 }
 
-.completion-panel {
-    width: 100%;
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: minmax(360px, 0.72fr) minmax(560px, 1.28fr);
-    background: rgba(255, 255, 255, 0.78);
+.profile-brand strong {
+    position: relative;
+    display: inline-block;
+    letter-spacing: .16em;
 }
 
-/* LEFT SIDE */
-
-.completion-intro {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    box-sizing: border-box;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    padding: clamp(45px, 7vw, 100px);
-
-    background:
-        radial-gradient(circle at 18% 25%, rgba(255, 255, 255, 0.72), transparent 34%),
-        linear-gradient(145deg, #dcefe3 0%, #edf6ef 55%, #f3efd8 100%);
-
-    border-right: 1px solid rgba(220, 229, 223, 0.9);
-    overflow: hidden;
-}
-
-.completion-intro::after {
+.profile-brand strong::after {
     content: "";
     position: absolute;
-    width: 300px;
-    height: 300px;
-    right: -150px;
-    bottom: -120px;
-    border-radius: 50%;
-    background: rgba(23, 107, 78, 0.06);
+    left: 0;
+    bottom: -7px;
+    width: 30px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--profile-green);
+    opacity: .7;
+}
+
+.profile-header-link {
+    position: relative;
+}
+
+/* SE logo interaction */
+.sidebar-logo {
+    transition:
+        transform .25s cubic-bezier(.2,.8,.2,1),
+        box-shadow .25s ease,
+        background .25s ease;
+    transform-origin: center;
+}
+
+.sidebar-logo:hover {
+    transform: translateY(-3px) rotate(-5deg) scale(1.06);
+    box-shadow:
+        0 14px 30px rgba(23,107,78,.24),
+        0 0 0 7px rgba(23,107,78,.06);
+}
+
+.sidebar-logo:active {
+    transform: scale(.94) rotate(0);
+}
+
+/* Hero cover */
+.profile-cover {
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,.5);
+}
+
+.profile-cover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 15% 75%, rgba(255,255,255,.35), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(255,255,255,.5), transparent 26%);
     pointer-events: none;
 }
 
-.completion-kicker {
-    margin-bottom: 20px;
-    color: var(--profile-green);
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: 0.18em;
+.cover-edit-button {
+    box-shadow: var(--profile-shadow-soft);
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
 }
 
-.completion-intro h1 {
-    max-width: 520px;
-    margin: 0;
-    font-size: clamp(46px, 5vw, 74px);
-    line-height: 0.94;
-    letter-spacing: -0.065em;
-    font-weight: 800;
+.cover-edit-button:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--profile-shadow-hover);
 }
 
-.completion-intro > p {
-    max-width: 470px;
-    margin: 26px 0 0;
-    color: #62736b;
-    font-size: 16px;
-    line-height: 1.75;
+/* Profile photo — hover zoom / premium ring */
+.profile-photo-wrapper {
+    position: relative;
+    cursor: zoom-in;
+    perspective: 700px;
 }
 
-.completion-progress {
-    display: flex;
-    gap: 7px;
-    margin-top: 38px;
-}
-
-.completion-progress span {
-    width: 44px;
-    height: 4px;
+.profile-photo-wrapper::after {
+    content: "VIEW";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 4;
+    transform: translate(-50%,-42%) scale(.8);
+    padding: 6px 9px;
     border-radius: 999px;
-    background: rgba(23, 107, 78, 0.13);
+    background: rgba(10,38,29,.76);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
 }
 
-.completion-progress span:first-child {
-    background: var(--profile-green);
+.profile-photo-wrapper:hover::after {
+    opacity: 1;
+    transform: translate(-50%,-50%) scale(1);
 }
 
-/* FORM AREA */
-
-.completion-form {
-    width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: clamp(55px, 6vw, 90px) clamp(35px, 6vw, 90px) 100px;
-    box-sizing: border-box;
+.profile-photo,
+.profile-photo-fallback {
+    transition:
+        transform .32s cubic-bezier(.2,.8,.2,1),
+        box-shadow .32s ease,
+        border-color .25s ease;
+    transform-origin: center;
 }
 
-.form-heading {
-    margin-bottom: 42px;
+.profile-photo-wrapper:hover .profile-photo,
+.profile-photo-wrapper:hover .profile-photo-fallback {
+    transform: scale(1.075);
+    box-shadow:
+        0 24px 50px rgba(20,75,53,.23),
+        0 0 0 7px rgba(23,107,78,.08);
 }
 
-.form-heading h2 {
-    margin: 0;
-    color: var(--profile-text);
-    font-size: clamp(34px, 3.2vw, 48px);
-    line-height: 1;
-    letter-spacing: -0.055em;
-    font-weight: 800;
+/* Main identity */
+.profile-main-info h1 {
+    text-wrap: balance;
 }
 
-.form-heading p {
-    margin: 13px 0 0;
-    color: var(--profile-muted);
-    font-size: 14px;
-    line-height: 1.6;
+.profile-main-info > p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
-.form-heading b,
-.completion-form label b {
-    color: #a25b10;
+/* Edit / Complete button */
+.profile-edit-only {
+    position: relative;
+    overflow: hidden;
 }
 
-/* LABELS */
+.profile-edit-only::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%);
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255,255,255,.25) 50%,
+        transparent 70%
+    );
+    transition: transform .5s ease;
+    pointer-events: none;
+}
 
-.completion-form label {
+.profile-edit-only:hover::after {
+    transform: translateX(120%);
+}
+
+/* Stats become interactive without becoming cards. */
+.stat-item {
+    position: relative;
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+.stat-item:hover {
+    background: rgba(223,245,233,.32);
+}
+
+.stat-item strong {
+    transition: transform .2s ease, color .2s ease;
+}
+
+.stat-item:hover strong {
+    color: var(--profile-green);
+    transform: translateY(-2px);
+}
+
+/* Bio: never allow ugly long strings to escape. */
+.profile-bio {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+    hyphens: auto;
+}
+
+/* Skills */
+.skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-pill {
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.skill-pill:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(23,107,78,.10);
+}
+
+/* Ratings */
+.rating-row {
+    transition:
+        transform .18s ease,
+        opacity .18s ease;
+    cursor: default;
+}
+
+.rating-row:hover {
+    transform: translateX(5px);
+}
+
+.rating-row:hover .rating-bar {
+    box-shadow: 0 0 0 3px rgba(23,107,78,.06);
+}
+
+.rating-bar-fill {
+    transition: width .55s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Reviews — linear, but interactive */
+.review-card {
+    position: relative;
+    transition:
+        background .2s ease,
+        padding-left .2s ease,
+        padding-right .2s ease;
+}
+
+.review-card:hover {
+    background: linear-gradient(
+        90deg,
+        rgba(223,245,233,.26),
+        transparent 80%
+    );
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.review-card-top {
+    transition: transform .2s ease;
+}
+
+.review-card:hover .review-card-top {
+    transform: translateX(2px);
+}
+
+.reviewer-avatar {
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+}
+
+.review-card:hover .reviewer-avatar {
+    transform: scale(1.08);
+    box-shadow: 0 8px 18px rgba(23,107,78,.14);
+}
+
+.review-stars {
+    letter-spacing: .06em;
+    transition: transform .2s ease;
+}
+
+.review-card:hover .review-stars {
+    transform: translateX(2px);
+}
+
+.review-comment {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Side information */
+.side-section {
+    transition: transform .2s ease;
+}
+
+.side-section:hover {
+    transform: translateY(-2px);
+}
+
+.side-action {
+    border-radius: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    transition:
+        color .18s ease,
+        background .18s ease,
+        padding-left .18s ease;
+}
+
+.side-action:hover {
+    background: rgba(223,245,233,.45);
+    padding-left: 12px;
+}
+
+/* Keyboard focus */
+.profile-page button:focus-visible {
+    outline: 2px solid var(--profile-green);
+    outline-offset: 3px;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .profile-photo-wrapper:hover::after {
+        opacity: 0;
+    }
+
+    .profile-photo-wrapper:hover .profile-photo,
+    .profile-photo-wrapper:hover .profile-photo-fallback {
+        transform: scale(1.025);
+    }
+
+    .profile-header {
+        position: relative;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .profile-header {
+        gap: 12px;
+    }
+
+    .profile-brand {
+        min-width: 0;
+    }
+
+    .profile-brand strong {
+        font-size: 12px;
+    }
+
+    .profile-header-actions {
+        flex-shrink: 0;
+    }
+
+    .profile-header-link {
+        white-space: nowrap;
+    }
+
+    .profile-photo-wrapper {
+        cursor: default;
+    }
+
+    .profile-photo-wrapper::after {
+        display: none;
+    }
+
+    .profile-photo-wrapper:hover .profile-photo,
+    .profile-photo-wrapper:hover .profile-photo-fallback {
+        transform: none;
+    }
+
+    .review-card:hover {
+        padding-left: 0;
+        padding-right: 0;
+        background: transparent;
+    }
+
+    .side-section:hover {
+        transform: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header-actions {
+        gap: 5px;
+    }
+
+    .profile-header-link {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .profile-photo {
+        width: 112px;
+        height: 112px;
+    }
+}
+
+
+/* =========================================================
+   FINAL VISUAL REFINEMENT — HEADER / SE LOGO / BIO → SKILLS
+========================================================= */
+
+/* Let the top header visually belong to the same page canvas. */
+.profile-header {
+    min-height: 92px;
+    padding: 18px clamp(24px, 5vw, 72px);
+    background: linear-gradient(
+        180deg,
+        rgba(247,250,247,.96) 0%,
+        rgba(247,250,247,.78) 100%
+    );
+    border-bottom: 1px solid rgba(211,225,218,.72);
+    box-shadow: 0 8px 28px rgba(24,68,51,.025);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Brand typography now matches the editorial profile typography. */
+.profile-brand {
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    margin-bottom: 25px;
+    gap: 3px;
+    min-width: 0;
+}
 
-    color: #263831;
-    font-size: 14px;
-    line-height: 1.4;
+.profile-brand strong {
+    display: inline-block;
+    width: fit-content;
+    margin: 0;
+    color: #12664a;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .17em;
+}
+
+.profile-brand strong::after {
+    content: "";
+    display: block;
+    width: 28px;
+    height: 2px;
+    margin-top: 7px;
+    border-radius: 99px;
+    background: #176b4e;
+    opacity: .72;
+}
+
+.profile-brand span {
+    margin: 1px 0 0;
+    color: #71827a;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: .01em;
+}
+
+/* Header links feel like part of the page, not buttons in a separate bar. */
+.profile-header-actions {
+    align-items: center;
+    gap: 30px;
+}
+
+.profile-header-actions button {
+    position: relative;
+    padding: 8px 0;
+    color: #176b4e;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .01em;
+    cursor: pointer;
+    transition:
+        color .2s ease,
+        transform .2s ease;
+}
+
+.profile-header-actions button::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 18px;
+    bottom: 1px;
+    height: 2px;
+    border-radius: 99px;
+    background: #176b4e;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .22s ease;
+}
+
+.profile-header-actions button:hover {
+    color: #0d5940;
+    transform: translateY(-2px);
+}
+
+.profile-header-actions button:hover::after {
+    transform: scaleX(1);
+}
+
+/* Premium SE logo: less generic, more like a product mark. */
+.sidebar-logo {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    overflow: visible;
+
+    border: 1px solid rgba(255,255,255,.30);
+    border-radius: 20px;
+
+    background:
+        radial-gradient(
+            circle at 30% 20%,
+            rgba(255,255,255,.18),
+            transparent 34%
+        ),
+        linear-gradient(
+            145deg,
+            #238463 0%,
+            #176b4e 55%,
+            #0d5940 100%
+        );
+
+    color: #fff;
+
+    box-shadow:
+        0 12px 26px rgba(23,107,78,.20),
+        inset 0 1px 0 rgba(255,255,255,.18);
+
+    font-size: 0;
+    transform: translateZ(0);
+}
+
+.sidebar-logo::before {
+    content: "↗";
+    position: absolute;
+    top: 7px;
+    right: 9px;
+
+    color: rgba(255,255,255,.86);
+    font-family:
+        "Segoe UI Symbol",
+        "Arial Unicode MS",
+        sans-serif;
+    font-size: 12px;
+    line-height: 1;
     font-weight: 700;
 }
 
-/* HELPER TEXT */
+.sidebar-logo::after {
+    content: "SE";
+    position: absolute;
+    left: 50%;
+    top: 53%;
+    transform: translate(-50%,-50%);
 
-.completion-form label small {
-    margin-top: -2px;
-    color: #7c8c85;
-    font-size: 12px;
-    line-height: 1.5;
-    font-weight: 500;
+    color: #fff;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 20px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -.06em;
 }
 
-/* INPUTS */
-
-.completion-form input,
-.completion-form textarea {
-    width: 100%;
-    box-sizing: border-box;
-
-    padding: 15px 17px;
-
-    border: 1px solid #d9e3dd;
-    border-radius: 12px;
-
-    outline: none;
-
-    background: rgba(250, 252, 250, 0.9);
-    color: var(--profile-text);
-
-    font-family: inherit;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 1.5;
-
+.sidebar-logo:hover {
+    transform: translateY(-4px) scale(1.055) rotate(-2deg);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
-        0 2px 8px rgba(21, 35, 31, 0.025);
+        0 18px 36px rgba(23,107,78,.27),
+        0 0 0 7px rgba(23,107,78,.07),
+        inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+.sidebar-logo:active {
+    transform: scale(.96);
+}
+
+/* Give the actual bio section breathing room before skills. */
+.profile-bio-section {
+    margin-bottom: 30px;
+}
+
+.profile-bio-section .profile-bio {
+    margin-bottom: 0;
+}
+
+/* Strong visual separation between bio and skills. */
+.skills-columns {
+    margin-top: 82px !important;
+    padding-top: 42px !important;
+}
+
+.profile-bio + .inline-link {
+    margin-bottom: 14px;
+}
+
+.profile-bio-section + .skills-columns {
+    margin-top: 84px !important;
+}
+
+/* If the JSX wraps the bio differently, this still creates the gap. */
+.profile-about + .skills-columns,
+.profile-about-section + .skills-columns,
+.about-section + .skills-columns {
+    margin-top: 84px !important;
+}
+
+/* Skills typography gets a slightly more refined editorial feel. */
+.skill-column > p {
+    margin-bottom: 16px;
+    color: #176b4e;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .15em;
+}
+
+.skill-pill {
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-weight: 800;
+}
+
+/* Keep long bio content completely inside the layout. */
+.profile-bio,
+.profile-about,
+.profile-about-section,
+.profile-identity,
+.profile-content {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.profile-bio {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+/* Mobile header */
+@media (max-width: 700px) {
+    .profile-header {
+        min-height: 82px;
+        padding: 15px 18px;
+    }
+
+    .profile-brand strong {
+        font-size: 13px;
+        letter-spacing: .13em;
+    }
+
+    .profile-brand span {
+        font-size: 10px;
+    }
+
+    .profile-header-actions {
+        gap: 13px;
+    }
+
+    .profile-header-actions button {
+        font-size: 11px;
+    }
+
+    .sidebar-logo {
+        width: 58px;
+        height: 58px;
+        flex-basis: 58px;
+        border-radius: 18px;
+    }
+
+    .sidebar-logo::after {
+        font-size: 18px;
+    }
+
+    .skills-columns,
+    .profile-bio-section + .skills-columns {
+        margin-top: 58px !important;
+        padding-top: 30px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        align-items: flex-start;
+    }
+
+    .profile-header-actions {
+        gap: 8px;
+    }
+
+    .profile-header-actions button {
+        padding: 7px 2px;
+        font-size: 10px;
+    }
+
+    .profile-header-actions button::after {
+        right: 0;
+    }
+}
+
+
+/* =========================================================
+   FINAL REQUEST — MY SPACE HEADER / ROLE SUBTITLE /
+   BIO → SKILLS SPACING / PROFILE IMAGE VIEW
+========================================================= */
+
+/* Remove the hard separator under MY SPACE. */
+.profile-header {
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    background: linear-gradient(
+        180deg,
+        rgba(247,250,247,.97),
+        rgba(247,250,247,.86)
+    ) !important;
+}
+
+/* Let the header merge into the workspace naturally. */
+.profile-workspace > .profile-header {
+    position: relative;
+    z-index: 10;
+}
+
+.profile-header::after {
+    display: none !important;
+}
+
+/* Dynamic role subtitle */
+.profile-brand span {
+    color: #74847d !important;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 11px !important;
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+/* Photo is a real interactive target. */
+.profile-photo-wrapper {
+    position: relative;
+    cursor: pointer;
+    isolation: isolate;
+}
+
+.profile-photo-wrapper::after {
+    content: "VIEW PHOTO";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 8;
+
+    padding: 7px 10px;
+    border: 1px solid rgba(255,255,255,.26);
+    border-radius: 999px;
+
+    background: rgba(11,39,30,.78);
+    color: #fff;
+
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .14em;
+
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.88);
+    pointer-events: none;
 
     transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease,
-        transform 0.2s ease;
+        opacity .2s ease,
+        transform .2s ease;
 }
 
-.completion-form input {
-    min-height: 54px;
+.profile-photo-wrapper:hover::after,
+.profile-photo-wrapper:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
 }
 
-.completion-form textarea {
-    min-height: 145px;
-    resize: vertical;
-}
-
-.completion-form input::placeholder,
-.completion-form textarea::placeholder {
-    color: #9aa8a2;
-    font-size: 16px;
-    font-weight: 400;
-}
-
-.completion-form input:hover,
-.completion-form textarea:hover {
-    border-color: #c8d8cf;
-    background: #ffffff;
-}
-
-.completion-form input:focus,
-.completion-form textarea:focus {
-    border-color: var(--profile-green);
-    background: #ffffff;
+.profile-photo-wrapper:hover .profile-photo,
+.profile-photo-wrapper:hover .profile-photo-fallback {
+    transform: scale(1.055);
     box-shadow:
-        0 0 0 4px rgba(23, 107, 78, 0.075),
-        0 10px 25px rgba(23, 107, 78, 0.06);
+        0 22px 48px rgba(23,107,78,.22),
+        0 0 0 7px rgba(23,107,78,.07);
 }
 
-/* TWO-COLUMN FIELDS */
+.profile-photo,
+.profile-photo-fallback {
+    transition:
+        transform .3s cubic-bezier(.2,.8,.2,1),
+        box-shadow .3s ease;
+}
 
-.form-grid {
+/* Bio has a clearly separated skills section. */
+.profile-section:first-child {
+    padding-bottom: 58px !important;
+    margin-bottom: 58px !important;
+}
+
+.profile-section:first-child .section-body {
+    min-width: 0;
+}
+
+.profile-section:first-child .profile-bio {
+    margin-bottom: 0;
+    max-width: 920px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Extra breathing room immediately before SKILLS. */
+.profile-section:nth-child(2) {
+    padding-top: 8px;
+}
+
+.profile-section:nth-child(2) .section-label {
+    margin-bottom: 18px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .profile-header {
+        border-bottom: 0 !important;
+        min-height: 78px;
+    }
+
+    .profile-section:first-child {
+        padding-bottom: 42px !important;
+        margin-bottom: 42px !important;
+    }
+
+    .profile-photo-wrapper::after {
+        display: none;
+    }
+
+    .profile-photo-wrapper:hover .profile-photo,
+    .profile-photo-wrapper:hover .profile-photo-fallback {
+        transform: none;
+    }
+}
+
+@media (max-width: 430px) {
+    .profile-section:first-child {
+        padding-bottom: 36px !important;
+        margin-bottom: 36px !important;
+    }
+}
+
+
+/* =========================================================
+   FINAL FIX — MY SPACE
+   1. remove ALL header/hero separator lines
+   2. correct bio -> skills spacing
+   3. reliable photo-view overlay/modal styling
+========================================================= */
+
+/* The visible green separator was coming from a later border rule.
+   Kill every border/shadow on the top header itself. */
+.profile-workspace > .profile-header,
+.profile-header {
+    border: 0 !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Do not let the cover create a fake line directly under the header. */
+.profile-workspace > .profile-cover {
+    border-top: 0 !important;
+}
+
+/* Keep only a tasteful, compact separation between ABOUT and SKILLS. */
+.profile-content .profile-section:first-child {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.profile-content .profile-section:nth-child(2) {
+    margin-top: 46px !important;
+    padding-top: 0 !important;
+}
+
+/* Override the previous oversized 82px/84px rules. */
+.profile-content .skills-columns,
+.profile-content .profile-about + .skills-columns,
+.profile-content .profile-about-section + .skills-columns,
+.profile-content .about-section + .skills-columns,
+.profile-bio-section + .skills-columns {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Bio remains readable and contained. */
+.profile-content .profile-bio {
+    max-width: 920px !important;
+    margin-bottom: 0 !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Photo target */
+.profile-photo-wrapper {
+    cursor: pointer !important;
+    position: relative !important;
+    isolation: isolate;
+}
+
+.profile-photo-wrapper::after {
+    content: "VIEW PHOTO";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 20;
+
+    transform: translate(-50%, -50%) scale(.92);
+    opacity: 0;
+
+    padding: 7px 11px;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 999px;
+
+    background: rgba(9,38,29,.84);
+    color: #fff;
+
+    font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    white-space: nowrap;
+
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.profile-photo-wrapper:hover::after,
+.profile-photo-wrapper:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.profile-photo-wrapper:hover .profile-photo {
+    transform: scale(1.045);
+}
+
+.profile-photo {
+    transition: transform .22s ease, box-shadow .22s ease;
+}
+
+/* Photo lightbox */
+.profile-photo-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px;
+    place-items: center;
+
+    padding: 28px;
+
+    background: rgba(8, 24, 18, .78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-/* ERROR */
+.profile-photo-lightbox-image {
+    display: block;
 
-.form-error {
-    margin: 4px 0 22px;
-    padding: 13px 15px;
+    width: min(86vw, 760px);
+    height: min(82vh, 760px);
 
-    border: 1px solid #f0d5ca;
-    border-left: 3px solid var(--profile-danger);
-    border-radius: 10px;
+    object-fit: contain;
 
-    background: #fff8f5;
-    color: var(--profile-danger);
+    border: 7px solid rgba(255,255,255,.92);
+    border-radius: 22px;
 
-    font-size: 13px;
-    line-height: 1.55;
+    background: #fff;
+    box-shadow: 0 30px 90px rgba(0,0,0,.38);
 }
 
-/* ACTIONS */
+.profile-photo-lightbox-close {
+    position: fixed;
+    top: 22px;
+    right: 24px;
 
-.completion-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
+    width: 44px;
+    height: 44px;
 
-    margin-top: 38px;
-    padding-top: 24px;
+    display: grid;
+    place-items: center;
 
-    border-top: 1px solid var(--profile-line);
-}
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 50%;
 
-.skip-button,
-.save-button {
-    min-height: 48px;
-    padding: 0 21px;
+    background: rgba(255,255,255,.12);
+    color: #fff;
 
-    border-radius: 10px;
-
-    font: inherit;
-    font-size: 13px;
-    font-weight: 800;
+    font-size: 24px;
+    line-height: 1;
 
     cursor: pointer;
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease,
-        border-color 0.2s ease;
+    transition: transform .18s ease, background .18s ease;
 }
 
-.skip-button {
-    border: 1px solid #d6e1da;
-    background: rgba(255, 255, 255, 0.85);
-    color: var(--profile-green);
+.profile-photo-lightbox-close:hover {
+    transform: scale(1.06);
+    background: rgba(255,255,255,.2);
 }
 
-.save-button {
-    border: 0;
-    background: var(--profile-green);
-    color: white;
-    box-shadow: 0 7px 18px rgba(23, 107, 78, 0.16);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .skip-button:hover,
-    .save-button:hover {
-        transform: translateY(-2px);
+@media (max-width: 700px) {
+    .profile-content .profile-section:nth-child(2) {
+        margin-top: 38px !important;
     }
 
-    .skip-button:hover {
-        border-color: var(--profile-green);
-        box-shadow: 0 8px 22px rgba(23, 107, 78, 0.08);
+    .profile-photo-wrapper::after {
+        display: none;
     }
 
-    .save-button:hover {
-        background: var(--profile-green-dark);
-        box-shadow: 0 11px 26px rgba(23, 107, 78, 0.22);
-    }
-}
-
-.skip-button:active,
-.save-button:active {
-    transform: scale(0.97);
-}
-
-.skip-button:disabled,
-.save-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* TABLET */
-
-@media (max-width: 1000px) {
-    .completion-panel {
-        grid-template-columns: 1fr;
+    .profile-photo-wrapper:hover .profile-photo {
+        transform: none;
     }
 
-    .completion-intro {
-        position: relative;
-        height: auto;
-        min-height: 390px;
-        padding: 65px 40px;
-        border-right: 0;
-        border-bottom: 1px solid var(--profile-line);
+    .profile-photo-lightbox {
+        padding: 16px;
     }
 
-    .completion-form {
-        max-width: 900px;
-        padding: 55px 40px 80px;
+    .profile-photo-lightbox-image {
+        width: 94vw;
+        height: 78vh;
+        border-width: 5px;
+        border-radius: 16px;
+    }
+
+    .profile-photo-lightbox-close {
+        top: 14px;
+        right: 14px;
     }
 }
 
-/* MOBILE */
 
-@media (max-width: 650px) {
-    .completion-intro {
-        min-height: 340px;
-        padding: 50px 24px;
+/* =========================================================
+   FINAL SKILLS SECTION FIX
+   - keep the Learning & sharing heading fully visible
+   - compact the skills block
+   - remove the unwanted separator directly after skills
+   - preserve clean spacing before Community Feedback
+========================================================= */
+
+.profile-content .profile-section:nth-child(2) {
+    display: block !important;
+    position: relative;
+    height: auto !important;
+    min-height: 0 !important;
+    margin-top: 42px !important;
+    margin-bottom: 0 !important;
+    padding: 0 0 8px !important;
+    overflow: visible !important;
+}
+
+.profile-content .profile-section:nth-child(2) .section-label {
+    display: block !important;
+    margin: 0 0 16px !important;
+    line-height: 1.2 !important;
+}
+
+.profile-content .profile-section:nth-child(2) .section-body {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+}
+
+.profile-content .profile-section:nth-child(2) .section-body h2 {
+    display: block !important;
+    margin: 0 0 24px !important;
+    padding: 0 !important;
+    line-height: 1.08 !important;
+    overflow: visible !important;
+}
+
+/* The two skill groups sit directly under the heading. */
+.profile-content .profile-section:nth-child(2) .skills-columns {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 48px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+}
+
+.profile-content .profile-section:nth-child(2) .skill-column {
+    min-width: 0 !important;
+}
+
+.profile-content .profile-section:nth-child(2) .skill-column > p {
+    margin: 0 0 12px !important;
+    line-height: 1.3 !important;
+}
+
+.profile-content .profile-section:nth-child(2) .skill-list {
+    min-height: 32px;
+}
+
+/* Keep Community Feedback visually separated, but not with a line
+   immediately underneath the skill pills. */
+.profile-content .profile-reviews-section {
+    margin-top: 72px !important;
+    padding-top: 48px !important;
+    border-top: 1px solid var(--profile-line) !important;
+}
+
+/* Desktop: never clip the heading because of a fixed/overflow parent. */
+.profile-content,
+.profile-content-main,
+.profile-section,
+.section-body {
+    overflow: visible !important;
+}
+
+@media (max-width: 800px) {
+    .profile-content .profile-section:nth-child(2) {
+        margin-top: 36px !important;
     }
 
-    .completion-intro h1 {
-        font-size: 45px;
+    .profile-content .profile-section:nth-child(2) .skills-columns {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
     }
 
-    .completion-intro > p {
-        font-size: 14px;
-    }
-
-    .completion-form {
-        padding: 42px 22px 70px;
-    }
-
-    .form-heading {
-        margin-bottom: 32px;
-    }
-
-    .form-heading h2 {
-        font-size: 34px;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-
-    .completion-form label {
-        font-size: 14px;
-    }
-
-    .completion-form input,
-    .completion-form textarea {
-        font-size: 16px;
-    }
-
-    .completion-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .skip-button,
-    .save-button {
-        width: 100%;
+    .profile-content .profile-reviews-section {
+        margin-top: 54px !important;
     }
 }
 
-/* SMALL PHONES */
-
-@media (max-width: 420px) {
-    .completion-intro h1 {
-        font-size: 39px;
+@media (max-width: 480px) {
+    .profile-content .profile-section:nth-child(2) {
+        margin-top: 30px !important;
     }
 
-    .completion-form {
-        padding-left: 18px;
-        padding-right: 18px;
+    .profile-content .profile-section:nth-child(2) .section-body h2 {
+        margin-bottom: 20px !important;
     }
 
-    .completion-actions {
-        grid-template-columns: 1fr;
+    .profile-content .profile-reviews-section {
+        margin-top: 44px !important;
+        padding-top: 36px !important;
     }
 }
