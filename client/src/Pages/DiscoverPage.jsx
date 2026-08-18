@@ -12,9 +12,10 @@ function DiscoverPage({
     const [people, setPeople] = useState([]);
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(true);
+    const [ratings, setRatings] = useState({});
 
     useEffect(() => {
-        async function load() {
+        async function loadUsers() {
             try {
                 const response = await fetch(
                     `${import.meta.env.VITE_API_URL}/getData`,
@@ -27,57 +28,128 @@ function DiscoverPage({
 
                 const data = await response.json();
 
-                if (response.ok) {
-                    setPeople(
-                        Array.isArray(data.data)
-                            ? data.data
-                            : []
+                if (!response.ok) {
+                    setPeople([]);
+                    return;
+                }
+
+                let currentUserId = null;
+
+                try {
+                    const payload = JSON.parse(
+                        atob(token.split(".")[1])
+                    );
+
+                    currentUserId =
+                        payload.id ||
+                        payload._id ||
+                        payload.userId;
+                } catch (error) {
+                    console.error(
+                        "Unable to decode user token",
+                        error
                     );
                 }
+
+                const users = Array.isArray(data.data)
+                    ? data.data
+                    : [];
+
+                const otherUsers = users.filter(
+                    (person) =>
+                        String(person._id) !==
+                        String(currentUserId)
+                );
+
+                setPeople(otherUsers);
+
+                const ratingResults = await Promise.all(
+                    otherUsers.map(async (person) => {
+                        try {
+                            const ratingResponse = await fetch(
+                                `${import.meta.env.VITE_API_URL}/reviews/user/${person._id}`,
+                                {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`
+                                    }
+                                }
+                            );
+
+                            if (!ratingResponse.ok) {
+                                return {
+                                    id: person._id,
+                                    stats: {
+                                        average: 0,
+                                        total: 0
+                                    }
+                                };
+                            }
+
+                            const ratingData =
+                                await ratingResponse.json();
+
+                            return {
+                                id: person._id,
+                                stats: ratingData.stats || {
+                                    average: 0,
+                                    total: 0
+                                }
+                            };
+                        } catch {
+                            return {
+                                id: person._id,
+                                stats: {
+                                    average: 0,
+                                    total: 0
+                                }
+                            };
+                        }
+                    })
+                );
+
+                const ratingMap = {};
+
+                ratingResults.forEach((item) => {
+                    ratingMap[item.id] = item.stats;
+                });
+
+                setRatings(ratingMap);
             } catch (error) {
                 console.error(
-                    "Unable to load mentors",
+                    "Unable to load users",
                     error
                 );
+                setPeople([]);
             } finally {
                 setLoading(false);
             }
         }
 
-        load();
+        loadUsers();
     }, [token]);
 
-    const matches = useMemo(
-        () =>
-            people.filter((person) =>
-                `${person.name} ${
-                    person.role || ""
-                } ${(person.skillsToTeach || []).join(" ")}`
-                    .toLowerCase()
-                    .includes(query.toLowerCase())
-            ),
-        [people, query]
-    );
+    const matches = useMemo(() => {
+        const search = query.toLowerCase().trim();
+
+        return people.filter((person) =>
+            `${person.name || ""} ${person.role || ""} ${(person.skillsToTeach || []).join(" ")}`
+                .toLowerCase()
+                .includes(search)
+        );
+    }, [people, query]);
 
     return (
         <main className="discover-page">
-
-            {/* =========================
-                NAVBAR
-            ========================= */}
-
             <nav className="app-nav">
-
                 <button
                     className="app-logo"
                     onClick={onHome}
                 >
-                    <span>↗</span>
+                    <span className="logo-mark">↗</span>
                     SkillSphere
                 </button>
 
                 <div className="nav-links">
-
                     <button className="active">
                         Discover
                     </button>
@@ -89,7 +161,6 @@ function DiscoverPage({
                     <button onClick={onProfile}>
                         Profile
                     </button>
-
                 </div>
 
                 <button
@@ -99,44 +170,35 @@ function DiscoverPage({
                     My space
                     <span>→</span>
                 </button>
-
             </nav>
 
-
-            {/* =========================
-                HEADER
-            ========================= */}
-
             <header className="discover-header">
-
                 <button
                     className="page-back"
                     onClick={onHome}
                 >
                     <span>←</span>
-                    Home
+                    Back home
                 </button>
 
-                <p className="home-kicker">
+                <div className="discover-kicker">
+                    <span></span>
                     COMMUNITY DIRECTORY
-                </p>
+                </div>
 
                 <h1>
-                    Find the right person to learn with.
+                    Find your next
+                    <br />
+                    <em>learning partner.</em>
                 </h1>
 
-                <p>
-                    Search by a name, role, or skill.
-                    Start a conversation when you find
-                    a good match.
+                <p className="discover-description">
+                    Meet people who can teach what you want
+                    to learn — and learn what you already know.
                 </p>
 
-
-                {/* SEARCH */}
-
-                <label className="discover-search">
-
-                    <span>⌕</span>
+                <div className="discover-search">
+                    <span className="search-icon">⌕</span>
 
                     <input
                         type="text"
@@ -144,140 +206,147 @@ function DiscoverPage({
                         onChange={(event) =>
                             setQuery(event.target.value)
                         }
-                        placeholder="Try ‘React’, ‘design’, or a name"
+                        placeholder="Search people, skills, or roles..."
                     />
 
-                </label>
+                    {query && (
+                        <button
+                            className="clear-search"
+                            onClick={() => setQuery("")}
+                        >
+                            ×
+                        </button>
+                    )}
 
+                    <span className="search-shortcut">
+                        /
+                    </span>
+                </div>
             </header>
 
-
-            {/* =========================
-                RESULTS
-            ========================= */}
-
             <section className="discover-results">
+                <div className="results-heading">
+                    <div>
+                        <p className="results-kicker">
+                            PEOPLE
+                        </p>
 
-                <div className="results-label">
+                        <h2>
+                            {loading
+                                ? "Finding people..."
+                                : `${matches.length} people to discover`}
+                        </h2>
+                    </div>
 
-                    <span>
-                        {loading
-                            ? "Finding people..."
-                            : `${matches.length} people to discover`}
-                    </span>
-
-                    <p>
-                        Skill exchange is built on
-                        mutual curiosity.
+                    <p className="results-note">
+                        Learn together.
+                        <br />
+                        Grow together.
                     </p>
-
                 </div>
 
-
-                {/* =========================
-                    USER CARDS
-                ========================= */}
-
-                <div className="mentor-grid">
-
-                    {matches.map((person) => {
-
+                <div className="people-list">
+                    {matches.map((person, index) => {
                         const teachingSkills =
                             person.skillsToTeach
                                 ?.filter(Boolean)
                                 .slice(0, 3) || [];
 
+                        const stats =
+                            ratings[person._id] || {
+                                average: 0,
+                                total: 0
+                            };
+
                         return (
                             <article
-                                className="mentor-card"
+                                className="person-row"
                                 key={person._id}
                             >
+                                <div className="person-number">
+                                    {String(index + 1).padStart(2, "0")}
+                                </div>
 
-                                {/* USER HEADER */}
+                                <div className="person-avatar">
+                                    {person.avatarUrl ? (
+                                        <img
+                                            src={person.avatarUrl}
+                                            alt=""
+                                        />
+                                    ) : (
+                                        person.name
+                                            ?.slice(0, 1)
+                                            .toUpperCase()
+                                    )}
+                                </div>
 
-                                <div className="mentor-card-head">
+                                <div className="person-main">
+                                    <div className="person-name-line">
+                                        <h3>
+                                            {person.name}
+                                        </h3>
 
-                                    <div className="mentor-initial">
-
-                                        {person.avatarUrl ? (
-
-                                            <img
-                                                src={
-                                                    person.avatarUrl
-                                                }
-                                                alt={`${person.name}'s profile`}
-                                            />
-
-                                        ) : (
-
-                                            person.name
-                                                ?.slice(0, 1)
-                                                .toUpperCase()
-
-                                        )}
-
+                                        <span className="person-role">
+                                            {person.role ||
+                                                "Learner"}
+                                        </span>
                                     </div>
 
-                                    <span>
-                                        {person.role ||
-                                            "Learner"}
-                                    </span>
+                                    <p className="person-bio">
+                                        {person.bio ||
+                                            "Open to meaningful skill exchanges."}
+                                    </p>
 
-                                </div>
-
-
-                                {/* NAME */}
-
-                                <h2>
-                                    {person.name}
-                                </h2>
-
-
-                                {/* BIO */}
-
-                                <p className="mentor-bio">
-
-                                    {person.bio ||
-                                        "Building a learning profile and open to meaningful skill exchanges."}
-
-                                </p>
-
-
-                                {/* SKILLS */}
-
-                                <div className="mentor-tags">
-
-                                    {teachingSkills.length > 0 ? (
-
-                                        teachingSkills.map(
-                                            (skill) => (
-                                                <span
-                                                    key={skill}
-                                                >
-                                                    {skill}
-                                                </span>
-                                            )
-                                        )
-
-                                    ) : (
-
-                                        <span>
-                                            Open to connect
+                                    <div className="person-meta">
+                                        <span className="person-rating">
+                                            ★{" "}
+                                            {stats.total > 0
+                                                ? stats.average.toFixed(1)
+                                                : "—"}
                                         </span>
 
-                                    )}
+                                        <span className="meta-divider">
+                                            ·
+                                        </span>
 
+                                        <span>
+                                            {stats.total > 0
+                                                ? `${stats.total} ${
+                                                      stats.total === 1
+                                                          ? "review"
+                                                          : "reviews"
+                                                  }`
+                                                : "No reviews yet"}
+                                        </span>
+
+                                        {teachingSkills.length >
+                                            0 && (
+                                            <>
+                                                <span className="meta-divider">
+                                                    ·
+                                                </span>
+
+                                                <div className="person-skills">
+                                                    {teachingSkills.map(
+                                                        (skill) => (
+                                                            <span
+                                                                key={
+                                                                    skill
+                                                                }
+                                                            >
+                                                                {skill}
+                                                            </span>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
 
-
-                                {/* ACTIONS */}
-
-                                <div className="mentor-card-actions">
-
-                                    {/* VIEW PROFILE */}
-
+                                <div className="person-actions">
                                     <button
-                                        className="mentor-view-profile"
+                                        className="person-profile"
                                         onClick={() =>
                                             onViewProfile(
                                                 person._id
@@ -288,41 +357,34 @@ function DiscoverPage({
                                         <span>↗</span>
                                     </button>
 
-
-                                    {/* MESSAGE */}
-
                                     <button
-                                        className="mentor-message"
+                                        className="person-message"
                                         onClick={onMessages}
+                                        aria-label={`Message ${person.name}`}
                                     >
-                                        Message
-                                        <span>→</span>
+                                        →
                                     </button>
-
                                 </div>
-
                             </article>
                         );
                     })}
-
                 </div>
 
+                {!loading && !matches.length && (
+                    <div className="directory-empty">
+                        <span>⌕</span>
 
-                {/* =========================
-                    EMPTY STATE
-                ========================= */}
+                        <h3>
+                            No one found
+                        </h3>
 
-                {!loading &&
-                    !matches.length && (
-
-                        <p className="directory-empty">
-                            No members match that search yet.
+                        <p>
+                            Try searching for another
+                            name, role, or skill.
                         </p>
-
-                    )}
-
+                    </div>
+                )}
             </section>
-
         </main>
     );
 }

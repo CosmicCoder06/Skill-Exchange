@@ -9,9 +9,10 @@ import CompleteProfile from "./Pages/Profile Page/CompleteProfile";
 import OtherProfilePage from "./Pages/Profile Page/OtherProfilePage";
 import HomePage from "./Pages/HomePage";
 import DiscoverPage from "./Pages/DiscoverPage";
+import BookingPage from "./Pages/BookingPage";
+import MyBookings from "./Pages/MyBookings";
 
 import { SocketProvider } from "./context/SocketContext";
-
 
 const hasCompletedDetails = (profile) => {
     const hasText = (value) =>
@@ -27,41 +28,41 @@ const hasCompletedDetails = (profile) => {
     );
 };
 
+function getCurrentUserId(token) {
+    try {
+        if (!token) return null;
+
+        const payload = token
+            .split(".")[1]
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+
+        return JSON.parse(atob(payload)).id;
+    } catch (error) {
+        console.error("Unable to get user ID from token:", error);
+        return null;
+    }
+}
 
 function App() {
-
-    const [token, setToken] = useState(
-        localStorage.getItem("Token")
-    );
-
+    const [token, setToken] = useState(localStorage.getItem("Token"));
     const [showRegister, setShowRegister] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
-
     const [page, setPage] = useState("home");
-
     const [profileStatus, setProfileStatus] = useState(null);
-
-    // ID of the user whose profile we want to view
     const [viewingUserId, setViewingUserId] = useState(null);
-
-
-    // =========================
-    // CHECK PROFILE
-    // =========================
+    const [bookingMentorId, setBookingMentorId] = useState(null);
+    const [bookingMentorName, setBookingMentorName] = useState("");
+    const [chatTargetUserId, setChatTargetUserId] = useState(null);
 
     useEffect(() => {
-
         async function checkProfile() {
-
             if (!token) {
                 setProfileStatus(null);
                 return;
             }
 
-            setProfileStatus(null);
-
             try {
-
                 const response = await fetch(
                     `${import.meta.env.VITE_API_URL}/profile/me`,
                     {
@@ -71,87 +72,111 @@ function App() {
                     }
                 );
 
+                if (response.status === 401) {
+                    localStorage.removeItem("Token");
+                    localStorage.removeItem("ProfileSkipped");
+                    setToken(null);
+                    setProfileStatus(null);
+                    return;
+                }
+
                 if (!response.ok) {
-                    throw new Error(
-                        "Unable to check profile status"
-                    );
+                    throw new Error("Unable to check profile status");
                 }
 
                 const data = await response.json();
 
-                setProfileStatus(
+                console.log("PROFILE CHECK:", data);
+
+                const complete =
                     data.profileComplete === true ||
-                    hasCompletedDetails(data.profile)
-                );
+                    hasCompletedDetails(data.profile);
 
+                const skipped =
+                    localStorage.getItem("ProfileSkipped") === "true";
+
+                if (complete) {
+                    localStorage.removeItem("ProfileSkipped");
+                    setProfileStatus(true);
+                } else if (skipped) {
+                    setProfileStatus("skipped");
+                } else {
+                    setProfileStatus(false);
+                }
             } catch (error) {
-
-                console.error(
-                    "Profile check failed",
-                    error
-                );
-
+                console.error("Profile check failed:", error);
                 setProfileStatus(true);
             }
         }
 
         checkProfile();
-
     }, [token]);
 
-
-    // =========================
-    // LOGIN
-    // =========================
-
     function handleLogin(newToken) {
-
-        localStorage.setItem(
-            "Token",
-            newToken
-        );
-
-        setPage("home");
+        localStorage.setItem("Token", newToken);
+        localStorage.removeItem("ProfileSkipped");
         setToken(newToken);
+        setPage("home");
+        setChatTargetUserId(null);
     }
-
-
-    // =========================
-    // LOGOUT
-    // =========================
 
     function handleLogout() {
-
         localStorage.removeItem("Token");
-
+        localStorage.removeItem("ProfileSkipped");
         setToken(null);
-
         setPage("home");
-
         setViewingUserId(null);
+        setBookingMentorId(null);
+        setBookingMentorName("");
+        setChatTargetUserId(null);
     }
 
+    function openNormalChat() {
+        setChatTargetUserId(null);
+        setPage("chat");
+    }
 
-    // =========================
-    // PUBLIC PAGES
-    // =========================
+    function openSessionChat(booking) {
+        if (!booking) return;
+
+        const currentUserId = getCurrentUserId(token);
+        const mentorId = booking.mentor?._id || booking.mentor;
+        const learnerId = booking.learner?._id || booking.learner;
+
+        let otherUserId = null;
+
+        if (String(currentUserId) === String(mentorId)) {
+            otherUserId = learnerId;
+        } else if (String(currentUserId) === String(learnerId)) {
+            otherUserId = mentorId;
+        }
+
+        if (!otherUserId) {
+            console.error(
+                "Unable to determine session participant",
+                booking
+            );
+            return;
+        }
+
+        console.log("Opening session chat with:", otherUserId);
+
+        setChatTargetUserId(otherUserId);
+        setPage("chat");
+    }
 
     if (!token) {
-
         if (showRegister) {
-
             return (
                 <RegistrationPage
                     onBackHome={() => {
                         setShowRegister(false);
                         setShowLogin(false);
                     }}
-
                     onBackToLogin={() => {
                         setShowRegister(false);
                         setShowLogin(true);
                     }}
-
                     onRegistered={() => {
                         setShowRegister(false);
                         setShowLogin(true);
@@ -160,13 +185,10 @@ function App() {
             );
         }
 
-
         if (showLogin) {
-
             return (
                 <LoginPage
                     onLogin={handleLogin}
-
                     onCreateAccount={() => {
                         setShowLogin(false);
                         setShowRegister(true);
@@ -175,181 +197,113 @@ function App() {
             );
         }
 
-
         return (
             <HomePage
                 publicMode
-
-                onLogin={() =>
-                    setShowLogin(true)
-                }
-
-                onRegister={() =>
-                    setShowRegister(true)
-                }
+                onLogin={() => setShowLogin(true)}
+                onRegister={() => setShowRegister(true)}
             />
         );
     }
 
-
-    // =========================
-    // AUTHENTICATED APP
-    // =========================
+    if (profileStatus === null) {
+        return (
+            <div
+                style={{
+                    minHeight: "100vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}
+            >
+                Loading...
+            </div>
+        );
+    }
 
     return (
-        <SocketProvider
-            key={token}
-            token={token}
-        >
-
-            {/* =========================
-                COMPLETE PROFILE
-            ========================= */}
-
+        <SocketProvider key={token} token={token}>
             {profileStatus === false ? (
-
                 <CompleteProfile
-
                     token={token}
-
                     onComplete={() => {
+                        localStorage.removeItem("ProfileSkipped");
                         setProfileStatus(true);
                         setPage("profile");
                     }}
-
                     onLater={() => {
+                        localStorage.setItem("ProfileSkipped", "true");
                         setProfileStatus("skipped");
                         setPage("profile");
                     }}
                 />
-
             ) : page === "home" ? (
-
-                /* =========================
-                   HOME
-                ========================= */
-
                 <HomePage
-
-                    onDiscover={() =>
-                        setPage("discover")
-                    }
-
-                    onProfile={() =>
-                        setPage("profile")
-                    }
-
-                    onMessages={() =>
-                        setPage("chat")
-                    }
+                    onDiscover={() => setPage("discover")}
+                    onProfile={() => setPage("profile")}
+                    onMessages={openNormalChat}
                 />
-
             ) : page === "discover" ? (
-
-                /* =========================
-                   DISCOVER
-                ========================= */
-
                 <DiscoverPage
-
                     token={token}
-
-                    onHome={() =>
-                        setPage("home")
-                    }
-
-                    onProfile={() =>
-                        setPage("profile")
-                    }
-
-                    onMessages={() =>
-                        setPage("chat")
-                    }
-
-                    // Open another user's profile
-                    onViewProfile={(userId) => {
-
-                        setViewingUserId(userId);
-
+                    onHome={() => setPage("home")}
+                    onProfile={() => setPage("profile")}
+                    onMessages={openNormalChat}
+                    onViewProfile={(id) => {
+                        setViewingUserId(id);
                         setPage("user-profile");
-
                     }}
                 />
-
             ) : page === "profile" ? (
-
-                /* =========================
-                   MY PROFILE
-                ========================= */
-
                 <ProfilePage
-
                     token={token}
-
                     profileStatus={profileStatus}
-
-                    onHome={() =>
-                        setPage("home")
-                    }
-
+                    onHome={() => setPage("home")}
                     onLogout={handleLogout}
-
-                    onMessagesClick={() =>
-                        setPage("chat")
-                    }
-
-                    onCompleteProfile={() =>
-                        setProfileStatus(false)
-                    }
+                    onMessagesClick={openNormalChat}
+                    onBookings={() => setPage("bookings")}
+                    onCompleteProfile={() => {
+                        localStorage.removeItem("ProfileSkipped");
+                        setProfileStatus(false);
+                    }}
                 />
-
             ) : page === "user-profile" ? (
-
-                /* =========================
-                   OTHER USER PROFILE
-                ========================= */
-
                 <OtherProfilePage
-
                     token={token}
-
                     userId={viewingUserId}
-
-                    onBack={() =>
-                        setPage("discover")
-                    }
-
-                    onMessages={() =>
-                        setPage("chat")
-                    }
+                    onBack={() => setPage("discover")}
+                    onMessages={openNormalChat}
+                    onBookSession={(id, name) => {
+                        setBookingMentorId(id);
+                        setBookingMentorName(name);
+                        setPage("booking");
+                    }}
                 />
-
-            ) : (
-
-                /* =========================
-                   CHAT
-                ========================= */
-
-                <ChatPage
-
+            ) : page === "booking" ? (
+                <BookingPage
+    token={token}
+    mentorId={bookingMentorId}
+    mentorName={bookingMentorName}
+    onBack={() => setPage("user-profile")}
+    onBookingCreated={() => setPage("bookings")}
+/>
+            ) : page === "bookings" ? (
+                <MyBookings
                     token={token}
-
-                    onLogout={handleLogout}
-
-                    onHome={() =>
-                        setPage("home")
-                    }
-
-                    onProfile={() =>
-                        setPage("profile")
-                    }
+                    onBack={() => setPage("profile")}
+                    onJoinSession={openSessionChat}
                 />
-
+            ) : (
+                <ChatPage
+                    token={token}
+                    onLogout={handleLogout}
+                    onHome={() => setPage("home")}
+                    onProfile={() => setPage("profile")}
+                    initialUserId={chatTargetUserId}
+                />
             )}
-
         </SocketProvider>
     );
 }
-
 
 export default App;

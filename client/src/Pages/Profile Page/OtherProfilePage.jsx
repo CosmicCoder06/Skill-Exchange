@@ -5,10 +5,13 @@ function OtherProfilePage({
     token,
     userId,
     onBack,
-    onMessages
+    onMessages,
+    onBookSession
 }) {
     const [profile, setProfile] = useState(null);
+    const [ratingData, setRatingData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [ratingLoading, setRatingLoading] = useState(true);
 
     useEffect(() => {
         async function fetchProfile() {
@@ -28,24 +31,45 @@ function OtherProfilePage({
                     setProfile(data.profile);
                 }
             } catch (error) {
-                console.error(
-                    "Unable to fetch user profile",
-                    error
-                );
+                console.error("Profile fetch error:", error);
             } finally {
                 setLoading(false);
             }
         }
 
+        async function fetchRatings() {
+            try {
+                const response = await fetch(
+                    `${import.meta.env.VITE_API_URL}/reviews/user/${userId}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    setRatingData(data);
+                }
+            } catch (error) {
+                console.error("Ratings fetch error:", error);
+            } finally {
+                setRatingLoading(false);
+            }
+        }
+
         if (userId) {
             fetchProfile();
+            fetchRatings();
         }
     }, [token, userId]);
 
     if (loading) {
         return (
             <main className="other-profile-loading">
-                Loading profile…
+                Loading profile...
             </main>
         );
     }
@@ -53,10 +77,10 @@ function OtherProfilePage({
     if (!profile) {
         return (
             <main className="other-profile-loading">
-                <p>Profile not found.</p>
+                <p>Profile not found</p>
 
                 <button onClick={onBack}>
-                    ← Back to discover
+                    Back
                 </button>
             </main>
         );
@@ -68,30 +92,45 @@ function OtherProfilePage({
     const learn =
         profile.skillsToLearn?.filter(Boolean) || [];
 
-    const initials =
-        profile.name?.charAt(0).toUpperCase();
+    const stats = ratingData?.stats || {
+        average: 0,
+        total: 0,
+        distribution: {
+            5: 0,
+            4: 0,
+            3: 0,
+            2: 0,
+            1: 0
+        }
+    };
+
+    const reviews =
+        ratingData?.reviews || [];
+
+    const getPercentage = (count) => {
+        if (!stats.total) return 0;
+
+        return Math.round(
+            (count / stats.total) * 100
+        );
+    };
 
     return (
         <main className="other-profile-page">
-
             <header className="other-profile-topbar">
-
                 <button
                     className="other-profile-back"
                     onClick={onBack}
                 >
-                    <span>←</span>
-                    Back to discover
+                    ← Back to discover
                 </button>
 
                 <span className="other-profile-label">
                     MEMBER PROFILE
                 </span>
-
             </header>
 
             <section className="other-profile-hero">
-
                 <div className="other-profile-avatar">
                     {profile.avatarUrl ? (
                         <img
@@ -99,12 +138,11 @@ function OtherProfilePage({
                             alt={`${profile.name}'s profile`}
                         />
                     ) : (
-                        initials
+                        profile.name?.charAt(0).toUpperCase()
                     )}
                 </div>
 
                 <div className="other-profile-heading">
-
                     <span className="other-profile-role">
                         {profile.role || "Learner"}
                     </span>
@@ -115,37 +153,67 @@ function OtherProfilePage({
                         Open to meaningful skill exchanges
                     </p>
 
+                    <div className="profile-rating-summary">
+                        <span className="rating-star">
+                            ★
+                        </span>
+
+                        <strong>
+                            {stats.total
+                                ? stats.average.toFixed(1)
+                                : "—"}
+                        </strong>
+
+                        <span>
+                            {stats.total
+                                ? `${stats.total} ${
+                                      stats.total === 1
+                                          ? "review"
+                                          : "reviews"
+                                  }`
+                                : "No reviews yet"}
+                        </span>
+                    </div>
                 </div>
 
-                <button
-                    className="other-profile-message"
-                    onClick={onMessages}
-                >
-                    Start a conversation
-                    <span>→</span>
-                </button>
+                <div className="other-profile-actions">
+                    <button
+                        className="other-profile-message"
+                        onClick={onMessages}
+                    >
+                        Start conversation →
+                    </button>
 
+                    <button
+                        className="other-profile-message"
+                        onClick={() =>
+                            onBookSession(
+                                profile._id,
+                                profile.name
+                            )
+                        }
+                    >
+                        Book Session 📅
+                    </button>
+                </div>
             </section>
 
             <section className="other-profile-content">
-
                 <div className="other-profile-main">
-
                     <p className="profile-eyebrow">
                         ABOUT
                     </p>
 
                     <h2>
-                        A little about {profile.name?.split(" ")[0]}
+                        A little about {profile.name}
                     </h2>
 
                     <p className="other-profile-bio">
                         {profile.bio ||
-                            "This member is open to learning and sharing skills with the community."}
+                            "This member is open to learning and sharing skills."}
                     </p>
 
                     <div className="other-profile-skills">
-
                         <div>
                             <p className="profile-eyebrow">
                                 I CAN HELP WITH
@@ -162,8 +230,8 @@ function OtherProfilePage({
                                         </span>
                                     ))
                                 ) : (
-                                    <span className="other-empty">
-                                        No teaching skills added yet.
+                                    <span className="other-skill-empty">
+                                        No teaching skills added
                                     </span>
                                 )}
                             </div>
@@ -185,42 +253,180 @@ function OtherProfilePage({
                                         </span>
                                     ))
                                 ) : (
-                                    <span className="other-empty">
-                                        No learning skills added yet.
+                                    <span className="other-skill-empty">
+                                        No learning skills added
                                     </span>
                                 )}
                             </div>
                         </div>
-
                     </div>
-
                 </div>
 
-                <aside className="other-profile-details">
+                <section className="profile-reviews-section">
+                    <div className="profile-reviews-header">
+                        <div>
+                            <p className="profile-eyebrow">
+                                COMMUNITY FEEDBACK
+                            </p>
 
-                    <div>
-                        <span>Availability</span>
-                        <strong>
-                            {profile.availability
-                                ?.filter(Boolean)
-                                .join(", ") ||
-                                "Not specified"}
-                        </strong>
+                            <h2>
+                                Ratings & Reviews
+                            </h2>
+                        </div>
+
+                        <div className="big-rating">
+                            <strong>
+                                {stats.total
+                                    ? stats.average.toFixed(1)
+                                    : "—"}
+                            </strong>
+
+                            <span>★★★★★</span>
+
+                            <small>
+                                {stats.total
+                                    ? `${stats.total} ${
+                                          stats.total === 1
+                                              ? "review"
+                                              : "reviews"
+                                      }`
+                                    : "No reviews yet"}
+                            </small>
+                        </div>
                     </div>
 
-                    <div>
-                        <span>Hourly rate</span>
-                        <strong>
-                            {profile.hourlyRate
-                                ? `₹${profile.hourlyRate}/hr`
-                                : "Open to discuss"}
-                        </strong>
-                    </div>
+                    {ratingLoading ? (
+                        <div className="reviews-loading">
+                            Loading ratings...
+                        </div>
+                    ) : (
+                        <>
+                            {stats.total > 0 && (
+                                <div className="rating-distribution">
+                                    {[5, 4, 3, 2, 1].map(
+                                        (star) => {
+                                            const count =
+                                                stats.distribution?.[
+                                                    star
+                                                ] || 0;
 
-                </aside>
+                                            return (
+                                                <div
+                                                    className="rating-row"
+                                                    key={star}
+                                                >
+                                                    <span>
+                                                        {star} ★
+                                                    </span>
 
+                                                    <div className="rating-bar">
+                                                        <div
+                                                            className="rating-bar-fill"
+                                                            style={{
+                                                                width: `${getPercentage(
+                                                                    count
+                                                                )}%`
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <small>
+                                                        {count}
+                                                    </small>
+                                                </div>
+                                            );
+                                        }
+                                    )}
+                                </div>
+                            )}
+
+                            {reviews.length > 0 ? (
+                                <div className="reviews-list">
+                                    {reviews.map((review) => (
+                                        <article
+                                            className="review-card"
+                                            key={review._id}
+                                        >
+                                            <div className="review-card-top">
+                                                <div className="reviewer-avatar">
+                                                    {review.reviewer?.name
+                                                        ?.charAt(0)
+                                                        .toUpperCase() ||
+                                                        "U"}
+                                                </div>
+
+                                                <div>
+                                                    <strong>
+                                                        {review.reviewer
+                                                            ?.name ||
+                                                            "Member"}
+                                                    </strong>
+
+                                                    <span className="reviewer-role">
+                                                        {review.reviewer
+                                                            ?.role ||
+                                                            "Learner"}
+                                                    </span>
+                                                </div>
+
+                                                <span className="review-date">
+                                                    {review.createdAt
+                                                        ? new Date(
+                                                              review.createdAt
+                                                          ).toLocaleDateString(
+                                                              "en-IN",
+                                                              {
+                                                                  day: "numeric",
+                                                                  month: "short",
+                                                                  year: "numeric"
+                                                              }
+                                                          )
+                                                        : ""}
+                                                </span>
+                                            </div>
+
+                                            <div className="review-stars">
+                                                {"★".repeat(
+                                                    review.rating
+                                                )}
+                                                <span>
+                                                    {"★".repeat(
+                                                        5 -
+                                                            review.rating
+                                                    )}
+                                                </span>
+                                            </div>
+
+                                            {review.comment && (
+                                                <p className="review-comment">
+                                                    “
+                                                    {review.comment}
+                                                    ”
+                                                </p>
+                                            )}
+                                        </article>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="no-reviews">
+                                    <div>⭐</div>
+
+                                    <h3>
+                                        No reviews yet
+                                    </h3>
+
+                                    <p>
+                                        Complete a session
+                                        with this member to
+                                        leave the first
+                                        review.
+                                    </p>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </section>
             </section>
-
         </main>
     );
 }
