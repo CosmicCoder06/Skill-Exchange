@@ -37,6 +37,8 @@ const initializeChatSocket = require("./sockets/chatSocket");
 // Admin
 const adminRoutes = require("./routes/adminRoutes");
 
+// Dashboard
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 // =========================
 // Middleware
@@ -95,6 +97,10 @@ app.use("/api", chatRoutes);
 
 // Admin API
 app.use("/api", adminRoutes);
+
+// Dashboard API
+app.use("/api", dashboardRoutes);
+
 
 
 

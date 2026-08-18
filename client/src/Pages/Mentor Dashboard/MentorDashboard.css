@@ -1,0 +1,245 @@
+.mentor-dashboard {
+    min-height: 100vh;
+    padding: 40px 24px;
+    background: #f7f8fc;
+    box-sizing: border-box;
+}
+
+.mentor-dashboard-container {
+    width: min(1150px, 100%);
+    margin: 0 auto;
+}
+
+.mentor-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 35px;
+}
+
+.dashboard-label,
+.card-label {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #777;
+}
+
+.mentor-dashboard-header h1 {
+    margin: 0;
+    font-size: 38px;
+    color: #1c1c1c;
+}
+
+.dashboard-subtitle {
+    margin-top: 10px;
+    color: #666;
+}
+
+.dashboard-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.dashboard-primary,
+.dashboard-secondary,
+.card-button,
+.mentor-logout {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dashboard-primary {
+    background: #111;
+    color: white;
+}
+
+.dashboard-secondary {
+    background: white;
+    border: 1px solid #ddd;
+    color: #222;
+}
+
+.mentor-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.mentor-stat-card {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    padding: 22px;
+}
+
+.mentor-stat-card span {
+    display: block;
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.mentor-stat-card strong {
+    font-size: 28px;
+    color: #171717;
+}
+
+.mentor-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.dashboard-card {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    padding: 25px;
+    min-height: 180px;
+}
+
+.dashboard-card h2 {
+    margin: 5px 0 12px;
+}
+
+.about-text {
+    color: #666;
+    line-height: 1.6;
+}
+
+.card-button {
+    margin-top: 15px;
+    background: #f0f0f0;
+    color: #222;
+}
+
+.skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.skill-pill {
+    padding: 8px 13px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.skill-pill.teach {
+    background: #e8f7ed;
+    color: #19733b;
+}
+
+.skill-pill.learn {
+    background: #edf1ff;
+    color: #3855a5;
+}
+
+.empty-text {
+    color: #888;
+}
+
+.availability-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.availability-item {
+    padding: 10px 12px;
+    background: #f7f7f7;
+    border-radius: 8px;
+}
+
+.availability-item span {
+    margin-right: 8px;
+}
+
+.mentor-profile-status {
+    margin-top: 20px;
+    padding: 25px;
+    border-radius: 16px;
+    background: white;
+    border: 1px solid #e5e5e5;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.mentor-profile-status h2 {
+    margin: 5px 0 8px;
+}
+
+.mentor-profile-status p:last-child {
+    margin: 0;
+    color: #666;
+}
+
+.mentor-logout {
+    margin-top: 25px;
+    background: #fff;
+    color: #c62828;
+    border: 1px solid #e0b5b5;
+}
+
+
+/* Responsive */
+
+@media (max-width: 800px) {
+
+    .mentor-dashboard {
+        padding: 25px 16px;
+    }
+
+    .mentor-dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mentor-dashboard-header h1 {
+        font-size: 30px;
+    }
+
+    .mentor-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mentor-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .mentor-profile-status {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .mentor-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-actions {
+        width: 100%;
+    }
+
+    .dashboard-actions button {
+        flex: 1;
+    }
+
+    .mentor-dashboard-header h1 {
+        font-size: 26px;
+    }
+}
