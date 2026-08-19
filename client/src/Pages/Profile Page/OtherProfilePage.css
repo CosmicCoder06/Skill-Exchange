@@ -1,0 +1,1124 @@
+/* =========================================================
+   OTHER PROFILE PAGE
+   Skill Exchange — Premium Member Profile
+========================================================= */
+
+:root {
+    --op-bg: #f7faf7;
+    --op-surface: #ffffff;
+    --op-text: #14241f;
+    --op-green: #176f51;
+    --op-green-dark: #0f5b42;
+    --op-green-soft: #e0f3e9;
+    --op-muted: #71817a;
+    --op-line: #dfe8e3;
+    --op-gold: #d89b00;
+    --op-yellow: #f8edc8;
+}
+
+/* =========================================================
+   RESET / BASE
+========================================================= */
+
+.other-profile-page,
+.other-profile-page * {
+    box-sizing: border-box;
+}
+
+.other-profile-page {
+    width: 100%;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at 5% 10%,
+            rgba(214, 243, 226, 0.8),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 96% 92%,
+            rgba(239, 240, 205, 0.7),
+            transparent 28%
+        ),
+        var(--op-bg);
+
+    color: var(--op-text);
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    overflow-x: hidden;
+}
+
+.other-profile-page button {
+    font: inherit;
+    cursor: pointer;
+}
+
+/* =========================================================
+   TOP BAR
+========================================================= */
+
+.other-profile-topbar {
+    width: min(1200px, calc(100% - 80px));
+
+    margin: 0 auto;
+    padding: 38px 0 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.other-profile-back {
+    border: 0;
+    background: transparent;
+
+    color: var(--op-green);
+
+    font-size: 14px;
+    font-weight: 800;
+
+    padding: 8px 0;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+.other-profile-back:hover {
+    color: var(--op-green-dark);
+    transform: translateX(-4px);
+}
+
+.other-profile-label {
+    color: var(--op-green);
+
+    font-size: 11px;
+    font-weight: 900;
+
+    letter-spacing: 0.16em;
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.other-profile-hero {
+    width: min(1200px, calc(100% - 80px));
+
+    margin: 30px auto 0;
+    padding: 48px 0 55px;
+
+    display: grid;
+
+    grid-template-columns: 130px minmax(0, 1fr) auto;
+
+    align-items: center;
+
+    gap: 30px;
+
+    border-bottom: 1px solid var(--op-line);
+}
+
+/* =========================================================
+   PROFILE IMAGE
+========================================================= */
+
+.other-profile-avatar {
+    width: 126px;
+    height: 126px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    display: grid;
+    place-items: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0f5d44,
+            #35a278
+        );
+
+    border: 7px solid #e4f3eb;
+
+    box-shadow:
+        0 14px 32px rgba(23, 111, 81, 0.14);
+
+    color: white;
+
+    font-size: 42px;
+    font-weight: 800;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.other-profile-avatar:hover {
+    transform: scale(1.04);
+
+    box-shadow:
+        0 18px 40px rgba(23, 111, 81, 0.22);
+}
+
+.other-profile-avatar img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+    object-position: center;
+}
+
+/* =========================================================
+   HERO TEXT
+========================================================= */
+
+.other-profile-heading {
+    min-width: 0;
+}
+
+.other-profile-role {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 28px;
+
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    background: var(--op-green-soft);
+
+    color: var(--op-green);
+
+    font-size: 10px;
+    font-weight: 900;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+}
+
+.other-profile-heading h1 {
+    margin: 12px 0 5px;
+
+    color: var(--op-text);
+
+    font-size: clamp(42px, 5vw, 66px);
+
+    line-height: 0.98;
+
+    letter-spacing: -0.065em;
+}
+
+.other-profile-heading > p {
+    margin: 0;
+
+    color: var(--op-muted);
+
+    font-size: 17px;
+
+    line-height: 1.5;
+}
+
+/* =========================================================
+   HERO RATING
+========================================================= */
+
+.profile-rating-summary {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 15px;
+
+    color: var(--op-text);
+
+    font-size: 14px;
+}
+
+.profile-rating-summary .rating-star {
+    color: var(--op-gold);
+
+    font-size: 18px;
+
+    line-height: 1;
+}
+
+.profile-rating-summary strong {
+    font-size: 16px;
+}
+
+.profile-rating-summary > span:last-child {
+    color: var(--op-muted);
+}
+
+/* =========================================================
+   HERO ACTIONS
+========================================================= */
+
+.other-profile-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    justify-self: end;
+}
+
+.other-profile-message {
+    min-height: 52px;
+
+    padding: 0 22px;
+
+    border-radius: 10px;
+
+    border: 1px solid var(--op-green);
+
+    background: var(--op-green);
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    box-shadow:
+        0 12px 24px rgba(23, 111, 81, 0.14);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.other-profile-message + .other-profile-message {
+    background: #eef7f2;
+
+    color: var(--op-green);
+
+    border-color: #cde3d7;
+
+    box-shadow: none;
+}
+
+.other-profile-message:hover {
+    transform: translateY(-2px);
+
+    background: var(--op-green-dark);
+
+    box-shadow:
+        0 16px 30px rgba(23, 111, 81, 0.2);
+}
+
+.other-profile-message + .other-profile-message:hover {
+    background: #e1f1e9;
+
+    color: var(--op-green-dark);
+
+    box-shadow:
+        0 10px 22px rgba(23, 111, 81, 0.1);
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.other-profile-content {
+    width: min(1200px, calc(100% - 80px));
+
+    margin: 0 auto;
+
+    padding: 68px 0 80px;
+}
+
+.other-profile-main {
+    width: 100%;
+}
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.profile-eyebrow {
+    margin: 0 0 17px;
+
+    color: var(--op-green);
+
+    font-size: 11px;
+
+    font-weight: 900;
+
+    letter-spacing: 0.14em;
+}
+
+.other-profile-main h2 {
+    margin: 0 0 20px;
+
+    color: var(--op-text);
+
+    font-size: clamp(34px, 4vw, 48px);
+
+    line-height: 1;
+
+    letter-spacing: -0.055em;
+}
+
+.other-profile-bio {
+    max-width: 900px;
+
+    margin: 0;
+
+    color: #52645d;
+
+    font-size: 17px;
+
+    line-height: 1.85;
+
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   SKILLS
+========================================================= */
+
+.other-profile-skills {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 60px;
+
+    margin-top: 58px;
+
+    padding-top: 34px;
+
+    border-top: 1px solid var(--op-line);
+}
+
+.other-profile-skills > div {
+    min-width: 0;
+}
+
+.other-profile-skills .profile-eyebrow {
+    margin-bottom: 15px;
+
+    color: var(--op-muted);
+}
+
+.other-skill-list {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 9px;
+}
+
+.other-skill {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 36px;
+
+    padding: 8px 15px;
+
+    border-radius: 999px;
+
+    font-size: 14px;
+
+    font-weight: 750;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.other-skill:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 16px rgba(23, 111, 81, 0.1);
+}
+
+.other-skill.teach {
+    background: #e0f3e9;
+
+    color: #176449;
+}
+
+.other-skill.learn {
+    background: var(--op-yellow);
+
+    color: #765919;
+}
+
+.other-skill-empty {
+    color: #888;
+
+    font-size: 14px;
+}
+
+/* =========================================================
+   COMMUNITY FEEDBACK
+========================================================= */
+
+.profile-reviews-section {
+    width: 100%;
+
+    margin-top: 75px;
+
+    padding-top: 52px;
+
+    border-top: 1px solid var(--op-line);
+}
+
+/* =========================================================
+   REVIEW HEADER
+========================================================= */
+
+.profile-reviews-header {
+    display: grid;
+
+    grid-template-columns:
+        minmax(280px, 0.8fr)
+        minmax(400px, 1.5fr)
+        180px;
+
+    align-items: start;
+
+    gap: 30px;
+
+    margin-bottom: 30px;
+}
+
+.profile-reviews-header > div:first-child {
+    grid-column: 1;
+}
+
+.profile-reviews-header h2 {
+    margin: 0;
+
+    color: var(--op-text);
+
+    font-size: clamp(34px, 4vw, 48px);
+
+    line-height: 1;
+
+    letter-spacing: -0.055em;
+}
+
+/* =========================================================
+   OVERALL RATING
+========================================================= */
+
+.big-rating {
+    grid-column: 3;
+
+    text-align: right;
+
+    min-width: 180px;
+}
+
+.big-rating strong {
+    display: block;
+
+    color: var(--op-text);
+
+    font-size: 48px;
+
+    line-height: 1;
+
+    letter-spacing: -0.06em;
+}
+
+.big-rating span {
+    display: block;
+
+    margin-top: 8px;
+
+    color: var(--op-gold);
+
+    font-size: 15px;
+
+    letter-spacing: 2px;
+}
+
+.big-rating small {
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--op-muted);
+
+    font-size: 12px;
+}
+
+/* =========================================================
+   RATING DISTRIBUTION
+========================================================= */
+
+.rating-distribution {
+    width: min(760px, 100%);
+
+    margin-left: auto;
+
+    margin-right: 205px;
+
+    margin-bottom: 38px;
+}
+
+.rating-row {
+    display: grid;
+
+    grid-template-columns: 42px minmax(0, 1fr) 32px;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 13px;
+
+    color: #5d6c66;
+
+    font-size: 12px;
+}
+
+.rating-row:last-child {
+    margin-bottom: 0;
+}
+
+.rating-row > span {
+    white-space: nowrap;
+}
+
+.rating-row small {
+    color: var(--op-muted);
+
+    text-align: right;
+}
+
+.rating-bar {
+    width: 100%;
+
+    height: 9px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background: #e4e7e3;
+}
+
+.rating-bar-fill {
+    height: 100%;
+
+    border-radius: inherit;
+
+    background: #202020;
+
+    transition: width 0.5s ease;
+}
+
+/* =========================================================
+   REVIEWS LIST
+   NO CARDS — CLEAN LINEAR STYLE
+========================================================= */
+
+.reviews-list {
+    width: 100%;
+
+    margin-top: 32px;
+
+    border-top: 1px solid var(--op-line);
+}
+
+.review-card {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 230px minmax(0, 1fr) auto;
+
+    align-items: start;
+
+    gap: 28px;
+
+    padding: 24px 0;
+
+    background: transparent;
+
+    border: 0;
+
+    border-bottom: 1px solid var(--op-line);
+
+    transition:
+        padding-left 0.2s ease,
+        background 0.2s ease;
+}
+
+.review-card:hover {
+    padding-left: 8px;
+}
+
+.review-card-top {
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+}
+
+.reviewer-avatar {
+    width: 42px;
+    height: 42px;
+
+    flex: 0 0 42px;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: var(--op-green);
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 800;
+}
+
+.review-card-top strong {
+    display: block;
+
+    color: var(--op-text);
+
+    font-size: 14px;
+}
+
+.reviewer-role {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--op-muted);
+
+    font-size: 11px;
+}
+
+.review-date {
+    justify-self: end;
+
+    color: var(--op-muted);
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+.review-stars {
+    color: var(--op-gold);
+
+    font-size: 15px;
+
+    letter-spacing: 1.5px;
+
+    padding-top: 4px;
+}
+
+.review-stars span {
+    color: #d7dcd8;
+}
+
+.review-comment {
+    grid-column: 2 / 4;
+
+    margin: -5px 0 0;
+
+    color: #475852;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+}
+
+/* =========================================================
+   LOADING / EMPTY
+========================================================= */
+
+.reviews-loading {
+    width: 100%;
+
+    padding: 35px 0;
+
+    color: var(--op-muted);
+
+    font-size: 14px;
+}
+
+.no-reviews {
+    width: 100%;
+
+    padding: 45px 20px;
+
+    text-align: center;
+
+    border-top: 1px solid var(--op-line);
+
+    color: var(--op-muted);
+}
+
+.no-reviews > div {
+    margin-bottom: 8px;
+
+    color: var(--op-gold);
+
+    font-size: 28px;
+}
+
+.no-reviews h3 {
+    margin: 0;
+
+    color: var(--op-text);
+
+    font-size: 18px;
+}
+
+.no-reviews p {
+    max-width: 420px;
+
+    margin: 8px auto 0;
+
+    color: var(--op-muted);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+/* =========================================================
+   LOADING PAGE
+========================================================= */
+
+.other-profile-loading {
+    width: 100%;
+
+    min-height: 100vh;
+
+    display: grid;
+
+    place-items: center;
+
+    align-content: center;
+
+    gap: 15px;
+
+    background: var(--op-bg);
+
+    color: var(--op-green);
+
+    font-weight: 800;
+
+    text-align: center;
+}
+
+.other-profile-loading button {
+    min-height: 44px;
+
+    padding: 0 18px;
+
+    border: 1px solid var(--op-green);
+
+    border-radius: 9px;
+
+    background: var(--op-green);
+
+    color: white;
+
+    font-weight: 800;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
+
+    .other-profile-topbar,
+    .other-profile-hero,
+    .other-profile-content {
+        width: calc(100% - 60px);
+    }
+
+    .other-profile-hero {
+        grid-template-columns: 105px minmax(0, 1fr);
+
+        gap: 24px;
+    }
+
+    .other-profile-avatar {
+        width: 105px;
+        height: 105px;
+    }
+
+    .other-profile-actions {
+        grid-column: 2;
+
+        justify-self: start;
+    }
+
+    .profile-reviews-header {
+        grid-template-columns:
+            minmax(0, 1fr)
+            170px;
+    }
+
+    .profile-reviews-header > div:first-child {
+        grid-column: 1;
+    }
+
+    .big-rating {
+        grid-column: 2;
+    }
+
+    .rating-distribution {
+        width: 100%;
+
+        margin-right: 0;
+    }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .other-profile-topbar,
+    .other-profile-hero,
+    .other-profile-content {
+        width: calc(100% - 36px);
+    }
+
+    .other-profile-topbar {
+        padding-top: 25px;
+    }
+
+    .other-profile-label {
+        font-size: 9px;
+    }
+
+    .other-profile-hero {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        align-items: flex-start;
+
+        gap: 18px;
+
+        margin-top: 20px;
+
+        padding-bottom: 35px;
+    }
+
+    .other-profile-avatar {
+        width: 88px;
+        height: 88px;
+
+        flex: 0 0 88px;
+
+        border-width: 5px;
+    }
+
+    .other-profile-heading {
+        flex: 1 1 200px;
+    }
+
+    .other-profile-heading h1 {
+        margin-top: 8px;
+
+        font-size: 40px;
+    }
+
+    .other-profile-heading > p {
+        font-size: 14px;
+    }
+
+    .other-profile-actions {
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 9px;
+    }
+
+    .other-profile-message {
+        width: 100%;
+
+        min-width: 0;
+
+        min-height: 48px;
+
+        padding: 0 10px;
+
+        font-size: 12px;
+    }
+
+    .other-profile-content {
+        padding-top: 48px;
+
+        padding-bottom: 60px;
+    }
+
+    .other-profile-main h2 {
+        font-size: 34px;
+    }
+
+    .other-profile-bio {
+        font-size: 15px;
+
+        line-height: 1.75;
+    }
+
+    .other-profile-skills {
+        grid-template-columns: 1fr;
+
+        gap: 30px;
+
+        margin-top: 45px;
+
+        padding-top: 30px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 55px;
+
+        padding-top: 42px;
+    }
+
+    .profile-reviews-header {
+        display: flex;
+
+        align-items: flex-start;
+
+        justify-content: space-between;
+
+        gap: 18px;
+    }
+
+    .profile-reviews-header h2 {
+        font-size: 32px;
+    }
+
+    .big-rating {
+        min-width: 105px;
+
+        text-align: right;
+    }
+
+    .big-rating strong {
+        font-size: 39px;
+    }
+
+    .rating-distribution {
+        margin-top: 30px;
+    }
+
+    .review-card {
+        grid-template-columns: 1fr;
+
+        gap: 11px;
+
+        padding: 21px 0;
+    }
+
+    .review-date {
+        margin-left: auto;
+    }
+
+    .review-stars {
+        padding-top: 0;
+    }
+
+    .review-comment {
+        grid-column: auto;
+
+        margin: 0;
+    }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 460px) {
+
+    .other-profile-topbar {
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .other-profile-label {
+        text-align: right;
+    }
+
+    .other-profile-hero {
+        display: block;
+    }
+
+    .other-profile-avatar {
+        margin-bottom: 20px;
+    }
+
+    .other-profile-heading h1 {
+        font-size: 38px;
+    }
+
+    .other-profile-actions {
+        grid-template-columns: 1fr;
+
+        margin-top: 22px;
+    }
+
+    .profile-reviews-header {
+        display: block;
+    }
+
+    .big-rating {
+        margin-top: 22px;
+
+        text-align: left;
+    }
+
+    .rating-row {
+        grid-template-columns: 35px minmax(0, 1fr) 25px;
+
+        gap: 8px;
+    }
+}

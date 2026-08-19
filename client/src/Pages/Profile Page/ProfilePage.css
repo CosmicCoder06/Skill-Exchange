@@ -1,1 +1,3673 @@
-:root{--ink:#15231f;--muted:#6f7e78;--line:#dfe8e3;--green:#176b4e}*{box-sizing:border-box}button,input,textarea{font:inherit}button{cursor:pointer}.profile-page{min-height:100vh;position:relative;overflow:hidden;padding:50px clamp(20px,6vw,96px);background:#f7faf7;color:var(--ink)}.profile-glow{position:absolute;border-radius:50%;pointer-events:none}.profile-glow-one{top:-210px;left:-130px;height:540px;width:540px;background:#d5f0df}.profile-glow-two{right:-110px;bottom:-210px;height:470px;width:470px;background:#e7edc5}.profile-shell{max-width:1180px;margin:auto;position:relative;border:1px solid #fff;background:#ffffffcf;box-shadow:0 28px 80px #16372a1f;backdrop-filter:blur(14px)}.profile-hero{display:flex;align-items:center;gap:25px;padding:42px 52px;border-bottom:1px solid var(--line)}.profile-avatar,.profile-avatar-image{width:96px;height:96px;border-radius:50%;object-fit:cover;border:5px solid #e8f4ed}.profile-avatar{display:grid;place-items:center;background:linear-gradient(135deg,#0d4534,#33a277);color:#fff;font-size:38px;font-weight:700}.profile-heading h1{margin:8px 0 3px;font-size:clamp(30px,4vw,44px);letter-spacing:-.055em}.profile-heading p{margin:0;color:var(--muted)}.profile-status{display:inline-block;padding:5px 10px;border-radius:20px;background:#fff0de;color:#a24f09;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.profile-status.complete{color:#176b4e;background:#dff5e9}.profile-hero-actions{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}.profile-primary-button,.profile-secondary-button,.profile-complete-cta{border:0;padding:13px 18px;border-radius:8px;font-weight:700}.profile-primary-button,.profile-complete-cta{background:var(--green);color:#fff;box-shadow:0 10px 20px #176b4e2e}.profile-secondary-button{background:#edf3ef;color:#25483c}.profile-content{display:grid;grid-template-columns:1.4fr .8fr;grid-template-areas:"about details" "skills skills";gap:46px;padding:58px 52px}.profile-about{grid-area:about;min-width:0}.profile-eyebrow{margin:0 0 12px;color:#4d8a70;font-size:11px;font-weight:800;letter-spacing:.14em}.profile-about h2{margin:0 0 15px;font-size:28px;letter-spacing:-.04em}.profile-bio{max-width:650px;color:#4b5c55;line-height:1.8;font-size:16px;overflow-wrap:anywhere;word-break:break-word}.profile-complete-cta{margin-top:18px}.profile-complete-cta span{margin-left:12px;font-size:20px}.profile-details{grid-area:details;border-left:1px solid var(--line);padding-left:35px}.detail-row{display:flex;flex-direction:column;gap:7px;padding:0 0 22px;margin-bottom:22px;border-bottom:1px solid var(--line)}.detail-row span{color:var(--muted);font-size:13px}.detail-row strong{font-size:16px}.profile-skills-section{grid-area:skills;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);padding-top:37px;gap:38px}.skill-block+.skill-block{border-left:1px solid var(--line);padding-left:38px}.skill-list{display:flex;flex-wrap:wrap;gap:9px}.skill-pill{padding:9px 12px;border-radius:999px;font-size:14px;font-weight:650}.teach{color:#155b42;background:#e0f3e8}.learn{color:#775719;background:#f8eec9}.empty-skills{color:var(--muted);font-size:14px}.profile-loading{min-height:100vh;display:grid;place-items:center;background:#f7f8f3;color:var(--green);font-weight:700}.completion-page{min-height:100vh;display:grid;place-items:center;padding:32px;background:radial-gradient(circle at 10% 12%,#c9ead7,transparent 31%),radial-gradient(circle at 90% 85%,#e9edc6,transparent 28%),#f5f8f4;color:var(--ink)}.completion-panel{width:min(1100px,100%);display:grid;grid-template-columns:.78fr 1.22fr;min-height:650px;overflow:hidden;background:#fff;box-shadow:0 28px 90px #18392c29;border-radius:20px}.completion-intro{padding:clamp(35px,5vw,70px);display:flex;flex-direction:column;justify-content:center;background:#143f31;color:#fff}.completion-kicker{color:#a6e1bd;font-size:12px;letter-spacing:.15em;font-weight:800}.completion-intro h1{margin:20px 0;font-size:clamp(40px,5vw,65px);line-height:.98;letter-spacing:-.065em}.completion-intro p{color:#c9dbd3;line-height:1.7}.completion-progress{display:flex;gap:8px;margin-top:45px}.completion-progress span{width:35px;height:4px;background:#3fa778}.completion-progress span:last-child{background:#76c69b}.completion-form{padding:clamp(30px,5vw,65px);display:flex;flex-direction:column;gap:18px}.form-heading{margin-bottom:8px}.form-heading h2{margin:0 0 5px;font-size:29px;letter-spacing:-.04em}.form-heading p{margin:0;color:var(--muted);font-size:14px}.completion-form label{display:flex;flex-direction:column;gap:7px;font-size:13px;color:#3d5048;font-weight:700}.completion-form label b,.form-heading b{color:#c0502e}.completion-form input,.completion-form textarea{width:100%;padding:12px 13px;border:1px solid #d6e1db;border-radius:7px;color:var(--ink);outline:0;background:#fcfdfc;font-weight:400}.completion-form textarea{min-height:85px;resize:vertical}.completion-form input:focus,.completion-form textarea:focus{border-color:#258561;box-shadow:0 0 0 3px #ddf3e7}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.form-error{margin:0;color:#b03b21;font-size:13px}.completion-actions{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}.skip-button{border:0;background:transparent;color:#60746a;font-weight:700;padding:12px 0}.save-button{border:0;border-radius:7px;background:var(--green);color:#fff;padding:13px 22px;font-weight:700;box-shadow:0 10px 22px #176b4e33}.save-button:disabled{opacity:.7;cursor:wait}@media(max-width:760px){.profile-page{padding:18px}.profile-hero{padding:30px;flex-wrap:wrap}.profile-hero-actions{margin-left:0;width:100%;justify-content:flex-start}.profile-content{padding:35px 30px;grid-template-columns:1fr;grid-template-areas:"about" "details" "skills";gap:30px}.profile-details,.skill-block+.skill-block{border-left:0;padding-left:0}.profile-skills-section,.form-grid{grid-template-columns:1fr;gap:26px}.completion-page{padding:0}.completion-panel{min-height:100vh;border-radius:0;grid-template-columns:1fr}.completion-intro{padding:38px}.completion-intro h1{font-size:43px}.completion-progress{display:none}.completion-form{padding:35px 28px}}
+/* =========================================================
+   SKILL EXCHANGE — MY PROFILE
+   VISUAL MATCH: OTHER PROFILE
+   Sidebar intentionally kept separate.
+========================================================= */
+
+:root {
+    --profile-bg: #f7faf7;
+    --profile-surface: #ffffff;
+    --profile-green: #176b4e;
+    --profile-green-dark: #0d5940;
+    --profile-green-soft: #dff5e9;
+    --profile-text: #15231f;
+    --profile-muted: #6f7e78;
+    --profile-line: #dfe8e3;
+    --profile-gold: #d99b00;
+    --profile-yellow: #f8eec9;
+    --profile-danger: #b84b42;
+}
+
+.profile-page,
+.profile-page * {
+    box-sizing: border-box;
+}
+
+.profile-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 5% 10%, #d8f1e2, transparent 28%),
+        radial-gradient(circle at 95% 90%, #e9edc9, transparent 25%),
+        #f7faf7;
+    color: var(--profile-text);
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+.profile-page button {
+    font: inherit;
+    cursor: pointer;
+}
+
+.profile-page img {
+    display: block;
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   SIDEBAR — ONLY THIS PART REMAINS DIFFERENT
+========================================================= */
+
+.profile-sidebar {
+    position: fixed;
+    z-index: 1000;
+    inset: 0 auto 0 0;
+    width: 98px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 16px 12px;
+
+    background: #eef5f1;
+    border-right: 1px solid #dce8e1;
+
+    overflow: hidden;
+    transition: none;
+}
+
+.profile-sidebar:hover {
+    width: 98px;
+    align-items: center;
+    box-shadow: none;
+}
+
+.sidebar-logo {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    border-radius: 17px;
+
+    background: var(--profile-green);
+    color: #fff;
+
+    font-size: 0;
+    font-weight: 900;
+}
+
+.sidebar-logo::after {
+    content: "SE";
+    font-size: 18px;
+    letter-spacing: -.04em;
+}
+
+.sidebar-navigation {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 58px;
+}
+
+.sidebar-item,
+.profile-sidebar:hover .sidebar-item {
+    width: 72px;
+    min-width: 72px;
+    height: 68px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+    padding: 7px 4px;
+
+    border: 0;
+    border-radius: 16px;
+
+    background: transparent;
+    color: #5f766d;
+
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+
+    transition:
+        background .18s ease,
+        color .18s ease,
+        transform .18s ease;
+}
+
+.sidebar-item:hover {
+    background: #e2eee8;
+    color: var(--profile-green);
+    transform: translateY(-1px);
+}
+
+.sidebar-item.active {
+    background: #dcefe5;
+    color: var(--profile-green);
+}
+
+.sidebar-icon {
+    width: 26px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    color: currentColor;
+    font-size: 17px;
+    line-height: 1;
+}
+
+.sidebar-text,
+.profile-sidebar:hover .sidebar-text {
+    opacity: 1;
+    transform: none;
+    color: currentColor;
+    font-size: 10px;
+    line-height: 1.1;
+}
+
+.sidebar-logout {
+    width: 72px;
+    min-width: 72px;
+    margin-top: auto;
+}
+
+
+/* =========================================================
+   WORKSPACE
+========================================================= */
+
+.profile-workspace {
+    min-height: 100vh;
+    min-width: 0;
+    margin-left: 98px;
+}
+
+
+/* =========================================================
+   HEADER
+   Kept because it belongs to the logged-in app shell.
+   It is visually flattened so the actual profile starts like
+   the Other Profile page.
+========================================================= */
+
+.profile-header {
+    min-height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 42px;
+
+    background: rgba(255,255,255,.96);
+    border-bottom: 1px solid var(--profile-line);
+
+    position: relative;
+    z-index: 10;
+}
+
+.profile-brand strong {
+    display: block;
+    color: var(--profile-green);
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: .1em;
+}
+
+.profile-brand span {
+    display: block;
+    margin-top: 3px;
+    color: var(--profile-muted);
+    font-size: 11px;
+}
+
+.profile-header-actions {
+    display: flex;
+    gap: 32px;
+}
+
+.profile-header-actions button {
+    border: 0;
+    background: transparent;
+    color: var(--profile-green);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   COVER
+   Other Profile has no cover, so hide it completely.
+========================================================= */
+
+.profile-cover {
+    display: none !important;
+}
+
+
+/* =========================================================
+   IDENTITY — DIRECT MATCH TO OTHER PROFILE HERO
+========================================================= */
+
+.profile-identity {
+    position: relative;
+    z-index: 5;
+
+    width: min(1180px, calc(100% - 80px));
+    min-height: 0;
+
+    display: grid;
+    grid-template-columns: 112px minmax(280px, 1fr) auto;
+    align-items: center;
+
+    gap: 28px;
+
+    margin: 38px auto 0;
+    padding: 0 0 45px;
+
+    background: transparent;
+    border-bottom: 1px solid var(--profile-line);
+}
+
+.profile-photo-wrapper {
+    align-self: center;
+    margin: 0;
+}
+
+.profile-photo {
+    width: 112px;
+    height: 112px;
+
+    flex: 0 0 112px;
+
+    display: block;
+
+    object-fit: cover;
+    object-position: center;
+
+    border: 6px solid #e7f3ec;
+    border-radius: 50%;
+
+    background: linear-gradient(135deg, #0d4534, #33a277);
+
+    box-shadow: 0 10px 28px rgba(23,107,78,.12);
+
+    transition: none;
+}
+
+.profile-photo:hover {
+    transform: none;
+    box-shadow: 0 10px 28px rgba(23,107,78,.12);
+}
+
+.profile-photo-fallback {
+    display: grid;
+    place-items: center;
+
+    color: #fff;
+    font-size: 42px;
+    font-weight: 800;
+
+    background: linear-gradient(135deg, #0d4534, #33a277);
+}
+
+
+/* =========================================================
+   MAIN INFO
+========================================================= */
+
+.profile-main-info {
+    min-width: 0;
+}
+
+.profile-status-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 8px;
+}
+
+.profile-status {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 27px;
+    padding: 6px 11px;
+
+    border-radius: 999px;
+
+    background: #dff5e9;
+    color: var(--profile-green);
+
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.profile-status.complete {
+    background: #dff5e9;
+    color: var(--profile-green);
+}
+
+.profile-role {
+    color: var(--profile-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.profile-main-info h1 {
+    margin: 10px 0 4px;
+
+    color: var(--profile-text);
+
+    font-size: clamp(36px, 5vw, 58px);
+    line-height: 1;
+    letter-spacing: -.06em;
+}
+
+.profile-main-info > p {
+    margin: 0;
+    color: var(--profile-muted);
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   RATING UNDER USER NAME
+   Same as Other Profile.
+========================================================= */
+
+.profile-main-info .profile-rating-summary,
+.profile-rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    color: var(--profile-text);
+    font-size: 14px;
+}
+
+.profile-rating-summary .rating-star {
+    color: var(--profile-gold);
+    font-size: 18px;
+    line-height: 1;
+}
+
+.profile-rating-summary strong {
+    font-size: 16px;
+}
+
+.profile-rating-summary span:last-child {
+    color: #777;
+}
+
+
+/* =========================================================
+   ACTIONS — SAME AS OTHER PROFILE
+========================================================= */
+
+.profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-self: end;
+}
+
+.secondary-action,
+.primary-action,
+.profile-message,
+.profile-booking {
+    min-height: 48px;
+
+    border-radius: 10px;
+
+    padding: 0 20px;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease,
+        border-color .2s ease;
+}
+
+.secondary-action,
+.profile-message,
+.profile-booking {
+    border: 1px solid #cfe3d8;
+    background: #eef7f2;
+    color: var(--profile-green);
+    box-shadow: none;
+}
+
+.primary-action {
+    border: 1px solid var(--profile-green);
+    background: var(--profile-green);
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(23,107,78,.16);
+}
+
+.secondary-action:hover,
+.profile-message:hover,
+.profile-booking:hover,
+.primary-action:hover {
+    transform: translateY(-2px);
+}
+
+.secondary-action:hover,
+.profile-message:hover,
+.profile-booking:hover {
+    background: #e1f1e9;
+    border-color: #b9d8c9;
+    box-shadow: 0 8px 20px rgba(23,107,78,.10);
+}
+
+.primary-action:hover {
+    background: #125b43;
+    box-shadow: 0 14px 28px rgba(23,107,78,.21);
+}
+
+
+/* =========================================================
+   STATS
+   Other Profile doesn't have the dashboard stat strip.
+   Hide it so the page remains visually identical.
+========================================================= */
+
+.profile-stats {
+    display: none !important;
+}
+
+
+/* =========================================================
+   CONTENT
+   Same 1180px editorial width as Other Profile.
+========================================================= */
+
+.profile-content {
+    width: min(1180px, calc(100% - 80px));
+    margin: 0 auto;
+
+    display: block;
+
+    padding-top: 60px;
+
+    background: transparent;
+}
+
+.profile-content-main {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+}
+
+
+/* =========================================================
+   ABOUT SECTION
+========================================================= */
+
+.profile-section {
+    display: block;
+
+    width: 100%;
+
+    padding: 0;
+    margin: 0;
+
+    border: 0;
+}
+
+.section-label {
+    margin: 0 0 16px;
+
+    color: var(--profile-green);
+
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .14em;
+}
+
+.section-body {
+    min-width: 0;
+}
+
+.section-body h2 {
+    margin: 0 0 18px;
+
+    color: var(--profile-text);
+
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.05;
+    letter-spacing: -.05em;
+}
+
+.profile-bio {
+    max-width: 720px;
+
+    margin: 0;
+
+    color: #4b5c55;
+
+    font-size: 17px;
+    line-height: 1.85;
+}
+
+.inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 17px;
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+
+    color: var(--profile-green);
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   SKILLS — SAME AS OTHER PROFILE
+========================================================= */
+
+.skills-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 45px;
+
+    margin-top: 65px;
+    padding-top: 35px;
+
+    border-top: 1px solid var(--profile-line);
+}
+
+.skill-column + .skill-column {
+    padding-left: 0;
+    border-left: 0;
+}
+
+.skill-column > p {
+    margin: 0 0 13px;
+
+    color: var(--profile-muted);
+
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .11em;
+}
+
+.skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.skill-pill {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 32px;
+    padding: 9px 13px;
+
+    border-radius: 999px;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.skill-pill.teaching {
+    color: #155b42;
+    background: #e0f3e8;
+}
+
+.skill-pill.learning {
+    color: #775719;
+    background: #f8eec9;
+}
+
+.empty-text {
+    color: #888;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   REVIEWS / COMMUNITY FEEDBACK
+   Exact visual language of Other Profile:
+   heading + rating on left, chart on right, reviews below.
+========================================================= */
+
+.profile-reviews-section {
+    width: 100%;
+
+    margin: 65px 0 0;
+    padding: 48px 0 20px;
+
+    border: 0;
+    border-top: 1px solid var(--profile-line);
+
+    min-width: 0;
+}
+
+.reviews-heading {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr) 180px;
+
+    align-items: start;
+
+    gap: 30px;
+
+    margin: 0 0 28px;
+}
+
+.reviews-heading > div:first-child {
+    grid-column: 1;
+}
+
+.reviews-heading > div:first-child h2 {
+    margin: 0;
+
+    font-size: clamp(30px, 3vw, 42px);
+    line-height: 1.05;
+    letter-spacing: -.05em;
+}
+
+.reviews-heading p {
+    margin: 10px 0 0;
+    color: var(--profile-muted);
+    font-size: 13px;
+}
+
+
+/* Overall rating */
+.overall-rating {
+    grid-column: 3;
+    text-align: right;
+
+    min-width: 180px;
+}
+
+.overall-rating strong {
+    display: block;
+
+    color: var(--profile-text);
+
+    font-size: 46px;
+    line-height: 1;
+    letter-spacing: -.06em;
+}
+
+.overall-rating span {
+    display: block;
+
+    margin-top: 8px;
+
+    color: var(--profile-gold);
+
+    font-size: 15px;
+    letter-spacing: 2px;
+}
+
+.overall-rating small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #777;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RATING BREAKDOWN — RIGHT SIDE
+========================================================= */
+
+.rating-breakdown {
+    width: 100%;
+
+    margin: 0 0 32px;
+    padding: 0 0 28px;
+
+    border-bottom: 1px solid var(--profile-line);
+}
+
+.rating-row {
+    display: grid;
+
+    grid-template-columns: 42px minmax(0, 1fr) 34px;
+
+    align-items: center;
+
+    gap: 12px;
+
+    width: 100%;
+
+    margin: 0 0 13px;
+
+    color: #52635b;
+    font-size: 12px;
+}
+
+.rating-row:last-child {
+    margin-bottom: 0;
+}
+
+.rating-row > span {
+    color: #52635b;
+}
+
+.rating-row > span:last-child {
+    color: #777;
+    text-align: right;
+}
+
+.rating-track {
+    width: 100%;
+    height: 9px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background: #e5e7e2;
+}
+
+.rating-track > div {
+    height: 100%;
+    min-width: 0;
+
+    border-radius: inherit;
+
+    background: #1c1c1c;
+
+    transition: width .4s ease;
+}
+
+
+/* =========================================================
+   REVIEWS LIST — LINEAR, NO CARDS
+========================================================= */
+
+.reviews-list {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 0;
+
+    margin: 0;
+
+    border-top: 1px solid var(--profile-line);
+}
+
+.review-item {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr) auto;
+
+    gap: 26px;
+    align-items: start;
+
+    padding: 22px 0;
+
+    border: 0;
+    border-bottom: 1px solid var(--profile-line);
+
+    background: transparent;
+}
+
+.review-item:first-child {
+    padding-top: 24px;
+}
+
+.review-item:last-child {
+    border-bottom: 0;
+}
+
+.review-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.review-avatar {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: var(--profile-green);
+    color: #fff;
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.review-user strong {
+    display: block;
+    color: var(--profile-text);
+    font-size: 14px;
+}
+
+.review-user span {
+    display: block;
+    margin-top: 2px;
+    color: #777;
+    font-size: 11px;
+}
+
+.review-content {
+    min-width: 0;
+}
+
+.review-stars {
+    margin: 0 0 7px;
+
+    color: var(--profile-gold);
+
+    font-size: 14px;
+    letter-spacing: 1.5px;
+}
+
+.review-stars span {
+    color: #d9ddd9;
+}
+
+.review-content p {
+    margin: 0;
+
+    color: #45534e;
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   RIGHT SIDE CONTENT
+   Keep functionality but make it flat and quiet.
+========================================================= */
+
+.profile-side-content {
+    display: none !important;
+}
+
+
+/* =========================================================
+   EMPTY REVIEWS
+========================================================= */
+
+.reviews-empty {
+    padding: 30px 0;
+
+    text-align: center;
+
+    color: var(--profile-muted);
+}
+
+.reviews-empty > span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--profile-gold);
+    font-size: 28px;
+}
+
+.reviews-empty strong {
+    display: block;
+    color: var(--profile-text);
+    font-size: 17px;
+}
+
+.reviews-empty p {
+    max-width: 400px;
+    margin: 6px auto 0;
+    color: #777;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.profile-loading {
+    min-height: 100vh;
+
+    display: grid;
+    place-items: center;
+
+    background: #f7faf7;
+    color: var(--profile-green);
+
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   BUTTON INTERACTION
+========================================================= */
+
+.profile-header-actions button,
+.secondary-action,
+.primary-action,
+.profile-message,
+.profile-booking {
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background-color .2s ease,
+        border-color .2s ease;
+}
+
+.secondary-action:active,
+.primary-action:active,
+.profile-message:active,
+.profile-booking:active {
+    transform: scale(.97);
+}
+
+.profile-header-actions button:focus-visible,
+.secondary-action:focus-visible,
+.primary-action:focus-visible,
+.profile-message:focus-visible,
+.profile-booking:focus-visible {
+    outline: 2px solid var(--profile-green);
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 980px) {
+
+    .profile-identity {
+        width: calc(100% - 60px);
+
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 24px;
+
+        margin-top: 32px;
+        padding-bottom: 40px;
+    }
+
+    .profile-photo {
+        width: 96px;
+        height: 96px;
+    }
+
+    .profile-actions {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    .profile-content {
+        width: calc(100% - 60px);
+        padding-top: 50px;
+    }
+
+    .skills-columns {
+        margin-top: 55px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 55px;
+    }
+
+    .reviews-heading {
+        display: grid;
+
+        grid-template-columns: minmax(0, 1fr) 170px;
+
+        gap: 24px;
+    }
+
+    .reviews-heading > div:first-child {
+        grid-column: 1;
+    }
+
+    .overall-rating {
+        grid-column: 2;
+        min-width: 0;
+    }
+
+    .rating-breakdown {
+        margin-top: 10px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .profile-sidebar {
+        position: fixed;
+        inset: auto 12px 12px 12px;
+
+        width: auto;
+        height: 66px;
+
+        flex-direction: row;
+        justify-content: center;
+
+        padding: 7px 10px;
+
+        border: 1px solid var(--profile-line);
+        border-radius: 18px;
+
+        box-shadow: 0 12px 40px rgba(23,107,78,.15);
+    }
+
+    .profile-sidebar:hover {
+        width: auto;
+        align-items: center;
+        box-shadow: 0 12px 40px rgba(23,107,78,.15);
+    }
+
+    .sidebar-logo {
+        display: none;
+    }
+
+    .sidebar-navigation {
+        width: 100%;
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+
+        margin: 0;
+    }
+
+    .sidebar-item,
+    .profile-sidebar:hover .sidebar-item {
+        width: 100%;
+        min-width: 0;
+        height: 52px;
+
+        justify-content: center;
+
+        padding: 4px 0;
+    }
+
+    .sidebar-text,
+    .profile-sidebar:hover .sidebar-text {
+        display: none;
+    }
+
+    .sidebar-logout {
+        display: none;
+    }
+
+    .profile-workspace {
+        margin-left: 0;
+        padding-bottom: 90px;
+    }
+
+    .profile-header {
+        min-height: 68px;
+        padding: 0 20px;
+    }
+
+    .profile-brand span,
+    .profile-header-actions {
+        display: none;
+    }
+
+    .profile-identity {
+        width: calc(100% - 40px);
+
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+
+        gap: 18px;
+
+        margin-top: 28px;
+        padding-bottom: 30px;
+    }
+
+    .profile-photo-wrapper {
+        flex: 0 0 auto;
+    }
+
+    .profile-photo {
+        width: 86px;
+        height: 86px;
+    }
+
+    .profile-main-info {
+        flex: 1 1 220px;
+    }
+
+    .profile-main-info h1 {
+        font-size: 42px;
+    }
+
+    .profile-main-info > p {
+        font-size: 15px;
+    }
+
+    .profile-actions {
+        width: 100%;
+
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+        gap: 10px;
+    }
+
+    .secondary-action,
+    .primary-action,
+    .profile-message,
+    .profile-booking {
+        width: 100%;
+        min-width: 0;
+        min-height: 48px;
+        padding: 0 12px;
+        font-size: 13px;
+    }
+
+    .profile-content {
+        width: calc(100% - 40px);
+        padding-top: 45px;
+    }
+
+    .section-label {
+        margin-bottom: 14px;
+    }
+
+    .section-body h2 {
+        font-size: 30px;
+    }
+
+    .profile-bio {
+        font-size: 16px;
+        line-height: 1.75;
+    }
+
+    .skills-columns {
+        grid-template-columns: 1fr;
+
+        gap: 32px;
+
+        margin-top: 45px;
+        padding-top: 30px;
+    }
+
+    .skill-pill {
+        font-size: 13px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 45px;
+        padding-top: 40px;
+    }
+
+    .reviews-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+    }
+
+    .reviews-heading > div:first-child {
+        min-width: 0;
+    }
+
+    .reviews-heading > div:first-child h2 {
+        font-size: 29px;
+    }
+
+    .overall-rating {
+        min-width: 110px;
+        text-align: right;
+    }
+
+    .overall-rating strong {
+        font-size: 40px;
+    }
+
+    .rating-breakdown {
+        margin-top: 28px;
+        padding-bottom: 24px;
+    }
+
+    .rating-row {
+        grid-template-columns: 38px minmax(0, 1fr) 30px;
+        gap: 10px;
+    }
+
+    .review-item {
+        grid-template-columns: 1fr;
+        gap: 12px;
+
+        padding: 20px 0;
+    }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .profile-identity {
+        width: calc(100% - 32px);
+    }
+
+    .profile-content {
+        width: calc(100% - 32px);
+    }
+
+    .profile-main-info h1 {
+        font-size: 36px;
+    }
+
+    .profile-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .reviews-heading {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .overall-rating {
+        text-align: left;
+    }
+
+    .rating-row {
+        grid-template-columns: 34px minmax(0, 1fr) 24px;
+        gap: 8px;
+    }
+}
+
+/* =========================================================
+   FINAL COMMUNITY FEEDBACK — MATCH OTHER PROFILE EXACTLY
+   Structure:
+   LEFT  -> Community Feedback / Ratings & Reviews / 3.7 / stars / count
+   RIGHT -> 5★ ... chart ... count
+   BELOW -> linear reviews, no cards
+========================================================= */
+
+.profile-reviews-section {
+    width: 100% !important;
+    margin: 65px 0 0 !important;
+    padding: 48px 0 25px !important;
+    border: 0 !important;
+    border-top: 1px solid #dfe8e3 !important;
+    min-width: 0 !important;
+}
+
+.profile-eyebrow {
+    margin: 0 0 16px !important;
+    color: #176b4e !important;
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    letter-spacing: .14em !important;
+}
+
+.profile-reviews-header {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr) !important;
+    column-gap: 70px !important;
+    align-items: start !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Make the two header children become the two visual columns. */
+.profile-reviews-header > div:first-child {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+}
+
+.profile-reviews-header > div:first-child h2 {
+    margin: 0 !important;
+    max-width: none !important;
+    color: #15231f !important;
+    font-size: clamp(30px, 3vw, 42px) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -.05em !important;
+}
+
+.big-rating {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    justify-self: start !important;
+    align-self: start !important;
+    min-width: 0 !important;
+    margin-top: 20px !important;
+    text-align: left !important;
+}
+
+.big-rating strong {
+    display: block !important;
+    color: #15231f !important;
+    font-size: 52px !important;
+    line-height: .95 !important;
+    letter-spacing: -.06em !important;
+}
+
+.big-rating span {
+    display: block !important;
+    margin-top: 10px !important;
+    color: #d99b00 !important;
+    font-size: 17px !important;
+    line-height: 1 !important;
+    letter-spacing: 2px !important;
+    white-space: nowrap !important;
+}
+
+.big-rating small {
+    display: block !important;
+    margin-top: 7px !important;
+    color: #777 !important;
+    font-size: 13px !important;
+}
+
+/* Rating chart occupies the complete RIGHT half. */
+.rating-distribution {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: center !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+.rating-row {
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) 34px !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin: 0 0 13px !important;
+    color: #52635b !important;
+    font-size: 12px !important;
+}
+
+.rating-row:last-child {
+    margin-bottom: 0 !important;
+}
+
+.rating-row > span {
+    color: #52635b !important;
+}
+
+.rating-row small {
+    display: block !important;
+    color: #777 !important;
+    text-align: right !important;
+    font-size: 12px !important;
+}
+
+.rating-bar {
+    width: 100% !important;
+    height: 9px !important;
+    overflow: hidden !important;
+    border-radius: 999px !important;
+    background: #e5e7e2 !important;
+}
+
+.rating-bar-fill {
+    height: 100% !important;
+    min-width: 0 !important;
+    border-radius: inherit !important;
+    background: #1c1c1c !important;
+    transition: width .4s ease !important;
+}
+
+/* Reviews start BELOW both columns and stay completely linear. */
+.reviews-list {
+    width: 100% !important;
+    margin: 40px 0 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    border-top: 1px solid #dfe8e3 !important;
+}
+
+.review-card {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 22px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #dfe8e3 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.review-card:first-child {
+    padding-top: 24px !important;
+}
+
+.review-card:last-child {
+    border-bottom: 0 !important;
+}
+
+.review-card-top {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.reviewer-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 50% !important;
+    background: #176b4e !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+}
+
+.review-card-top strong {
+    display: block !important;
+    color: #15231f !important;
+    font-size: 14px !important;
+}
+
+.reviewer-role {
+    display: block !important;
+    margin-top: 2px !important;
+    color: #777 !important;
+    font-size: 11px !important;
+    text-transform: capitalize !important;
+}
+
+.review-date {
+    margin-left: auto !important;
+    color: #888 !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+}
+
+.review-stars {
+    margin: 13px 0 8px !important;
+    color: #d99b00 !important;
+    font-size: 14px !important;
+    letter-spacing: 1.5px !important;
+}
+
+.review-stars span {
+    color: #d9ddd9 !important;
+}
+
+.review-comment {
+    margin: 0 !important;
+    color: #45534e !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.no-reviews {
+    width: 100% !important;
+    padding: 35px 0 !important;
+    border: 0 !important;
+    border-top: 1px solid #dfe8e3 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    text-align: center !important;
+}
+
+.no-reviews div {
+    margin-bottom: 8px !important;
+    font-size: 28px !important;
+}
+
+.no-reviews h3 {
+    margin: 0 0 6px !important;
+    color: #15231f !important;
+}
+
+.no-reviews p {
+    margin: 0 !important;
+    color: #777 !important;
+    font-size: 14px !important;
+}
+
+.reviews-loading {
+    width: 100% !important;
+    padding: 30px 0 !important;
+    color: #777 !important;
+    text-align: center !important;
+}
+
+@media (max-width: 980px) {
+    .profile-reviews-header {
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: space-between !important;
+        gap: 20px !important;
+    }
+
+    .profile-reviews-header > div:first-child {
+        min-width: 0 !important;
+    }
+
+    .big-rating {
+        margin-top: 0 !important;
+        text-align: right !important;
+    }
+
+    .big-rating strong {
+        font-size: 40px !important;
+    }
+
+    .rating-distribution {
+        width: 100% !important;
+        margin-top: 28px !important;
+    }
+
+    .reviews-list {
+        margin-top: 30px !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .profile-reviews-section {
+        margin-top: 45px !important;
+        padding-top: 40px !important;
+    }
+
+    .profile-reviews-header {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px !important;
+    }
+
+    .big-rating {
+        text-align: left !important;
+    }
+
+    .review-date {
+        display: none !important;
+    }
+}
+
+/* =========================================================
+   FINAL RESPONSIVE POLISH
+   - Only Edit Profile remains beside the identity
+   - Header/sidebar stay functional
+   - Identity, skills, ratings and reviews reflow cleanly
+========================================================= */
+
+.profile-edit-only {
+    min-width: 150px;
+}
+
+/* Medium desktop / tablets */
+@media (max-width: 1100px) {
+
+    .profile-header {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .profile-identity,
+    .profile-content {
+        width: calc(100% - 60px);
+    }
+
+    .profile-identity {
+        grid-template-columns: 100px minmax(0, 1fr) auto;
+        gap: 22px;
+    }
+
+    .profile-photo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-main-info h1 {
+        font-size: clamp(38px, 6vw, 52px);
+    }
+
+    .profile-actions {
+        justify-self: end;
+    }
+
+    .profile-content {
+        padding-top: 52px;
+    }
+
+    .skills-columns {
+        gap: 34px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+
+    .profile-header {
+        min-height: 72px;
+    }
+
+    .profile-header-actions {
+        gap: 18px;
+    }
+
+    .profile-identity {
+        grid-template-columns: 96px minmax(0, 1fr);
+        align-items: center;
+        gap: 20px;
+        padding-bottom: 34px;
+    }
+
+    .profile-photo {
+        width: 96px;
+        height: 96px;
+        border-width: 5px;
+    }
+
+    .profile-photo-fallback {
+        font-size: 34px;
+    }
+
+    .profile-main-info h1 {
+        font-size: clamp(34px, 7vw, 48px);
+    }
+
+    .profile-main-info > p {
+        font-size: 15px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-actions {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: 2px;
+    }
+
+    .profile-edit-only {
+        min-height: 46px;
+    }
+
+    .profile-content {
+        padding-top: 48px;
+    }
+
+    .skills-columns {
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 48px !important;
+    }
+
+    .profile-reviews-header {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start !important;
+        gap: 24px !important;
+    }
+
+    .big-rating {
+        min-width: 115px;
+    }
+}
+
+/* Phones */
+@media (max-width: 700px) {
+
+    .profile-page {
+        overflow-x: hidden;
+    }
+
+    .profile-sidebar {
+        position: fixed;
+        inset: auto 12px 12px 12px;
+        width: auto;
+        height: 66px;
+        padding: 7px 10px;
+        flex-direction: row;
+        justify-content: center;
+        border: 1px solid #dce8e1;
+        border-radius: 18px;
+        box-shadow: 0 12px 40px rgba(23,107,78,.14);
+    }
+
+    .profile-sidebar:hover {
+        width: auto;
+    }
+
+    .sidebar-logo {
+        display: none;
+    }
+
+    .sidebar-navigation {
+        width: 100%;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2px;
+    }
+
+    .sidebar-item,
+    .profile-sidebar:hover .sidebar-item {
+        width: 100%;
+        min-width: 0;
+        height: 52px;
+        padding: 4px 0;
+        justify-content: center;
+        border-radius: 14px;
+    }
+
+    .sidebar-text,
+    .profile-sidebar:hover .sidebar-text {
+        display: none;
+    }
+
+    .sidebar-logout {
+        display: none;
+    }
+
+    .profile-workspace {
+        margin-left: 0;
+        padding-bottom: 92px;
+    }
+
+    .profile-header {
+        min-height: 68px;
+        padding: 0 18px;
+    }
+
+    .profile-brand strong {
+        font-size: 14px;
+    }
+
+    .profile-brand span,
+    .profile-header-actions {
+        display: none;
+    }
+
+    .profile-identity {
+        width: calc(100% - 36px);
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        align-items: start;
+        gap: 16px;
+        margin-top: 28px;
+        padding-bottom: 30px;
+    }
+
+    .profile-photo {
+        width: 82px;
+        height: 82px;
+        border-width: 5px;
+    }
+
+    .profile-photo-fallback {
+        font-size: 29px;
+    }
+
+    .profile-status-row {
+        gap: 7px;
+        margin-bottom: 7px;
+    }
+
+    .profile-status {
+        min-height: 24px;
+        padding: 5px 9px;
+        font-size: 9px;
+    }
+
+    .profile-role {
+        font-size: 11px;
+    }
+
+    .profile-main-info h1 {
+        margin-top: 7px;
+        font-size: clamp(30px, 9vw, 42px);
+        line-height: .98;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-main-info > p {
+        margin-top: 4px;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-rating-summary {
+        margin-top: 10px;
+        gap: 6px;
+        font-size: 12px;
+    }
+
+    .profile-rating-summary .rating-star {
+        font-size: 15px;
+    }
+
+    .profile-rating-summary strong {
+        font-size: 14px;
+    }
+
+    .profile-actions {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin-top: 4px;
+        justify-self: stretch;
+    }
+
+    .profile-edit-only {
+        width: 100%;
+        min-height: 48px;
+    }
+
+    .profile-content {
+        width: calc(100% - 36px);
+        padding-top: 40px;
+    }
+
+    .section-label {
+        margin-bottom: 13px;
+        font-size: 10px;
+    }
+
+    .section-body h2 {
+        font-size: clamp(28px, 8vw, 36px);
+        line-height: 1.08;
+    }
+
+    .profile-bio {
+        max-width: none;
+        font-size: 15px;
+        line-height: 1.75;
+    }
+
+    .skills-columns {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        margin-top: 42px;
+    }
+
+    .skill-column + .skill-column {
+        padding-top: 28px;
+        padding-left: 0;
+        border-top: 1px solid var(--profile-line);
+        border-left: 0;
+    }
+
+    .skill-pill {
+        font-size: 12px;
+    }
+
+    .profile-reviews-section {
+        margin-top: 42px !important;
+        padding-top: 34px !important;
+    }
+
+    .profile-reviews-header {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .profile-reviews-header h2 {
+        font-size: 29px !important;
+        line-height: 1.08;
+    }
+
+    .big-rating {
+        min-width: 0;
+        text-align: left !important;
+    }
+
+    .big-rating strong {
+        font-size: 40px !important;
+    }
+
+    .rating-distribution {
+        margin-top: 22px !important;
+    }
+
+    .rating-row {
+        grid-template-columns: 34px minmax(0, 1fr) 28px !important;
+        gap: 9px !important;
+        font-size: 11px !important;
+    }
+
+    .review-card {
+        padding: 18px 0 !important;
+    }
+
+    .review-card-top {
+        min-width: 0;
+    }
+
+    .review-date {
+        display: none !important;
+    }
+
+    .review-comment {
+        font-size: 14px !important;
+        overflow-wrap: anywhere;
+    }
+
+    .profile-side-content {
+        display: none !important;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+
+    .profile-header {
+        padding: 0 15px;
+    }
+
+    .profile-identity {
+        width: calc(100% - 30px);
+        grid-template-columns: 70px minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    .profile-photo {
+        width: 70px;
+        height: 70px;
+        border-width: 4px;
+    }
+
+    .profile-photo-fallback {
+        font-size: 24px;
+    }
+
+    .profile-main-info h1 {
+        font-size: clamp(28px, 9vw, 36px);
+    }
+
+    .profile-main-info > p {
+        font-size: 13px;
+    }
+
+    .profile-status {
+        font-size: 8px;
+        letter-spacing: .08em;
+    }
+
+    .profile-content {
+        width: calc(100% - 30px);
+        padding-top: 34px;
+    }
+
+    .section-body h2 {
+        font-size: 27px;
+    }
+
+    .profile-bio {
+        font-size: 14px;
+    }
+
+    .skills-columns {
+        margin-top: 36px;
+    }
+
+    .profile-reviews-header h2 {
+        font-size: 27px !important;
+    }
+
+    .big-rating strong {
+        font-size: 36px !important;
+    }
+
+    .rating-row {
+        grid-template-columns: 30px minmax(0, 1fr) 24px !important;
+        gap: 7px !important;
+    }
+
+    .rating-bar {
+        height: 8px !important;
+    }
+
+    .review-card-top {
+        gap: 8px !important;
+    }
+
+    .reviewer-avatar {
+        width: 36px !important;
+        height: 36px !important;
+        flex-basis: 36px !important;
+        font-size: 13px !important;
+    }
+
+    .review-card-top strong {
+        font-size: 13px !important;
+    }
+
+    .review-comment {
+        font-size: 13px !important;
+        line-height: 1.55 !important;
+    }
+}
+
+/* Very narrow phones */
+@media (max-width: 360px) {
+
+    .profile-identity {
+        width: calc(100% - 24px);
+        grid-template-columns: 62px minmax(0, 1fr);
+        gap: 11px;
+    }
+
+    .profile-photo {
+        width: 62px;
+        height: 62px;
+    }
+
+    .profile-content {
+        width: calc(100% - 24px);
+    }
+
+    .profile-main-info h1 {
+        font-size: 28px;
+    }
+
+    .profile-main-info > p {
+        font-size: 12px;
+    }
+
+    .profile-edit-only {
+        min-height: 46px;
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================================
+   CLEAN FINAL OVERRIDES
+   Matches the final JSX structure and keeps the profile
+   responsive without changing the desktop visual language.
+========================================================= */
+
+.profile-reviews-section {
+    min-width: 0;
+}
+
+.reviews-heading {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr) 180px;
+    align-items: start;
+    gap: 30px;
+    margin: 0 0 28px;
+}
+
+.reviews-heading > div:first-child {
+    grid-column: 1;
+}
+
+.overall-rating {
+    grid-column: 3;
+    text-align: right;
+    min-width: 180px;
+}
+
+.rating-breakdown {
+    width: 100%;
+    margin: 0 0 32px;
+    padding: 0 0 28px;
+    border-bottom: 1px solid var(--profile-line);
+}
+
+.reviews-empty {
+    padding: 30px 0;
+    text-align: center;
+    color: var(--profile-muted);
+}
+
+@media (max-width: 900px) {
+    .reviews-heading {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 22px;
+    }
+
+    .reviews-heading > div:first-child {
+        grid-column: 1;
+    }
+
+    .overall-rating {
+        grid-column: 2;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 700px) {
+    .reviews-heading {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .overall-rating {
+        min-width: 0;
+        text-align: left;
+    }
+
+    .rating-breakdown {
+        margin-top: 4px;
+    }
+
+    .profile-content {
+        width: calc(100% - 36px);
+    }
+
+    .profile-identity {
+        width: calc(100% - 36px);
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-content,
+    .profile-identity {
+        width: calc(100% - 30px);
+    }
+
+    .rating-row {
+        grid-template-columns: 30px minmax(0, 1fr) 24px;
+        gap: 7px;
+    }
+}
+
+
+/* =========================================================
+   FINAL POLISH — HEADER ACTIONS / BIO / RESPONSIVENESS
+========================================================= */
+
+/* The top-right navigation was intentionally restored. */
+.profile-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 28px;
+    flex-shrink: 0;
+}
+
+.profile-header-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 9px 2px;
+
+    border: 0;
+    background: transparent;
+
+    color: var(--profile-green);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 850;
+    letter-spacing: -.01em;
+
+    cursor: pointer;
+
+    transition:
+        color .18s ease,
+        transform .18s ease,
+        opacity .18s ease;
+}
+
+.profile-header-link span {
+    display: inline-block;
+    transition: transform .18s ease;
+}
+
+.profile-header-link:hover {
+    color: var(--profile-green-dark);
+    transform: translateY(-1px);
+}
+
+.profile-header-link:hover span {
+    transform: translateX(4px);
+}
+
+.profile-header-link:focus-visible {
+    outline: 2px solid var(--profile-green);
+    outline-offset: 5px;
+    border-radius: 6px;
+}
+
+/* Long bios must NEVER escape the content column. */
+.profile-content,
+.profile-content-main,
+.profile-section,
+.section-body,
+.profile-bio {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.profile-bio {
+    width: 100%;
+    max-width: 820px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+    hyphens: auto;
+}
+
+/* Failed avatar image: keep the same visual circle and show initials. */
+.profile-photo-wrapper {
+    position: relative;
+}
+
+.profile-photo-fallback-letter {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+    background: linear-gradient(145deg, #dff2e7, #c9e7d7);
+    color: var(--profile-green);
+
+    font-size: 34px;
+    font-weight: 900;
+    z-index: 0;
+}
+
+.profile-photo {
+    position: relative;
+    z-index: 1;
+}
+
+.profile-photo-failed {
+    display: none !important;
+}
+
+/* Smoother interaction across the profile without making it cardy. */
+.sidebar-item,
+.sidebar-logo,
+.profile-header-link,
+.cover-edit-button,
+.profile-edit-only,
+.skill-pill,
+.inline-link,
+.side-action {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.skill-pill {
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background-color .18s ease;
+}
+
+.skill-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 18px rgba(22, 94, 68, .10);
+}
+
+.profile-edit-only {
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background-color .18s ease;
+}
+
+.profile-edit-only:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(23, 107, 78, .18);
+}
+
+.profile-edit-only:active,
+.profile-header-link:active,
+.sidebar-item:active {
+    transform: translateY(0);
+}
+
+/* Better medium-screen behavior. */
+@media (max-width: 1050px) {
+    .profile-header {
+        padding: 0 28px;
+    }
+
+    .profile-header-actions {
+        gap: 20px;
+    }
+
+    .profile-content,
+    .profile-identity {
+        width: min(100% - 48px, 1180px);
+    }
+
+    .profile-bio {
+        max-width: 100%;
+    }
+}
+
+/* Tablet: keep header actions but allow them to breathe. */
+@media (max-width: 760px) {
+    .profile-header {
+        min-height: 70px;
+        padding: 0 18px;
+        gap: 14px;
+    }
+
+    .profile-brand strong {
+        font-size: 13px;
+    }
+
+    .profile-brand span {
+        font-size: 10px;
+    }
+
+    .profile-header-actions {
+        gap: 13px;
+    }
+
+    .profile-header-link {
+        font-size: 11px;
+        padding: 8px 0;
+    }
+
+    .profile-header-link span {
+        display: none;
+    }
+
+    .profile-bio {
+        font-size: 15px;
+        line-height: 1.75;
+    }
+}
+
+/* Phone: navigation stays usable instead of disappearing. */
+@media (max-width: 560px) {
+    .profile-header {
+        min-height: 64px;
+    }
+
+    .profile-brand span {
+        display: none;
+    }
+
+    .profile-header-actions {
+        gap: 8px;
+    }
+
+    .profile-header-link {
+        min-height: 38px;
+        padding: 7px 10px;
+
+        border: 1px solid var(--profile-line);
+        border-radius: 999px;
+
+        background: rgba(255,255,255,.72);
+        font-size: 10px;
+    }
+
+    .profile-header-link:hover {
+        background: var(--profile-green-soft);
+    }
+
+    .profile-bio {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+}
+
+/* Very small phones: compact navigation labels. */
+@media (max-width: 390px) {
+    .profile-header {
+        padding: 0 12px;
+    }
+
+    .profile-brand strong {
+        font-size: 11px;
+        letter-spacing: .1em;
+    }
+
+    .profile-header-actions {
+        gap: 5px;
+    }
+
+    .profile-header-link {
+        padding: 6px 8px;
+        font-size: 9px;
+    }
+}
+
+
+/* =========================================================
+   PREMIUM PROFILE POLISH — FINAL OVERRIDES
+   Keeps existing JSX + functionality intact.
+========================================================= */
+
+.profile-page {
+    --profile-shadow-soft: 0 18px 55px rgba(20, 75, 53, .08);
+    --profile-shadow-hover: 0 22px 65px rgba(20, 75, 53, .14);
+    overflow-x: hidden;
+}
+
+/* Make the brand feel integrated with the page instead of a detached bar. */
+.profile-header {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(247,250,247,.96),
+            rgba(255,255,255,.88)
+        );
+    border-bottom-color: rgba(223,232,227,.78);
+}
+
+.profile-brand strong {
+    position: relative;
+    display: inline-block;
+    letter-spacing: .16em;
+}
+
+.profile-brand strong::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -7px;
+    width: 30px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--profile-green);
+    opacity: .7;
+}
+
+.profile-header-link {
+    position: relative;
+}
+
+/* SE logo interaction */
+.sidebar-logo {
+    transition:
+        transform .25s cubic-bezier(.2,.8,.2,1),
+        box-shadow .25s ease,
+        background .25s ease;
+    transform-origin: center;
+}
+
+.sidebar-logo:hover {
+    transform: translateY(-3px) rotate(-5deg) scale(1.06);
+    box-shadow:
+        0 14px 30px rgba(23,107,78,.24),
+        0 0 0 7px rgba(23,107,78,.06);
+}
+
+.sidebar-logo:active {
+    transform: scale(.94) rotate(0);
+}
+
+/* Hero cover */
+.profile-cover {
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,.5);
+}
+
+.profile-cover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 15% 75%, rgba(255,255,255,.35), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(255,255,255,.5), transparent 26%);
+    pointer-events: none;
+}
+
+.cover-edit-button {
+    box-shadow: var(--profile-shadow-soft);
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.cover-edit-button:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--profile-shadow-hover);
+}
+
+/* Profile photo — hover zoom / premium ring */
+.profile-photo-wrapper {
+    position: relative;
+    cursor: zoom-in;
+    perspective: 700px;
+}
+
+.profile-photo-wrapper::after {
+    content: "VIEW";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 4;
+    transform: translate(-50%,-42%) scale(.8);
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: rgba(10,38,29,.76);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .14em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+}
+
+.profile-photo-wrapper:hover::after {
+    opacity: 1;
+    transform: translate(-50%,-50%) scale(1);
+}
+
+.profile-photo,
+.profile-photo-fallback {
+    transition:
+        transform .32s cubic-bezier(.2,.8,.2,1),
+        box-shadow .32s ease,
+        border-color .25s ease;
+    transform-origin: center;
+}
+
+.profile-photo-wrapper:hover .profile-photo,
+.profile-photo-wrapper:hover .profile-photo-fallback {
+    transform: scale(1.075);
+    box-shadow:
+        0 24px 50px rgba(20,75,53,.23),
+        0 0 0 7px rgba(23,107,78,.08);
+}
+
+/* Main identity */
+.profile-main-info h1 {
+    text-wrap: balance;
+}
+
+.profile-main-info > p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Edit / Complete button */
+.profile-edit-only {
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-edit-only::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-120%);
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255,255,255,.25) 50%,
+        transparent 70%
+    );
+    transition: transform .5s ease;
+    pointer-events: none;
+}
+
+.profile-edit-only:hover::after {
+    transform: translateX(120%);
+}
+
+/* Stats become interactive without becoming cards. */
+.stat-item {
+    position: relative;
+    transition:
+        background .2s ease,
+        transform .2s ease;
+}
+
+.stat-item:hover {
+    background: rgba(223,245,233,.32);
+}
+
+.stat-item strong {
+    transition: transform .2s ease, color .2s ease;
+}
+
+.stat-item:hover strong {
+    color: var(--profile-green);
+    transform: translateY(-2px);
+}
+
+/* Bio: never allow ugly long strings to escape. */
+.profile-bio {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+    hyphens: auto;
+}
+
+/* Skills */
+.skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-pill {
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.skill-pill:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(23,107,78,.10);
+}
+
+/* Ratings */
+.rating-row {
+    transition:
+        transform .18s ease,
+        opacity .18s ease;
+    cursor: default;
+}
+
+.rating-row:hover {
+    transform: translateX(5px);
+}
+
+.rating-row:hover .rating-bar {
+    box-shadow: 0 0 0 3px rgba(23,107,78,.06);
+}
+
+.rating-bar-fill {
+    transition: width .55s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Reviews — linear, but interactive */
+.review-card {
+    position: relative;
+    transition:
+        background .2s ease,
+        padding-left .2s ease,
+        padding-right .2s ease;
+}
+
+.review-card:hover {
+    background: linear-gradient(
+        90deg,
+        rgba(223,245,233,.26),
+        transparent 80%
+    );
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.review-card-top {
+    transition: transform .2s ease;
+}
+
+.review-card:hover .review-card-top {
+    transform: translateX(2px);
+}
+
+.reviewer-avatar {
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+}
+
+.review-card:hover .reviewer-avatar {
+    transform: scale(1.08);
+    box-shadow: 0 8px 18px rgba(23,107,78,.14);
+}
+
+.review-stars {
+    letter-spacing: .06em;
+    transition: transform .2s ease;
+}
+
+.review-card:hover .review-stars {
+    transform: translateX(2px);
+}
+
+.review-comment {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Side information */
+.side-section {
+    transition: transform .2s ease;
+}
+
+.side-section:hover {
+    transform: translateY(-2px);
+}
+
+.side-action {
+    border-radius: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    transition:
+        color .18s ease,
+        background .18s ease,
+        padding-left .18s ease;
+}
+
+.side-action:hover {
+    background: rgba(223,245,233,.45);
+    padding-left: 12px;
+}
+
+/* Keyboard focus */
+.profile-page button:focus-visible {
+    outline: 2px solid var(--profile-green);
+    outline-offset: 3px;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .profile-photo-wrapper:hover::after {
+        opacity: 0;
+    }
+
+    .profile-photo-wrapper:hover .profile-photo,
+    .profile-photo-wrapper:hover .profile-photo-fallback {
+        transform: scale(1.025);
+    }
+
+    .profile-header {
+        position: relative;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .profile-header {
+        gap: 12px;
+    }
+
+    .profile-brand {
+        min-width: 0;
+    }
+
+    .profile-brand strong {
+        font-size: 12px;
+    }
+
+    .profile-header-actions {
+        flex-shrink: 0;
+    }
+
+    .profile-header-link {
+        white-space: nowrap;
+    }
+
+    .profile-photo-wrapper {
+        cursor: default;
+    }
+
+    .profile-photo-wrapper::after {
+        display: none;
+    }
+
+    .profile-photo-wrapper:hover .profile-photo,
+    .profile-photo-wrapper:hover .profile-photo-fallback {
+        transform: none;
+    }
+
+    .review-card:hover {
+        padding-left: 0;
+        padding-right: 0;
+        background: transparent;
+    }
+
+    .side-section:hover {
+        transform: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header-actions {
+        gap: 5px;
+    }
+
+    .profile-header-link {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .profile-photo {
+        width: 112px;
+        height: 112px;
+    }
+}
+
+
+/* =========================================================
+   FINAL VISUAL REFINEMENT — HEADER / SE LOGO / BIO → SKILLS
+========================================================= */
+
+/* Let the top header visually belong to the same page canvas. */
+.profile-header {
+    min-height: 92px;
+    padding: 18px clamp(24px, 5vw, 72px);
+    background: linear-gradient(
+        180deg,
+        rgba(247,250,247,.96) 0%,
+        rgba(247,250,247,.78) 100%
+    );
+    border-bottom: 1px solid rgba(211,225,218,.72);
+    box-shadow: 0 8px 28px rgba(24,68,51,.025);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Brand typography now matches the editorial profile typography. */
+.profile-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.profile-brand strong {
+    display: inline-block;
+    width: fit-content;
+    margin: 0;
+    color: #12664a;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .17em;
+}
+
+.profile-brand strong::after {
+    content: "";
+    display: block;
+    width: 28px;
+    height: 2px;
+    margin-top: 7px;
+    border-radius: 99px;
+    background: #176b4e;
+    opacity: .72;
+}
+
+.profile-brand span {
+    margin: 1px 0 0;
+    color: #71827a;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 11px;
+    line-height: 1.25;
+    letter-spacing: .01em;
+}
+
+/* Header links feel like part of the page, not buttons in a separate bar. */
+.profile-header-actions {
+    align-items: center;
+    gap: 30px;
+}
+
+.profile-header-actions button {
+    position: relative;
+    padding: 8px 0;
+    color: #176b4e;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .01em;
+    cursor: pointer;
+    transition:
+        color .2s ease,
+        transform .2s ease;
+}
+
+.profile-header-actions button::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 18px;
+    bottom: 1px;
+    height: 2px;
+    border-radius: 99px;
+    background: #176b4e;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .22s ease;
+}
+
+.profile-header-actions button:hover {
+    color: #0d5940;
+    transform: translateY(-2px);
+}
+
+.profile-header-actions button:hover::after {
+    transform: scaleX(1);
+}
+
+/* Premium SE logo: less generic, more like a product mark. */
+.sidebar-logo {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    overflow: visible;
+
+    border: 1px solid rgba(255,255,255,.30);
+    border-radius: 20px;
+
+    background:
+        radial-gradient(
+            circle at 30% 20%,
+            rgba(255,255,255,.18),
+            transparent 34%
+        ),
+        linear-gradient(
+            145deg,
+            #238463 0%,
+            #176b4e 55%,
+            #0d5940 100%
+        );
+
+    color: #fff;
+
+    box-shadow:
+        0 12px 26px rgba(23,107,78,.20),
+        inset 0 1px 0 rgba(255,255,255,.18);
+
+    font-size: 0;
+    transform: translateZ(0);
+}
+
+.sidebar-logo::before {
+    content: "↗";
+    position: absolute;
+    top: 7px;
+    right: 9px;
+
+    color: rgba(255,255,255,.86);
+    font-family:
+        "Segoe UI Symbol",
+        "Arial Unicode MS",
+        sans-serif;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.sidebar-logo::after {
+    content: "SE";
+    position: absolute;
+    left: 50%;
+    top: 53%;
+    transform: translate(-50%,-50%);
+
+    color: #fff;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 20px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -.06em;
+}
+
+.sidebar-logo:hover {
+    transform: translateY(-4px) scale(1.055) rotate(-2deg);
+    box-shadow:
+        0 18px 36px rgba(23,107,78,.27),
+        0 0 0 7px rgba(23,107,78,.07),
+        inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+.sidebar-logo:active {
+    transform: scale(.96);
+}
+
+/* Give the actual bio section breathing room before skills. */
+.profile-bio-section {
+    margin-bottom: 30px;
+}
+
+.profile-bio-section .profile-bio {
+    margin-bottom: 0;
+}
+
+/* Strong visual separation between bio and skills. */
+.skills-columns {
+    margin-top: 82px !important;
+    padding-top: 42px !important;
+}
+
+.profile-bio + .inline-link {
+    margin-bottom: 14px;
+}
+
+.profile-bio-section + .skills-columns {
+    margin-top: 84px !important;
+}
+
+/* If the JSX wraps the bio differently, this still creates the gap. */
+.profile-about + .skills-columns,
+.profile-about-section + .skills-columns,
+.about-section + .skills-columns {
+    margin-top: 84px !important;
+}
+
+/* Skills typography gets a slightly more refined editorial feel. */
+.skill-column > p {
+    margin-bottom: 16px;
+    color: #176b4e;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .15em;
+}
+
+.skill-pill {
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-weight: 800;
+}
+
+/* Keep long bio content completely inside the layout. */
+.profile-bio,
+.profile-about,
+.profile-about-section,
+.profile-identity,
+.profile-content {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.profile-bio {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+/* Mobile header */
+@media (max-width: 700px) {
+    .profile-header {
+        min-height: 82px;
+        padding: 15px 18px;
+    }
+
+    .profile-brand strong {
+        font-size: 13px;
+        letter-spacing: .13em;
+    }
+
+    .profile-brand span {
+        font-size: 10px;
+    }
+
+    .profile-header-actions {
+        gap: 13px;
+    }
+
+    .profile-header-actions button {
+        font-size: 11px;
+    }
+
+    .sidebar-logo {
+        width: 58px;
+        height: 58px;
+        flex-basis: 58px;
+        border-radius: 18px;
+    }
+
+    .sidebar-logo::after {
+        font-size: 18px;
+    }
+
+    .skills-columns,
+    .profile-bio-section + .skills-columns {
+        margin-top: 58px !important;
+        padding-top: 30px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        align-items: flex-start;
+    }
+
+    .profile-header-actions {
+        gap: 8px;
+    }
+
+    .profile-header-actions button {
+        padding: 7px 2px;
+        font-size: 10px;
+    }
+
+    .profile-header-actions button::after {
+        right: 0;
+    }
+}
+
+
+/* =========================================================
+   FINAL REQUEST — MY SPACE HEADER / ROLE SUBTITLE /
+   BIO → SKILLS SPACING / PROFILE IMAGE VIEW
+========================================================= */
+
+/* Remove the hard separator under MY SPACE. */
+.profile-header {
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    background: linear-gradient(
+        180deg,
+        rgba(247,250,247,.97),
+        rgba(247,250,247,.86)
+    ) !important;
+}
+
+/* Let the header merge into the workspace naturally. */
+.profile-workspace > .profile-header {
+    position: relative;
+    z-index: 10;
+}
+
+.profile-header::after {
+    display: none !important;
+}
+
+/* Dynamic role subtitle */
+.profile-brand span {
+    color: #74847d !important;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 11px !important;
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+/* Photo is a real interactive target. */
+.profile-photo-wrapper {
+    position: relative;
+    cursor: pointer;
+    isolation: isolate;
+}
+
+.profile-photo-wrapper::after {
+    content: "VIEW PHOTO";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 8;
+
+    padding: 7px 10px;
+    border: 1px solid rgba(255,255,255,.26);
+    border-radius: 999px;
+
+    background: rgba(11,39,30,.78);
+    color: #fff;
+
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .14em;
+
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.88);
+    pointer-events: none;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
+}
+
+.profile-photo-wrapper:hover::after,
+.profile-photo-wrapper:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.profile-photo-wrapper:hover .profile-photo,
+.profile-photo-wrapper:hover .profile-photo-fallback {
+    transform: scale(1.055);
+    box-shadow:
+        0 22px 48px rgba(23,107,78,.22),
+        0 0 0 7px rgba(23,107,78,.07);
+}
+
+.profile-photo,
+.profile-photo-fallback {
+    transition:
+        transform .3s cubic-bezier(.2,.8,.2,1),
+        box-shadow .3s ease;
+}
+
+/* Bio has a clearly separated skills section. */
+.profile-section:first-child {
+    padding-bottom: 58px !important;
+    margin-bottom: 58px !important;
+}
+
+.profile-section:first-child .section-body {
+    min-width: 0;
+}
+
+.profile-section:first-child .profile-bio {
+    margin-bottom: 0;
+    max-width: 920px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Extra breathing room immediately before SKILLS. */
+.profile-section:nth-child(2) {
+    padding-top: 8px;
+}
+
+.profile-section:nth-child(2) .section-label {
+    margin-bottom: 18px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .profile-header {
+        border-bottom: 0 !important;
+        min-height: 78px;
+    }
+
+    .profile-section:first-child {
+        padding-bottom: 42px !important;
+        margin-bottom: 42px !important;
+    }
+
+    .profile-photo-wrapper::after {
+        display: none;
+    }
+
+    .profile-photo-wrapper:hover .profile-photo,
+    .profile-photo-wrapper:hover .profile-photo-fallback {
+        transform: none;
+    }
+}
+
+@media (max-width: 430px) {
+    .profile-section:first-child {
+        padding-bottom: 36px !important;
+        margin-bottom: 36px !important;
+    }
+}
+
+
+/* =========================================================
+   FINAL FIX — MY SPACE
+   1. remove ALL header/hero separator lines
+   2. correct bio -> skills spacing
+   3. reliable photo-view overlay/modal styling
+========================================================= */
+
+/* The visible green separator was coming from a later border rule.
+   Kill every border/shadow on the top header itself. */
+.profile-workspace > .profile-header,
+.profile-header {
+    border: 0 !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Do not let the cover create a fake line directly under the header. */
+.profile-workspace > .profile-cover {
+    border-top: 0 !important;
+}
+
+/* Keep only a tasteful, compact separation between ABOUT and SKILLS. */
+.profile-content .profile-section:first-child {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.profile-content .profile-section:nth-child(2) {
+    margin-top: 46px !important;
+    padding-top: 0 !important;
+}
+
+/* Override the previous oversized 82px/84px rules. */
+.profile-content .skills-columns,
+.profile-content .profile-about + .skills-columns,
+.profile-content .profile-about-section + .skills-columns,
+.profile-content .about-section + .skills-columns,
+.profile-bio-section + .skills-columns {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Bio remains readable and contained. */
+.profile-content .profile-bio {
+    max-width: 920px !important;
+    margin-bottom: 0 !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+/* Photo target */
+.profile-photo-wrapper {
+    cursor: pointer !important;
+    position: relative !important;
+    isolation: isolate;
+}
+
+.profile-photo-wrapper::after {
+    content: "VIEW PHOTO";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 20;
+
+    transform: translate(-50%, -50%) scale(.92);
+    opacity: 0;
+
+    padding: 7px 11px;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 999px;
+
+    background: rgba(9,38,29,.84);
+    color: #fff;
+
+    font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    white-space: nowrap;
+
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.profile-photo-wrapper:hover::after,
+.profile-photo-wrapper:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.profile-photo-wrapper:hover .profile-photo {
+    transform: scale(1.045);
+}
+
+.profile-photo {
+    transition: transform .22s ease, box-shadow .22s ease;
+}
+
+/* Photo lightbox */
+.profile-photo-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: grid;
+    place-items: center;
+
+    padding: 28px;
+
+    background: rgba(8, 24, 18, .78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.profile-photo-lightbox-image {
+    display: block;
+
+    width: min(86vw, 760px);
+    height: min(82vh, 760px);
+
+    object-fit: contain;
+
+    border: 7px solid rgba(255,255,255,.92);
+    border-radius: 22px;
+
+    background: #fff;
+    box-shadow: 0 30px 90px rgba(0,0,0,.38);
+}
+
+.profile-photo-lightbox-close {
+    position: fixed;
+    top: 22px;
+    right: 24px;
+
+    width: 44px;
+    height: 44px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.12);
+    color: #fff;
+
+    font-size: 24px;
+    line-height: 1;
+
+    cursor: pointer;
+    transition: transform .18s ease, background .18s ease;
+}
+
+.profile-photo-lightbox-close:hover {
+    transform: scale(1.06);
+    background: rgba(255,255,255,.2);
+}
+
+@media (max-width: 700px) {
+    .profile-content .profile-section:nth-child(2) {
+        margin-top: 38px !important;
+    }
+
+    .profile-photo-wrapper::after {
+        display: none;
+    }
+
+    .profile-photo-wrapper:hover .profile-photo {
+        transform: none;
+    }
+
+    .profile-photo-lightbox {
+        padding: 16px;
+    }
+
+    .profile-photo-lightbox-image {
+        width: 94vw;
+        height: 78vh;
+        border-width: 5px;
+        border-radius: 16px;
+    }
+
+    .profile-photo-lightbox-close {
+        top: 14px;
+        right: 14px;
+    }
+}
+
+
+/* =========================================================
+   FINAL SKILLS SECTION FIX
+   - keep the Learning & sharing heading fully visible
+   - compact the skills block
+   - remove the unwanted separator directly after skills
+   - preserve clean spacing before Community Feedback
+========================================================= */
+
+.profile-content .profile-section:nth-child(2) {
+    display: block !important;
+    position: relative;
+    height: auto !important;
+    min-height: 0 !important;
+    margin-top: 42px !important;
+    margin-bottom: 0 !important;
+    padding: 0 0 8px !important;
+    overflow: visible !important;
+}
+
+.profile-content .profile-section:nth-child(2) .section-label {
+    display: block !important;
+    margin: 0 0 16px !important;
+    line-height: 1.2 !important;
+}
+
+.profile-content .profile-section:nth-child(2) .section-body {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+}
+
+.profile-content .profile-section:nth-child(2) .section-body h2 {
+    display: block !important;
+    margin: 0 0 24px !important;
+    padding: 0 !important;
+    line-height: 1.08 !important;
+    overflow: visible !important;
+}
+
+/* The two skill groups sit directly under the heading. */
+.profile-content .profile-section:nth-child(2) .skills-columns {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 48px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+}
+
+.profile-content .profile-section:nth-child(2) .skill-column {
+    min-width: 0 !important;
+}
+
+.profile-content .profile-section:nth-child(2) .skill-column > p {
+    margin: 0 0 12px !important;
+    line-height: 1.3 !important;
+}
+
+.profile-content .profile-section:nth-child(2) .skill-list {
+    min-height: 32px;
+}
+
+/* Keep Community Feedback visually separated, but not with a line
+   immediately underneath the skill pills. */
+.profile-content .profile-reviews-section {
+    margin-top: 72px !important;
+    padding-top: 48px !important;
+    border-top: 1px solid var(--profile-line) !important;
+}
+
+/* Desktop: never clip the heading because of a fixed/overflow parent. */
+.profile-content,
+.profile-content-main,
+.profile-section,
+.section-body {
+    overflow: visible !important;
+}
+
+@media (max-width: 800px) {
+    .profile-content .profile-section:nth-child(2) {
+        margin-top: 36px !important;
+    }
+
+    .profile-content .profile-section:nth-child(2) .skills-columns {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+    }
+
+    .profile-content .profile-reviews-section {
+        margin-top: 54px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-content .profile-section:nth-child(2) {
+        margin-top: 30px !important;
+    }
+
+    .profile-content .profile-section:nth-child(2) .section-body h2 {
+        margin-bottom: 20px !important;
+    }
+
+    .profile-content .profile-reviews-section {
+        margin-top: 44px !important;
+        padding-top: 36px !important;
+    }
+}

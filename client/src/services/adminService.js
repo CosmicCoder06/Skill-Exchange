@@ -1,37 +1,207 @@
-import axios from "axios";
+const API_BASE =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000/api";
 
-const baseURL = import.meta.env.VITE_API_URL;
+async function adminRequest(
+    path,
+    token,
+    options = {}
+) {
+    const response = await fetch(
+        `${API_BASE}${path}`,
+        {
+            ...options,
 
-function authConfig(token) {
-  return { headers: { Authorization: `Bearer ${token}` } };
+            headers: {
+                ...(options.body
+                    ? {
+                        "Content-Type":
+                            "application/json",
+                    }
+                    : {}),
+
+                ...(token
+                    ? {
+                        Authorization:
+                            `Bearer ${token}`,
+                    }
+                    : {}),
+
+                ...(options.headers || {}),
+            },
+        }
+    );
+
+    const text =
+        await response.text();
+
+    let data = {};
+
+    try {
+        data = text
+            ? JSON.parse(text)
+            : {};
+    } catch {
+        data = {
+            message: text,
+        };
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            data?.message ||
+            data?.error ||
+            `Admin request failed (${response.status})`
+        );
+    }
+
+    return data;
 }
 
-export async function fetchAdminOverview(token) {
-  const response = await axios.get(`${baseURL}/admin/overview`, authConfig(token));
-  return response.data;
+/* =========================================================
+   OVERVIEW
+========================================================= */
+
+export async function getAdminOverview(
+    token
+) {
+    return adminRequest(
+        "/admin/overview",
+        token
+    );
 }
 
-export async function fetchAdminUsers(token) {
-  const response = await axios.get(`${baseURL}/admin/users?limit=100`, authConfig(token));
-  return response.data;
+export async function fetchAdminOverview(
+    token
+) {
+    return getAdminOverview(token);
 }
 
-export async function fetchAdminReports(token) {
-  const response = await axios.get(`${baseURL}/admin/reports`, authConfig(token));
-  return response.data;
+/* =========================================================
+   USERS
+========================================================= */
+
+export async function getAdminUsers(
+    token,
+    params = {}
+) {
+    const query =
+        new URLSearchParams();
+
+    Object.entries(params).forEach(
+        ([key, value]) => {
+            if (
+                value !== undefined &&
+                value !== null &&
+                value !== ""
+            ) {
+                query.set(
+                    key,
+                    value
+                );
+            }
+        }
+    );
+
+    const queryString =
+        query.toString();
+
+    return adminRequest(
+        `/admin/users${
+            queryString
+                ? `?${queryString}`
+                : ""
+        }`,
+        token
+    );
 }
 
-export async function updateAdminUser(token, userId, updates) {
-  const response = await axios.patch(
-    `${baseURL}/admin/users/${userId}`,
-    updates,
-    authConfig(token),
-  );
-  return response.data.user;
+export async function fetchAdminUsers(
+    token,
+    params = {}
+) {
+    return getAdminUsers(
+        token,
+        params
+    );
 }
 
-export async function deleteAdminUser(token, userId) {
-  const response = await axios.delete(`${baseURL}/admin/users/${userId}`, authConfig(token));
-  return response.data;
+/* =========================================================
+   REPORTS
+========================================================= */
+
+export async function getAdminReports(
+    token
+) {
+    return adminRequest(
+        "/admin/reports",
+        token
+    );
 }
 
+export async function fetchAdminReports(
+    token
+) {
+    return getAdminReports(token);
+}
+
+/* =========================================================
+   UPDATE USER
+========================================================= */
+
+export async function updateAdminUser(
+    token,
+    userId,
+    updates
+) {
+    return adminRequest(
+        `/admin/users/${userId}`,
+        token,
+        {
+            method: "PATCH",
+
+            body: JSON.stringify(
+                updates
+            ),
+        }
+    );
+}
+
+/* =========================================================
+   DELETE USER
+========================================================= */
+
+export async function deleteAdminUser(
+    token,
+    userId
+) {
+    return adminRequest(
+        `/admin/users/${userId}`,
+        token,
+        {
+            method: "DELETE",
+        }
+    );
+}
+
+/* =========================================================
+   REMOVE PROFILE PHOTO
+========================================================= */
+
+export async function removeAdminUserPhoto(
+    token,
+    userId,
+    reason
+) {
+    return adminRequest(
+        `/admin/users/${userId}/avatar`,
+        token,
+        {
+            method: "DELETE",
+
+            body: JSON.stringify({
+                reason,
+            }),
+        }
+    );
+}

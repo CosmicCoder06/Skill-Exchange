@@ -10,32 +10,70 @@ const server = http.createServer(app);
 
 
 // =========================
-// Database
+// Database Configuration
 // =========================
 
-const connectDB = require("./Backend Configuration/Configuration Folders/DB Configuration/dbConfig");
-
+const connectDB = require(
+    "./Backend Configuration/Configuration Folders/DB Configuration/dbConfig"
+);
 
 // =========================
-// Routes
+// Authentication Routes
 // =========================
 
-// Auth Routes
-const RegistrationApi = require("./Backend Configuration/Routes/Registration & Login Route/Register/register");
-const getUsers = require("./Backend Configuration/Routes/Get All User Route/getUser");
-const deleteUsers = require("./Backend Configuration/Routes/User Data Deleted/userDataDelete");
-const updatedUser = require("./Backend Configuration/Routes/User Updation Route/userUpdateRoute");
-const LoginRoute = require("./Backend Configuration/Routes/Registration & Login Route/Login/loginRoute");
+const RegistrationApi = require(
+    "./Backend Configuration/Routes/Registration & Login Route/Register/register"
+);
 
-// Profile
-const profileRoutes = require("./routes/profileRoutes");
+const getUsers = require(
+    "./Backend Configuration/Routes/Get All User Route/getUser"
+);
 
-// Chat
-const chatRoutes = require("./routes/chatRoutes");
-const initializeChatSocket = require("./sockets/chatSocket");
+const deleteUsers = require(
+    "./Backend Configuration/Routes/User Data Deleted/userDataDelete"
+);
 
-// Admin
-const adminRoutes = require("./routes/adminRoutes");
+const updatedUser = require(
+    "./Backend Configuration/Routes/User Updation Route/userUpdateRoute"
+);
+
+const LoginRoute = require(
+    "./Backend Configuration/Routes/Registration & Login Route/Login/loginRoute"
+);
+
+// =========================
+// Profile Routes
+// =========================
+
+const profileRoutes =
+    require("./routes/profileRoutes");
+
+// =========================
+// Chat Routes
+// =========================
+
+const chatRoutes =
+    require("./routes/chatRoutes");
+
+const initializeChatSocket =
+    require("./sockets/chatSocket");
+
+// =========================
+// Booking & Review Routes
+// =========================
+
+const bookingRoutes =
+    require("./routes/bookingRoutes");
+
+const reviewRoutes =
+    require("./routes/reviewRoutes");
+
+// =========================
+// ADMIN ROUTES
+// =========================
+
+const adminRoutes =
+    require("./routes/adminRoutes");
 
 
 // =========================
@@ -44,58 +82,61 @@ const adminRoutes = require("./routes/adminRoutes");
 
 app.use(express.json());
 
-
 const allowedOrigins = [
     "http://localhost:5173",
-    process.env.CLIENT_URL
-];
-
+    process.env.CLIENT_URL,
+].filter(Boolean);
 
 app.use(
     cors({
         origin: allowedOrigins,
-        credentials: true
+        credentials: true,
     })
 );
-
 
 // =========================
 // Health Check
 // =========================
 
 app.get("/", (req, res) => {
-    res.send("Skill Exchange Server is Running 🚀");
+    res.send(
+        "Skill Exchange Server is Running 🚀"
+    );
 });
 
-
 // =========================
-// Database
+// Connect Database
 // =========================
 
 connectDB();
 
-
 // =========================
-// APIs
+// API Routes
 // =========================
 
+// Authentication
 app.use("/api", RegistrationApi);
 app.use("/api", getUsers);
 app.use("/api", deleteUsers);
 app.use("/api", updatedUser);
 app.use("/api", LoginRoute);
 
-
-// Profile API
+// Profile
 app.use("/api", profileRoutes);
 
-
-// Chat API
+// Chat
 app.use("/api", chatRoutes);
 
-// Admin API
-app.use("/api", adminRoutes);
+// Booking
+app.use("/api", bookingRoutes);
 
+// Reviews
+app.use("/api", reviewRoutes);
+
+// Admin
+// Protected internally by:
+// verifyToken + authorize("admin")
+app.use("/api", adminRoutes);
 
 
 // =========================
@@ -106,25 +147,23 @@ const io = new Server(server, {
     cors: {
         origin: allowedOrigins,
         methods: ["GET", "POST"],
-        credentials: true
-    }
+        credentials: true,
+    },
 });
-
 
 app.set("io", io);
 
-
 initializeChatSocket(io);
 
-
-
 // =========================
-// Server
+// Start Server
 // =========================
 
-const port = process.env.PORT || 5000;
-
+const port =
+    process.env.PORT || 5000;
 
 server.listen(port, () => {
-    console.log(`Your Server is running at port ${port}`);
+    console.log(
+        `Your Server is running at port ${port}`
+    );
 });
