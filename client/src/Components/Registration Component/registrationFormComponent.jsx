@@ -45,8 +45,6 @@ function Register({ onBackHome, onBackToLogin, onRegistered }) {
 
             console.log("Registration response:", response.data);
 
-            alert("Account created successfully! Please login.");
-
             setUser({
                 name: "",
                 email: "",
@@ -54,7 +52,7 @@ function Register({ onBackHome, onBackToLogin, onRegistered }) {
                 role: "learner"
             });
 
-            onRegistered();
+            onRegistered(response.data.email || user.email);
 
         } catch (error) {
             console.error("Registration Error:", error);

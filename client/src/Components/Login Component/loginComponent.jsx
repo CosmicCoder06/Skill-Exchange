@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import "./loginComponent.css";
 
-function LoginComponent({ onLogin, onCreateAccount }) {
+function LoginComponent({ onLogin, onCreateAccount, onNeedsVerification }) {
     const [user, setUser] = useState({
         email: "",
         password: ""
@@ -58,6 +58,11 @@ function LoginComponent({ onLogin, onCreateAccount }) {
 
         } catch (error) {
             console.error("Login Error:", error);
+
+            if (error.response?.data?.code === "EMAIL_NOT_VERIFIED") {
+                onNeedsVerification(error.response.data.email || user.email);
+                return;
+            }
 
             if (error.response) {
                 setError(

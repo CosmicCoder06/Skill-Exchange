@@ -30,6 +30,21 @@ const loginUser = async (req, res) => {
       });
     }
 
+    if (user.isActive === false) {
+      return res.status(403).json({
+        code: 'ACCOUNT_SUSPENDED',
+        message: 'Your account has been suspended. Contact an administrator.',
+      });
+    }
+
+    if (user.isEmailVerified === false) {
+      return res.status(403).json({
+        code: 'EMAIL_NOT_VERIFIED',
+        email: user.email,
+        message: 'Verify your email address before signing in.',
+      });
+    }
+
     const accessToken = generateAccessToken(user._id, user.role);
     const refreshToken = generateRefreshToken(user._id);
 
