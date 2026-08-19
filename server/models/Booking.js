@@ -55,8 +55,8 @@ const bookingSchema = new mongoose.Schema(
 );
 
 
-module.exports = mongoose.model(
-    "Booking",
-    bookingSchema
-);
+// Avoid recompiling the model when the server reloads.
+module.exports =
+    mongoose.models.Booking ||
+    mongoose.model("Booking", bookingSchema);
 // @teamcosmiccoders

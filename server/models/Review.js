@@ -42,5 +42,8 @@ reviewSchema.index(
     { unique: true }
 );
 
-module.exports = mongoose.model("Review", reviewSchema);
+// Avoid recompiling the model when the server reloads.
+module.exports =
+    mongoose.models.Review ||
+    mongoose.model("Review", reviewSchema);
 // @teamcosmiccoders
