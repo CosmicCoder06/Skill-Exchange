@@ -6,6 +6,8 @@
     border: 1px solid #e8e8e4;
     border-radius: 24px;
     box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
@@ -372,3 +374,10 @@ span:not(.calendar-status) {
         display: none;
     }
 }
+
+.calendar-weekdays,
+.calendar-grid {
+    width: 100%;
+    min-width: 0;
+}
+/* @teamcosmiccoders */

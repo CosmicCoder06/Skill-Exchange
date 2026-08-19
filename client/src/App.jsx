@@ -188,7 +188,7 @@ function AppContent() {
 
     const showSharedSidebar =
         profileStatus !== false &&
-        !["home", "chat", "bookings"].includes(page);
+        !["home", "chat"].includes(page);
 
     const [viewingUserId, setViewingUserId] =
         useState(null);

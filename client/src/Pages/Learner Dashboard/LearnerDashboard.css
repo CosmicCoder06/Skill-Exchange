@@ -876,3 +876,38 @@
         gap: 12px;
     }
 }
+
+/* Keep learner workspace visually aligned with the profile design system. */
+.learner-dashboard {
+    background:
+        radial-gradient(circle at 85% 0%, rgba(23, 107, 78, .09), transparent 28%),
+        #f7faf7;
+    color: #15231f;
+}
+
+.learner-dashboard .brand-mark,
+.learner-dashboard .dashboard-nav .dashboard-nav-active,
+.learner-dashboard .dashboard-primary {
+    background: #176b4e;
+    border-color: #176b4e;
+}
+
+.learner-dashboard .dashboard-eyebrow,
+.learner-dashboard .panel-kicker,
+.learner-dashboard .dashboard-hero h1 span {
+    color: #176b4e;
+}
+
+.learner-dashboard .overview-card,
+.learner-dashboard .dashboard-panel,
+.learner-dashboard .quick-action-card {
+    border-color: #dfe8e3;
+    box-shadow: 0 14px 32px rgba(23, 107, 78, .06);
+}
+
+.learner-dashboard .overview-icon.purple,
+.learner-dashboard .learn-dot {
+    background: #dff5e9;
+    color: #176b4e;
+}
+/* @teamcosmiccoders */
