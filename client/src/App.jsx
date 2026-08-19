@@ -12,6 +12,7 @@ import HomePage from "./Pages/HomePage";
 import DiscoverPage from "./Pages/DiscoverPage";
 import BookingPage from "./Pages/BookingPage";
 import MyBookings from "./Pages/MyBookings";
+import AccountManagement from "./Pages/AccountManagement";
 import AppSidebar from "./Components/AppSidebar";
 import AppFooter from "./Components/AppFooter";
 
@@ -137,6 +138,7 @@ const PAGE_PATHS = {
     discover: "/discover",
     bookings: "/bookings",
     chat: "/chat"
+    ,account: "/account"
 };
 
 function getPageFromPath(pathname) {
@@ -508,6 +510,7 @@ function AppContent() {
                         onProfile={() => navigateTo("profile")}
                         onDashboard={() => navigateTo(getDashboardPage(userRole))}
                         dashboardLabel={userRole === "mentor" ? "Mentor Dashboard" : "Learner Dashboard"}
+                        onAccount={() => navigateTo("account")}
                         onLogout={handleLogout}
                     />
                 )}
@@ -752,6 +755,10 @@ function AppContent() {
                         openSessionChat
                     }
                 />
+
+            ) : page === "account" ? (
+
+                <AccountManagement token={token} onLogout={handleLogout} />
 
             ) : (
 

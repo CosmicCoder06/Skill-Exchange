@@ -63,6 +63,12 @@ const userSchema = new mongoose.Schema(
             default: true,
         },
 
+        deactivationReason: {
+            type: String,
+            default: "",
+            trim: true,
+        },
+
         // =========================
         // PROFILE FIELDS
         // =========================
@@ -165,3 +171,4 @@ module.exports =
         "User",
         userSchema
     );
+// @teamcosmiccoders

@@ -111,6 +111,7 @@
         minmax(280px, 1fr)
     );
     gap: 22px;
+    grid-auto-rows: 1fr;
 }
 
 /* CARD */
@@ -125,6 +126,11 @@
     transition:
         transform 0.2s ease,
         box-shadow 0.2s ease;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .booking-card:hover {
@@ -419,6 +425,8 @@
         padding: 20px;
     }
 }
+
+.booking-card::before{content:"SKILL EXCHANGE RECEIPT";margin:-25px -25px 20px;padding:10px 25px;background:#f3f8f4;color:#176b4e;font-size:10px;font-weight:900;letter-spacing:.12em}.booking-card .booking-actions,.booking-card .review-completed-box{margin-top:auto}.booking-status.missed{background:#fff1ce;color:#8a5b00}.missed-session{background:#fff8e7!important;border:1px solid #f4dfac}.booking-card .booking-message p{overflow-wrap:anywhere}
 
 .booking-calendar-section,
 .booking-calendar {

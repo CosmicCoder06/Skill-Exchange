@@ -16,6 +16,12 @@ body {
   color: #10251d;
 }
 
+html, body, #root { max-width: 100%; overflow-x: hidden; }
+
+button { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease; }
+button:hover:not(:disabled) { transform: translateY(-2px); }
+button:active:not(:disabled) { transform: translateY(0); }
+
 html[data-theme="dark"] {
   background: #0d1511;
 }
@@ -38,3 +44,4 @@ input,
 textarea {
   font: inherit;
 }
+/* @teamcosmiccoders */

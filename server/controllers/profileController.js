@@ -231,6 +231,23 @@ const getUserProfile = async(req,res)=>{
 
 };
 
+const deactivateMyAccount = async (req, res) => {
+    try {
+        const reason = String(req.body?.reason || "").trim();
+        if (!reason) return res.status(400).json({ message: "A deactivation reason is required" });
+
+        await User.findByIdAndUpdate(req.user.id, {
+            isActive: false,
+            deactivationReason: reason,
+            refreshToken: null
+        });
+
+        return res.status(200).json({ message: "Account deactivated" });
+    } catch (error) {
+        return res.status(500).json({ message: "Unable to deactivate account" });
+    }
+};
+
 
 
 
@@ -240,7 +257,8 @@ module.exports={
     getMyProfile,
 
     updateProfile,
-
-    getUserProfile
+    getUserProfile,
+    deactivateMyAccount
 
 };
+// @teamcosmiccoders
