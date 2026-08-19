@@ -57,3 +57,116 @@ Skill-Exchange/
 ├── .env.example                # Environment variable reference
 └── README.md                   # Project documentation
 ```
+
+## Prerequisites
+
+- Git
+- Node.js 20 or newer
+- npm
+- A MongoDB Atlas database or local MongoDB instance
+
+## Local Setup
+
+1. Clone the repository and enter the project directory:
+
+   ```bash
+   git clone https://github.com/CosmicCoder06/Skill-Exchange.git
+   cd Skill-Exchange
+   ```
+
+2. Install the backend dependencies:
+
+   ```bash
+   cd server
+   npm install
+   ```
+
+3. Install the frontend dependencies:
+
+   ```bash
+   cd ../client
+   npm install
+   ```
+
+4. Configure the environment files described below.
+
+5. Start the server from the `server` directory:
+
+   ```bash
+   npm run dev
+   ```
+
+6. In another terminal, start the client from the `client` directory:
+
+   ```bash
+   npm run dev
+   ```
+
+The client runs at `http://localhost:5173` by default and the API runs at `http://localhost:5000`.
+
+## Environment Variables
+
+Create `server/.env`:
+
+```dotenv
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/skill-exchange
+CLIENT_URL=http://localhost:5173
+JWT_ACCESS_SECRET=replace-with-a-long-random-secret
+JWT_REFRESH_SECRET=replace-with-another-long-random-secret
+ADMIN_NAME=Skill Exchange Admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=replace-with-a-secure-password
+```
+
+Create `client/.env`:
+
+```dotenv
+VITE_API_URL=http://localhost:5000/api
+VITE_SOCKET_URL=http://localhost:5000
+```
+
+Do not commit either `.env` file. Vite exposes variables prefixed with `VITE_` to browser code, so never place secrets in the client environment file.
+
+## Create an Administrator
+
+After configuring `server/.env`, run the admin seed script from the `server` directory:
+
+```bash
+node scripts/seedAdmin.js
+```
+
+The script creates the configured administrator or promotes an existing account with the same email. Admin routes also enforce JWT authentication and the `admin` role on the server.
+
+## API Overview
+
+All protected endpoints expect an access token in the following header:
+
+```http
+Authorization: Bearer <access-token>
+```
+
+| Area | Method | Endpoint | Purpose |
+| --- | --- | --- | --- |
+| Authentication | `POST` | `/api/registration/api` | Register a learner or mentor |
+| Authentication | `POST` | `/api/loginRoute/api` | Log in and receive an access token |
+| Profile | `GET` | `/api/profile/me` | Read the current profile |
+| Profile | `PUT` | `/api/profile/update` | Update the current profile |
+| Profile | `GET` | `/api/profile/:id` | View another member's profile |
+| Chat | `GET`, `POST` | `/api/conversations` | List or create conversations |
+| Chat | `GET`, `POST` | `/api/conversations/:id/messages` | Read or send messages |
+| Chat | `PATCH` | `/api/conversations/:id/read` | Mark a conversation as read |
+| Booking | `GET`, `POST` | `/api/bookings` | List or create bookings |
+| Booking | `GET` | `/api/bookings/requests` | List mentor booking requests |
+| Booking | `PUT`, `DELETE` | `/api/bookings/:id` | Update or cancel a booking |
+| Reviews | `GET`, `POST` | `/api/reviews` | List received reviews or create a review |
+| Reviews | `GET` | `/api/reviews/user/:userId` | List reviews for a member |
+| Reviews | `GET` | `/api/reviews/booking/:bookingId` | Read a booking review |
+| Admin | `GET` | `/api/admin/overview` | Read platform summary statistics |
+| Admin | `GET` | `/api/admin/users` | Search and filter members |
+| Admin | `PATCH`, `DELETE` | `/api/admin/users/:id` | Moderate a member account |
+| Admin | `GET` | `/api/admin/reports` | Read platform reports |
+
+## Real-Time Chat
+
+Socket.IO authenticates connections with the same access token. The chat flow uses conversation rooms and events including `join_conversation`, `leave_conversation`, `send_message`, `receive_message`, `typing_start`, `typing_stop`, `message_updated`, `message_deleted`, and `messages_read`.
