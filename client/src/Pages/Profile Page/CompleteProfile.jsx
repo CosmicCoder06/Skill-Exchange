@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./ProfilePage.css";
+import "./CompleteProfile.css";
 
 const emptyProfile = {
     bio: "",
@@ -258,27 +258,6 @@ function CompleteProfile({ token, onComplete, onLater }) {
 
                         <small>
                             Add a profile picture URL.
-                        </small>
-                    </label>
-
-
-                    {/* COVER IMAGE */}
-
-                    <label>
-                        Cover image / collage URL
-
-                        <input
-                            name="coverImageUrl"
-                            type="url"
-                            value={formData.coverImageUrl}
-                            placeholder="https://..."
-                            onChange={handleChange}
-                        />
-
-                        <small>
-                            Add a wide banner, portfolio,
-                            collage, or any image that
-                            represents you.
                         </small>
                     </label>
 
