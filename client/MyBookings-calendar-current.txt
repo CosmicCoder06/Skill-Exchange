@@ -3,9 +3,6 @@ import {
     useEffect,
     useState
 } from "react";
-
-import BookingCalendar from "../Components/booking/BookingCalendar";
-
 import "./MyBookings.css";
 
 const getUserIdFromToken = (token) => {
@@ -180,11 +177,6 @@ function MyBookings({
         setReviewedBookings
     ] = useState({});
 
-    const [
-        selectedCalendarBooking,
-        setSelectedCalendarBooking
-    ] = useState(null);
-
     const API =
         import.meta.env.VITE_API_URL;
 
@@ -268,22 +260,22 @@ function MyBookings({
             }
         }, [API, token]);
 
-    useEffect(() => {
-        if (!token) return;
+   useEffect(() => {
+    if (!token) return;
 
-        const timer = setTimeout(() => {
-            fetchBookings();
-            fetchRequests();
-        }, 0);
+    const timer = setTimeout(() => {
+        fetchBookings();
+        fetchRequests();
+    }, 0);
 
-        return () => {
-            clearTimeout(timer);
-        };
-    }, [
-        token,
-        fetchBookings,
-        fetchRequests
-    ]);
+    return () => {
+        clearTimeout(timer);
+    };
+}, [
+    token,
+    fetchBookings,
+    fetchRequests
+]);
 
     const checkReviewStatus =
         useCallback(
@@ -382,10 +374,6 @@ function MyBookings({
                 fetchBookings(),
                 fetchRequests()
             ]);
-
-            setSelectedCalendarBooking(
-                null
-            );
         } catch (error) {
             console.error(
                 "Booking update error:",
@@ -431,10 +419,6 @@ function MyBookings({
                         "Unable to cancel booking"
                 );
             }
-
-            setSelectedCalendarBooking(
-                null
-            );
 
             await fetchBookings();
         } catch (error) {
@@ -520,6 +504,20 @@ function MyBookings({
         }
     }
 
+    if (loading) {
+        return (
+            <main className="bookings-loading">
+                <h2>
+                    Loading your bookings...
+                </h2>
+
+                <p>
+                    Please wait a moment.
+                </p>
+            </main>
+        );
+    }
+
     const mySessions =
         sortBookings(
             bookings.filter(
@@ -549,9 +547,9 @@ function MyBookings({
             )
         );
 
-    function renderBookingCard(
+    function BookingCard({
         booking
-    ) {
+    }) {
         const {
             person,
             role
@@ -595,9 +593,7 @@ function MyBookings({
                     </div>
 
                     <div className="booking-person-info">
-                        <h3>
-                            {name}
-                        </h3>
+                        <h3>{name}</h3>
 
                         {role && (
                             <span className="booking-person-role">
@@ -614,9 +610,7 @@ function MyBookings({
 
                 <div className="booking-info">
                     <div>
-                        <span>
-                            Date
-                        </span>
+                        <span>Date</span>
 
                         <strong>
                             {booking.date}
@@ -624,9 +618,7 @@ function MyBookings({
                     </div>
 
                     <div>
-                        <span>
-                            Time
-                        </span>
+                        <span>Time</span>
 
                         <strong>
                             {booking.time}
@@ -805,28 +797,6 @@ function MyBookings({
         );
     }
 
-    function handleCalendarBooking(
-        booking
-    ) {
-        setSelectedCalendarBooking(
-            booking
-        );
-    }
-
-    if (loading) {
-        return (
-            <main className="bookings-loading">
-                <h2>
-                    Loading your bookings...
-                </h2>
-
-                <p>
-                    Please wait a moment.
-                </p>
-            </main>
-        );
-    }
-
     return (
         <main className="bookings-page">
             <header className="bookings-header">
@@ -870,60 +840,6 @@ function MyBookings({
                     {error}
                 </div>
             )}
-
-            {/* BOOKING CALENDAR */}
-
-            <section className="booking-calendar-section">
-                <BookingCalendar
-                    bookings={mySessions}
-                    onSelectBooking={
-                        handleCalendarBooking
-                    }
-                />
-            </section>
-
-            {/* SELECTED CALENDAR BOOKING */}
-
-            {selectedCalendarBooking && (
-                <section className="booking-section">
-                    <div className="section-heading">
-                        <div>
-                            <h2>
-                                Selected Session
-                            </h2>
-
-                            <p>
-                                {
-                                    selectedCalendarBooking.date
-                                }{" "}
-                                at{" "}
-                                {
-                                    selectedCalendarBooking.time
-                                }
-                            </p>
-                        </div>
-
-                        <button
-                            className="refresh-bookings"
-                            onClick={() =>
-                                setSelectedCalendarBooking(
-                                    null
-                                )
-                            }
-                        >
-                            Close
-                        </button>
-                    </div>
-
-                    <div className="booking-grid">
-                        {renderBookingCard(
-                            selectedCalendarBooking
-                        )}
-                    </div>
-                </section>
-            )}
-
-            {/* INCOMING REQUESTS */}
 
             <section className="booking-section">
                 <div className="section-heading">
@@ -1076,8 +992,6 @@ function MyBookings({
                 )}
             </section>
 
-            {/* MY SESSIONS */}
-
             <section className="booking-section">
                 <div className="section-heading">
                     <h2>
@@ -1111,22 +1025,19 @@ function MyBookings({
                     <div className="booking-grid">
                         {mySessions.map(
                             (booking) => (
-                                <div
+                                <BookingCard
                                     key={
                                         booking._id
                                     }
-                                >
-                                    {renderBookingCard(
+                                    booking={
                                         booking
-                                    )}
-                                </div>
+                                    }
+                                />
                             )
                         )}
                     </div>
                 )}
             </section>
-
-            {/* REVIEW MODAL */}
 
             {reviewBooking && (
                 <div
