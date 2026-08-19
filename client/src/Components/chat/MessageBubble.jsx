@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 
 function formatMessageTime(date) {
     if (!date) return ""
@@ -20,21 +20,22 @@ export default function MessageBubble({
     const [draft, setDraft] = useState(message.content || "")
     const menuRef = useRef(null)
 
-    useEffect(() => {
-        function closeMenu(event) {
-            if (!menuRef.current?.contains(event.target)) {
-                setMenuOpen(false)
-            }
+    function handleDocumentClick(event) {
+        if (!menuRef.current?.contains(event.target)) {
+            setMenuOpen(false)
         }
+    }
 
-        document.addEventListener("mousedown", closeMenu)
-        return () =>
-            document.removeEventListener("mousedown", closeMenu)
-    }, [])
+    function startMenuListener() {
+        document.addEventListener("mousedown", handleDocumentClick)
+    }
 
-    useEffect(() => {
-        setDraft(message.content || "")
-    }, [message.content])
+    function removeMenuListener() {
+        document.removeEventListener(
+            "mousedown",
+            handleDocumentClick
+        )
+    }
 
     const canDeleteForEveryone =
         isOwn &&
@@ -135,9 +136,15 @@ export default function MessageBubble({
                             type="button"
                             className="message-menu-trigger"
                             aria-label="Message options"
-                            onClick={() =>
+                            onClick={() => {
                                 setMenuOpen((value) => !value)
-                            }
+
+                                if (!menuOpen) {
+                                    startMenuListener()
+                                } else {
+                                    removeMenuListener()
+                                }
+                            }}
                         >
                             ⋮
                         </button>
@@ -153,6 +160,7 @@ export default function MessageBubble({
                                         onClick={() => {
                                             setEditing(true)
                                             setMenuOpen(false)
+                                            removeMenuListener()
                                         }}
                                     >
                                         ✎ Edit
@@ -164,6 +172,7 @@ export default function MessageBubble({
                                         type="button"
                                         onClick={() => {
                                             setMenuOpen(false)
+                                            removeMenuListener()
                                             onDelete(
                                                 message._id,
                                                 "everyone"
@@ -178,6 +187,7 @@ export default function MessageBubble({
                                     type="button"
                                     onClick={() => {
                                         setMenuOpen(false)
+                                        removeMenuListener()
                                         onDelete(
                                             message._id,
                                             "me"

@@ -1,11 +1,17 @@
-import { useEffect, useState } from "react";
+import {
+    useCallback,
+    useEffect,
+    useState
+} from "react";
 import "./MyBookings.css";
 
 const getUserIdFromToken = (token) => {
     try {
         if (!token) return null;
 
-        const payload = JSON.parse(atob(token.split(".")[1]));
+        const payload = JSON.parse(
+            atob(token.split(".")[1])
+        );
 
         return (
             payload._id ||
@@ -19,22 +25,39 @@ const getUserIdFromToken = (token) => {
     }
 };
 
-const getBookingPerson = (booking, currentUserId) => {
-    const mentorId = booking?.mentor?._id || booking?.mentor?.id;
-    const learnerId = booking?.learner?._id || booking?.learner?.id;
+const getBookingPerson = (
+    booking,
+    currentUserId
+) => {
+    const mentorId =
+        booking?.mentor?._id ||
+        booking?.mentor?.id;
+
+    const learnerId =
+        booking?.learner?._id ||
+        booking?.learner?.id;
 
     if (!currentUserId) {
-        return { person: null, role: "" };
+        return {
+            person: null,
+            role: ""
+        };
     }
 
-    if (String(currentUserId) === String(mentorId)) {
+    if (
+        String(currentUserId) ===
+        String(mentorId)
+    ) {
         return {
             person: booking.learner,
             role: "Learner"
         };
     }
 
-    if (String(currentUserId) === String(learnerId)) {
+    if (
+        String(currentUserId) ===
+        String(learnerId)
+    ) {
         return {
             person: booking.mentor,
             role: "Mentor"
@@ -48,19 +71,27 @@ const getBookingPerson = (booking, currentUserId) => {
 };
 
 const getSessionDate = (booking) => {
-    if (!booking?.date) return Number.MAX_SAFE_INTEGER;
+    if (!booking?.date) {
+        return Number.MAX_SAFE_INTEGER;
+    }
 
     const dateTime = new Date(
-        `${booking.date}T${booking.time || "00:00"}`
+        `${booking.date}T${
+            booking.time || "00:00"
+        }`
     );
 
-    return Number.isNaN(dateTime.getTime())
+    return Number.isNaN(
+        dateTime.getTime()
+    )
         ? Number.MAX_SAFE_INTEGER
         : dateTime.getTime();
 };
 
 const getCreatedDate = (booking) => {
-    const date = new Date(booking?.createdAt);
+    const date = new Date(
+        booking?.createdAt
+    );
 
     return Number.isNaN(date.getTime())
         ? 0
@@ -76,26 +107,40 @@ const sortBookings = (bookings) => {
         cancelled: 5
     };
 
-    return [...bookings].sort((a, b) => {
-        const priorityA = priority[a.status] || 99;
-        const priorityB = priority[b.status] || 99;
+    return [...bookings].sort(
+        (a, b) => {
+            const priorityA =
+                priority[a.status] || 99;
 
-        if (priorityA !== priorityB) {
-            return priorityA - priorityB;
-        }
+            const priorityB =
+                priority[b.status] || 99;
 
-        if (a.status === "accepted") {
+            if (
+                priorityA !==
+                priorityB
+            ) {
+                return (
+                    priorityA -
+                    priorityB
+                );
+            }
+
+            if (
+                a.status ===
+                "accepted"
+            ) {
+                return (
+                    getSessionDate(a) -
+                    getSessionDate(b)
+                );
+            }
+
             return (
-                getSessionDate(a) -
-                getSessionDate(b)
+                getCreatedDate(b) -
+                getCreatedDate(a)
             );
         }
-
-        return (
-            getCreatedDate(b) -
-            getCreatedDate(a)
-        );
-    });
+    );
 };
 
 function MyBookings({
@@ -103,160 +148,225 @@ function MyBookings({
     onBack,
     onJoinSession
 }) {
-    const [bookings, setBookings] = useState([]);
-    const [requests, setRequests] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [reviewBooking, setReviewBooking] = useState(null);
-    const [rating, setRating] = useState(5);
-    const [comment, setComment] = useState("");
-    const [submittingReview, setSubmittingReview] = useState(false);
-    const [reviewedBookings, setReviewedBookings] = useState({});
+    const [bookings, setBookings] =
+        useState([]);
 
-    const API = import.meta.env.VITE_API_URL;
-    const currentUserId = getUserIdFromToken(token);
+    const [requests, setRequests] =
+        useState([]);
 
-    async function fetchBookings() {
-        try {
-            setLoading(true);
-            setError("");
+    const [loading, setLoading] =
+        useState(true);
 
-            const response = await fetch(
-                `${API}/bookings`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+    const [error, setError] =
+        useState("");
+
+    const [reviewBooking, setReviewBooking] =
+        useState(null);
+
+    const [rating, setRating] =
+        useState(5);
+
+    const [comment, setComment] =
+        useState("");
+
+    const [submittingReview, setSubmittingReview] =
+        useState(false);
+
+    const [
+        reviewedBookings,
+        setReviewedBookings
+    ] = useState({});
+
+    const API =
+        import.meta.env.VITE_API_URL;
+
+    const currentUserId =
+        getUserIdFromToken(token);
+
+    const fetchBookings =
+        useCallback(async () => {
+            try {
+                setLoading(true);
+                setError("");
+
+                const response =
+                    await fetch(
+                        `${API}/bookings`,
+                        {
+                            headers: {
+                                Authorization:
+                                    `Bearer ${token}`
+                            }
+                        }
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Unable to load bookings"
+                    );
                 }
-            );
 
-            if (!response.ok) {
-                throw new Error(
-                    "Unable to load bookings"
+                const data =
+                    await response.json();
+
+                setBookings(
+                    Array.isArray(data)
+                        ? data
+                        : []
+                );
+            } catch (error) {
+                console.error(
+                    "Bookings fetch error:",
+                    error
+                );
+
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        }, [API, token]);
+
+    const fetchRequests =
+        useCallback(async () => {
+            try {
+                const response =
+                    await fetch(
+                        `${API}/bookings/requests`,
+                        {
+                            headers: {
+                                Authorization:
+                                    `Bearer ${token}`
+                            }
+                        }
+                    );
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const data =
+                    await response.json();
+
+                setRequests(
+                    Array.isArray(data)
+                        ? data
+                        : []
+                );
+            } catch (error) {
+                console.error(
+                    "Requests fetch error:",
+                    error
                 );
             }
+        }, [API, token]);
 
-            const data = await response.json();
+   useEffect(() => {
+    if (!token) return;
 
-            setBookings(
-                Array.isArray(data)
-                    ? data
-                    : []
-            );
-        } catch (error) {
-            console.error(
-                "Bookings fetch error:",
-                error
-            );
+    const timer = setTimeout(() => {
+        fetchBookings();
+        fetchRequests();
+    }, 0);
 
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    }
+    return () => {
+        clearTimeout(timer);
+    };
+}, [
+    token,
+    fetchBookings,
+    fetchRequests
+]);
 
-    async function fetchRequests() {
-        try {
-            const response = await fetch(
-                `${API}/bookings/requests`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
+    const checkReviewStatus =
+        useCallback(
+            async (bookingId) => {
+                try {
+                    const response =
+                        await fetch(
+                            `${API}/reviews/booking/${bookingId}`,
+                            {
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${token}`
+                                }
+                            }
+                        );
+
+                    if (!response.ok) {
+                        return;
                     }
+
+                    const data =
+                        await response.json();
+
+                    setReviewedBookings(
+                        (previous) => ({
+                            ...previous,
+                            [bookingId]:
+                                Boolean(
+                                    data.review
+                                )
+                        })
+                    );
+                } catch (error) {
+                    console.error(
+                        "Review status error:",
+                        error
+                    );
                 }
-            );
-
-            if (!response.ok) {
-                return;
-            }
-
-            const data = await response.json();
-
-            setRequests(
-                Array.isArray(data)
-                    ? data
-                    : []
-            );
-        } catch (error) {
-            console.error(
-                "Requests fetch error:",
-                error
-            );
-        }
-    }
-
-    useEffect(() => {
-        if (!token) return;
-
-        Promise.all([
-            fetchBookings(),
-            fetchRequests()
-        ]);
-    }, [token]);
-
-    async function checkReviewStatus(bookingId) {
-        try {
-            const response = await fetch(
-                `${API}/reviews/booking/${bookingId}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
-
-            if (!response.ok) return;
-
-            const data = await response.json();
-
-            setReviewedBookings((previous) => ({
-                ...previous,
-                [bookingId]: Boolean(data.review)
-            }));
-        } catch (error) {
-            console.error(
-                "Review status error:",
-                error
-            );
-        }
-    }
-
-    useEffect(() => {
-        const completedBookings = bookings.filter(
-            (booking) =>
-                booking.status === "completed"
+            },
+            [API, token]
         );
 
-        completedBookings.forEach((booking) => {
-            checkReviewStatus(booking._id);
-        });
-    }, [bookings]);
+    useEffect(() => {
+        const completedBookings =
+            bookings.filter(
+                (booking) =>
+                    booking.status ===
+                    "completed"
+            );
+
+        completedBookings.forEach(
+            (booking) => {
+                checkReviewStatus(
+                    booking._id
+                );
+            }
+        );
+    }, [
+        bookings,
+        checkReviewStatus
+    ]);
 
     async function updateBooking(
         bookingId,
         status
     ) {
         try {
-            const response = await fetch(
-                `${API}/bookings/${bookingId}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        status
-                    })
-                }
-            );
+            const response =
+                await fetch(
+                    `${API}/bookings/${bookingId}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                            Authorization:
+                                `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            status
+                        })
+                    }
+                );
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
                     data.message ||
-                    "Unable to update booking"
+                        "Unable to update booking"
                 );
             }
 
@@ -270,11 +380,15 @@ function MyBookings({
                 error
             );
 
-            window.alert(error.message);
+            window.alert(
+                error.message
+            );
         }
     }
 
-    async function cancelBooking(bookingId) {
+    async function cancelBooking(
+        bookingId
+    ) {
         if (
             !window.confirm(
                 "Cancel this booking?"
@@ -284,22 +398,25 @@ function MyBookings({
         }
 
         try {
-            const response = await fetch(
-                `${API}/bookings/${bookingId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`
+            const response =
+                await fetch(
+                    `${API}/bookings/${bookingId}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
                     }
-                }
-            );
+                );
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
                     data.message ||
-                    "Unable to cancel booking"
+                        "Unable to cancel booking"
                 );
             }
 
@@ -310,7 +427,9 @@ function MyBookings({
                 error
             );
 
-            window.alert(error.message);
+            window.alert(
+                error.message
+            );
         }
     }
 
@@ -326,36 +445,41 @@ function MyBookings({
         try {
             setSubmittingReview(true);
 
-            const response = await fetch(
-                `${API}/reviews`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        bookingId:
-                            reviewBooking._id,
-                        rating,
-                        comment
-                    })
-                }
-            );
+            const response =
+                await fetch(
+                    `${API}/reviews`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json",
+                            Authorization:
+                                `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            bookingId:
+                                reviewBooking._id,
+                            rating,
+                            comment
+                        })
+                    }
+                );
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (!response.ok) {
                 throw new Error(
                     data.message ||
-                    "Unable to submit review"
+                        "Unable to submit review"
                 );
             }
 
             setReviewedBookings(
                 (previous) => ({
                     ...previous,
-                    [reviewBooking._id]: true
+                    [reviewBooking._id]:
+                        true
                 })
             );
 
@@ -372,7 +496,9 @@ function MyBookings({
                 error
             );
 
-            window.alert(error.message);
+            window.alert(
+                error.message
+            );
         } finally {
             setSubmittingReview(false);
         }
@@ -392,29 +518,42 @@ function MyBookings({
         );
     }
 
-    const mySessions = sortBookings(
-        bookings.filter((booking) => {
-            const mentorId =
-                booking.mentor?._id ||
-                booking.mentor?.id;
+    const mySessions =
+        sortBookings(
+            bookings.filter(
+                (booking) => {
+                    const mentorId =
+                        booking.mentor?._id ||
+                        booking.mentor?.id;
 
-            const isMentor =
-                String(mentorId) ===
-                String(currentUserId);
+                    const isMentor =
+                        String(
+                            mentorId
+                        ) ===
+                        String(
+                            currentUserId
+                        );
 
-            if (
-                booking.status === "pending" &&
-                isMentor
-            ) {
-                return false;
-            }
+                    if (
+                        booking.status ===
+                            "pending" &&
+                        isMentor
+                    ) {
+                        return false;
+                    }
 
-            return true;
-        })
-    );
+                    return true;
+                }
+            )
+        );
 
-    function BookingCard({ booking }) {
-        const { person, role } =
+    function BookingCard({
+        booking
+    }) {
+        const {
+            person,
+            role
+        } =
             getBookingPerson(
                 booking,
                 currentUserId
@@ -425,16 +564,21 @@ function MyBookings({
             "Skill Exchange member";
 
         const initial =
-            name.charAt(0).toUpperCase();
+            name
+                .charAt(0)
+                .toUpperCase();
 
         const isCompleted =
-            booking.status === "completed";
+            booking.status ===
+            "completed";
 
         const isPending =
-            booking.status === "pending";
+            booking.status ===
+            "pending";
 
         const isAccepted =
-            booking.status === "accepted";
+            booking.status ===
+            "accepted";
 
         const alreadyReviewed =
             reviewedBookings[
@@ -458,7 +602,8 @@ function MyBookings({
                         )}
 
                         <p>
-                            Skill Exchange session
+                            Skill Exchange
+                            session
                         </p>
                     </div>
                 </div>
@@ -466,6 +611,7 @@ function MyBookings({
                 <div className="booking-info">
                     <div>
                         <span>Date</span>
+
                         <strong>
                             {booking.date}
                         </strong>
@@ -473,6 +619,7 @@ function MyBookings({
 
                     <div>
                         <span>Time</span>
+
                         <strong>
                             {booking.time}
                         </strong>
@@ -481,7 +628,10 @@ function MyBookings({
 
                 {booking.message && (
                     <div className="booking-message">
-                        <span>Message</span>
+                        <span>
+                            Message
+                        </span>
+
                         <p>
                             {booking.message}
                         </p>
@@ -498,50 +648,72 @@ function MyBookings({
 
                 {isAccepted && (
                     <div className="booking-message">
-                        <span>Session status</span>
+                        <span>
+                            Session status
+                        </span>
+
                         <p>
-                            Your session is confirmed
-                            and ready to attend.
+                            Your session is
+                            confirmed and
+                            ready to attend.
                         </p>
                     </div>
                 )}
 
                 {isPending && (
                     <div className="booking-message">
-                        <span>Request status</span>
+                        <span>
+                            Request status
+                        </span>
+
                         <p>
-                            Waiting for mentor approval.
-                            Your session request has
-                            been sent successfully.
+                            Waiting for
+                            mentor approval.
+                            Your session
+                            request has been
+                            sent successfully.
                         </p>
                     </div>
                 )}
 
-                {booking.status === "rejected" && (
+                {booking.status ===
+                    "rejected" && (
                     <div className="booking-message">
-                        <span>Request status</span>
+                        <span>
+                            Request status
+                        </span>
+
                         <p>
-                            The mentor declined this
+                            The mentor
+                            declined this
                             session request.
                         </p>
                     </div>
                 )}
 
-                {booking.status === "cancelled" && (
+                {booking.status ===
+                    "cancelled" && (
                     <div className="booking-message">
-                        <span>Session status</span>
+                        <span>
+                            Session status
+                        </span>
+
                         <p>
-                            This booking has been
-                            cancelled.
+                            This booking has
+                            been cancelled.
                         </p>
                     </div>
                 )}
 
                 {isCompleted && (
                     <div className="booking-message">
-                        <span>Session status</span>
+                        <span>
+                            Session status
+                        </span>
+
                         <p>
-                            Successful session completed.
+                            Successful
+                            session completed.
                         </p>
                     </div>
                 )}
@@ -550,7 +722,9 @@ function MyBookings({
                     <button
                         className="join-session-button"
                         onClick={() => {
-                            if (onJoinSession) {
+                            if (
+                                onJoinSession
+                            ) {
                                 onJoinSession(
                                     booking
                                 );
@@ -571,7 +745,8 @@ function MyBookings({
                             )
                         }
                     >
-                        ✓ Mark Session Complete
+                        ✓ Mark Session
+                        Complete
                     </button>
                 )}
 
@@ -593,12 +768,14 @@ function MyBookings({
                     alreadyReviewed && (
                         <div className="review-completed-box">
                             <strong>
-                                ⭐ Review submitted
+                                ⭐ Review
+                                submitted
                             </strong>
 
                             <span>
-                                Thanks for sharing
-                                your experience.
+                                Thanks for
+                                sharing your
+                                experience.
                             </span>
                         </div>
                     )}
@@ -640,8 +817,9 @@ function MyBookings({
                     </h1>
 
                     <p className="bookings-subtitle">
-                        Track upcoming sessions,
-                        requests and completed
+                        Track upcoming
+                        sessions, requests
+                        and completed
                         skill exchanges.
                     </p>
                 </div>
@@ -674,20 +852,23 @@ function MyBookings({
                     </span>
                 </div>
 
-                {requests.length === 0 ? (
+                {requests.length ===
+                0 ? (
                     <div className="empty-bookings">
                         <div className="empty-icon">
                             📭
                         </div>
 
                         <h3>
-                            No pending requests
+                            No pending
+                            requests
                         </h3>
 
                         <p>
                             New learners will
                             appear here when
-                            they book a session.
+                            they book a
+                            session.
                         </p>
                     </div>
                 ) : (
@@ -774,8 +955,7 @@ function MyBookings({
 
                                         <p>
                                             Waiting
-                                            for
-                                            your
+                                            for your
                                             approval.
                                         </p>
                                     </div>
@@ -823,7 +1003,8 @@ function MyBookings({
                     </span>
                 </div>
 
-                {mySessions.length === 0 ? (
+                {mySessions.length ===
+                0 ? (
                     <div className="empty-bookings">
                         <div className="empty-icon">
                             📅
@@ -835,7 +1016,8 @@ function MyBookings({
 
                         <p>
                             Book a mentor to
-                            start your learning
+                            start your
+                            learning
                             journey.
                         </p>
                     </div>
@@ -861,7 +1043,9 @@ function MyBookings({
                 <div
                     className="review-modal-overlay"
                     onClick={() =>
-                        setReviewBooking(null)
+                        setReviewBooking(
+                            null
+                        )
                     }
                 >
                     <div
@@ -886,12 +1070,14 @@ function MyBookings({
                         </p>
 
                         <h2>
-                            How was your session?
+                            How was your
+                            session?
                         </h2>
 
                         <p className="review-person">
-                            Share your experience
-                            with the other
+                            Share your
+                            experience with
+                            the other
                             member.
                         </p>
 
@@ -899,7 +1085,9 @@ function MyBookings({
                             {[1, 2, 3, 4, 5].map(
                                 (star) => (
                                     <button
-                                        key={star}
+                                        key={
+                                            star
+                                        }
                                         type="button"
                                         className={
                                             star <=
@@ -926,10 +1114,15 @@ function MyBookings({
                         <textarea
                             className="review-textarea"
                             placeholder="Tell them what you liked about the session..."
-                            value={comment}
-                            onChange={(event) =>
+                            value={
+                                comment
+                            }
+                            onChange={(
+                                event
+                            ) =>
                                 setComment(
-                                    event.target
+                                    event
+                                        .target
                                         .value
                                 )
                             }

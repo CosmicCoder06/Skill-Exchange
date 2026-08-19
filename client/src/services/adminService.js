@@ -35,7 +35,7 @@ async function adminRequest(
     const text =
         await response.text();
 
-    let data = {};
+    let data;
 
     try {
         data = text
@@ -50,8 +50,8 @@ async function adminRequest(
     if (!response.ok) {
         throw new Error(
             data?.message ||
-            data?.error ||
-            `Admin request failed (${response.status})`
+                data?.error ||
+                `Admin request failed (${response.status})`
         );
     }
 
