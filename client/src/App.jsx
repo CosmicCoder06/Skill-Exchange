@@ -12,6 +12,7 @@ import HomePage from "./Pages/HomePage";
 import DiscoverPage from "./Pages/DiscoverPage";
 import BookingPage from "./Pages/BookingPage";
 import MyBookings from "./Pages/MyBookings";
+import AppSidebar from "./Components/AppSidebar";
 
 // =========================
 // DASHBOARDS
@@ -491,6 +492,17 @@ function AppContent() {
             key={token}
             token={token}
         >
+            <div className={`app-page-with-sidebar ${page === "profile" ? "app-page-profile" : ""}`}>
+                {page !== "home" && (
+                    <AppSidebar
+                        activePage={page === "user-profile" ? "discover" : page}
+                        onHome={() => navigateTo("home")}
+                        onMessages={openNormalChat}
+                        onBookings={() => navigateTo("bookings")}
+                        onProfile={() => navigateTo("profile")}
+                        onLogout={handleLogout}
+                    />
+                )}
             {/* =================================================
                 COMPLETE PROFILE
             ================================================= */}
@@ -642,7 +654,6 @@ function AppContent() {
                     profileStatus={
                         profileStatus
                     }
-                    onHome={() => navigateTo("home")}
                     onLogout={
                         handleLogout
                     }
@@ -779,6 +790,7 @@ function AppContent() {
                     }
                 />
             )}
+            </div>
         </SocketProvider>
     );
 }

@@ -1,0 +1,17 @@
+#root {
+    min-height: 100vh;
+}
+
+.app-page-with-sidebar {
+    min-height: 100vh;
+}
+
+.app-page-with-sidebar:not(.app-page-profile) > :not(.profile-sidebar) {
+    margin-left: 98px;
+}
+
+@media (max-width: 700px) {
+    .app-page-with-sidebar:not(.app-page-profile) > :not(.profile-sidebar) {
+        margin-left: 0;
+    }
+}
