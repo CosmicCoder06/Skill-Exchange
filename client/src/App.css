@@ -11,7 +11,42 @@
 }
 
 @media (max-width: 700px) {
+    .app-page-with-sidebar {
+        padding-bottom: 78px;
+    }
+
     .app-page-with-sidebar:not(.app-page-profile) > :not(.profile-sidebar) {
         margin-left: 0;
+    }
+
+    .app-page-with-sidebar .profile-sidebar {
+        inset: auto 0 0;
+        width: 100%;
+        height: 68px;
+        flex-direction: row;
+        justify-content: center;
+        padding: 6px 8px;
+        border-top: 1px solid #dce8e1;
+        border-right: 0;
+        overflow-x: auto;
+    }
+
+    .app-page-with-sidebar .sidebar-logo,
+    .app-page-with-sidebar .sidebar-logout {
+        display: none;
+    }
+
+    .app-page-with-sidebar .sidebar-navigation {
+        flex-direction: row;
+        justify-content: center;
+        gap: 4px;
+        margin: 0;
+    }
+
+    .app-page-with-sidebar .sidebar-item {
+        width: auto;
+        min-width: 58px;
+        height: 54px;
+        padding: 5px 7px;
     }
 }
