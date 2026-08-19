@@ -1,7 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./LearnerDashboard.css";
 
-function LearnerDashboard({ token, onHome, onProfile, onLogout }) {
+function LearnerDashboard({
+    token,
+    onHome,
+    onProfile,
+    onLogout,
+    onBookings,
+}) {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -9,6 +15,9 @@ function LearnerDashboard({ token, onHome, onProfile, onLogout }) {
     useEffect(() => {
         async function fetchDashboard() {
             try {
+                setLoading(true);
+                setError("");
+
                 const response = await fetch(
                     `${import.meta.env.VITE_API_URL}/dashboard/learner`,
                     {
@@ -22,14 +31,22 @@ function LearnerDashboard({ token, onHome, onProfile, onLogout }) {
 
                 if (!response.ok) {
                     throw new Error(
-                        data.message || "Unable to load learner dashboard"
+                        data.message ||
+                            "Unable to load learner dashboard"
                     );
                 }
 
                 setProfile(data.dashboard);
-            } catch (error) {
-                console.error("Learner dashboard error:", error);
-                setError(error.message);
+            } catch (requestError) {
+                console.error(
+                    "Learner dashboard error:",
+                    requestError
+                );
+
+                setError(
+                    requestError.message ||
+                        "Unable to load dashboard"
+                );
             } finally {
                 setLoading(false);
             }
@@ -40,254 +57,820 @@ function LearnerDashboard({ token, onHome, onProfile, onLogout }) {
         }
     }, [token]);
 
-    // Loading
+    const skillsToLearn = useMemo(
+        () =>
+            (profile?.skillsToLearn || []).filter(
+                (skill) =>
+                    typeof skill === "string" &&
+                    skill.trim()
+            ),
+        [profile]
+    );
+
+    const skillsToTeach = useMemo(
+        () =>
+            (profile?.skillsToTeach || []).filter(
+                (skill) =>
+                    typeof skill === "string" &&
+                    skill.trim()
+            ),
+        [profile]
+    );
+
+    const availability = useMemo(
+        () =>
+            (profile?.availability || []).filter(
+                (item) =>
+                    typeof item === "string" &&
+                    item.trim()
+            ),
+        [profile]
+    );
+
+    const totalSkills =
+        skillsToLearn.length +
+        skillsToTeach.length;
+
+    const learnPercentage =
+        totalSkills > 0
+            ? Math.round(
+                  (skillsToLearn.length /
+                      totalSkills) *
+                      100
+              )
+            : 0;
+
+    const teachPercentage =
+        totalSkills > 0
+            ? Math.round(
+                  (skillsToTeach.length /
+                      totalSkills) *
+                      100
+              )
+            : 0;
+
+    const profileScore = profile?.profileCompleted
+        ? 100
+        : Math.min(
+              100,
+              (skillsToLearn.length > 0 ? 25 : 0) +
+                  (skillsToTeach.length > 0 ? 25 : 0) +
+                  (profile?.bio?.trim() ? 25 : 0) +
+                  (availability.length > 0 ? 25 : 0)
+          );
+
     if (loading) {
         return (
             <main className="learner-dashboard">
-                <div className="learner-dashboard-container">
-                    <h2>Loading dashboard...</h2>
+                <div className="learner-dashboard-shell learner-loading">
+                    <div className="loader-ring"></div>
+                    <h2>Building your dashboard...</h2>
+                    <p>
+                        Fetching your learning space.
+                    </p>
                 </div>
             </main>
         );
     }
 
-    // Error
     if (error) {
         return (
             <main className="learner-dashboard">
-                <div className="learner-dashboard-container">
-                    <h2>Unable to load dashboard</h2>
+                <div className="learner-dashboard-shell learner-error">
+                    <div className="error-icon">!</div>
+
+                    <p className="dashboard-eyebrow">
+                        LEARNER DASHBOARD
+                    </p>
+
+                    <h1>
+                        Unable to load dashboard
+                    </h1>
 
                     <p>{error}</p>
 
-                    <button
-                        onClick={onHome}
-                        className="learner-primary-button"
-                    >
-                        Back Home
-                    </button>
                 </div>
             </main>
         );
     }
 
-    const skillsToTeach = profile?.skillsToTeach || [];
-    const skillsToLearn = profile?.skillsToLearn || [];
-    const availability = profile?.availability || [];
-
     return (
         <main className="learner-dashboard">
-            <div className="learner-dashboard-container">
+            <div className="learner-dashboard-shell">
 
-                {/* Header */}
-                <header className="learner-dashboard-header">
-                    <div>
-                        <p className="learner-dashboard-label">
-                            LEARNER DASHBOARD
-                        </p>
+                {/* =========================================
+                    TOP BAR
+                ========================================= */}
 
-                        <h1>
-                            Welcome, {profile?.name || "Learner"} 👋
-                        </h1>
+                <header className="dashboard-topbar">
+                    <div className="dashboard-brand">
+                        <div className="brand-mark">
+                            S
+                        </div>
 
-                        <p className="learner-dashboard-subtitle">
-                            Track what you want to learn and manage your
-                            learning profile.
-                        </p>
+                        <div>
+                            <strong>
+                                Skill Exchange
+                            </strong>
+
+                            <span>
+                                Learner workspace
+                            </span>
+                        </div>
                     </div>
 
-                    <div className="learner-dashboard-actions">
+                    <nav className="dashboard-nav">
                         <button
+                            type="button"
                             onClick={onHome}
-                            className="learner-secondary-button"
                         >
                             Home
                         </button>
 
                         <button
-                            onClick={onProfile}
-                            className="learner-primary-button"
+                            type="button"
+                            className="dashboard-nav-active"
                         >
-                            My Profile
+                            Dashboard
                         </button>
-                    </div>
-                </header>
-
-                {/* Stats */}
-                <section className="learner-stats">
-
-                    <div className="learner-stat-card">
-                        <span>Skills I Want To Learn</span>
-                        <strong>{skillsToLearn.length}</strong>
-                    </div>
-
-                    <div className="learner-stat-card">
-                        <span>Skills I Can Teach</span>
-                        <strong>{skillsToTeach.length}</strong>
-                    </div>
-
-                    <div className="learner-stat-card">
-                        <span>Availability</span>
-                        <strong>{availability.length}</strong>
-                    </div>
-
-                    <div className="learner-stat-card">
-                        <span>Profile</span>
-                        <strong>
-                            {profile?.profileCompleted
-                                ? "100%"
-                                : "Pending"}
-                        </strong>
-                    </div>
-
-                </section>
-
-                {/* Dashboard Cards */}
-                <section className="learner-dashboard-grid">
-
-                    {/* About */}
-                    <div className="learner-dashboard-card">
-                        <p className="learner-card-label">
-                            ABOUT ME
-                        </p>
-
-                        <h2>
-                            {profile?.name || "Your Profile"}
-                        </h2>
-
-                        <p className="learner-about-text">
-                            {profile?.bio ||
-                                "Add a short bio to tell mentors about yourself."}
-                        </p>
 
                         <button
+                            type="button"
                             onClick={onProfile}
-                            className="learner-card-button"
                         >
-                            View / Edit Profile →
+                            Profile
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={onBookings}
+                        >
+                            My Sessions
+                        </button>
+                    </nav>
+
+                    <button
+                        type="button"
+                        className="dashboard-avatar"
+                        onClick={onProfile}
+                        title="Open profile"
+                    >
+                        {profile?.name
+                            ?.charAt(0)
+                            ?.toUpperCase() || "L"}
+                    </button>
+                </header>
+
+                {/* =========================================
+                    HERO
+                ========================================= */}
+
+                <section className="dashboard-hero">
+                    <div>
+                        <p className="dashboard-eyebrow">
+                            LEARNER DASHBOARD
+                        </p>
+
+                        <h1>
+                            Welcome back,{" "}
+                            <span>
+                                {profile?.name ||
+                                    "Learner"}
+                            </span>{" "}
+                            👋
+                        </h1>
+
+                        <p className="dashboard-hero-text">
+                            Keep your learning goals visible,
+                            discover your strengths, and stay
+                            ready for your next skill exchange.
+                        </p>
+                    </div>
+
+                    <div className="hero-actions">
+                        <button
+                            type="button"
+                            className="dashboard-secondary"
+                            onClick={onProfile}
+                        >
+                            View Profile
+                        </button>
+
+                        <button
+                            type="button"
+                            className="dashboard-primary"
+                            onClick={onBookings}
+                        >
+                            My Sessions →
                         </button>
                     </div>
+                </section>
 
-                    {/* Skills to Learn */}
-                    <div className="learner-dashboard-card">
-                        <p className="learner-card-label">
-                            I WANT TO LEARN
-                        </p>
+                {/* =========================================
+                    OVERVIEW STATS
+                ========================================= */}
 
-                        <div className="learner-skill-list">
+                <section className="overview-grid">
 
-                            {skillsToLearn.length > 0 ? (
-                                skillsToLearn.map((skill, index) => (
-                                    <span
-                                        className="learner-skill-pill learn"
-                                        key={`${skill}-${index}`}
-                                    >
-                                        {skill}
-                                    </span>
-                                ))
-                            ) : (
-                                <p className="learner-empty-text">
-                                    No learning skills added yet.
-                                </p>
-                            )}
-
+                    <article className="overview-card">
+                        <div className="overview-icon purple">
+                            ↗
                         </div>
-                    </div>
 
-                    {/* Skills to Teach */}
-                    <div className="learner-dashboard-card">
-                        <p className="learner-card-label">
-                            I CAN ALSO TEACH
-                        </p>
+                        <div>
+                            <span>
+                                Learning Goals
+                            </span>
 
-                        <div className="learner-skill-list">
+                            <strong>
+                                {skillsToLearn.length}
+                            </strong>
 
-                            {skillsToTeach.length > 0 ? (
-                                skillsToTeach.map((skill, index) => (
-                                    <span
-                                        className="learner-skill-pill teach"
-                                        key={`${skill}-${index}`}
-                                    >
-                                        {skill}
-                                    </span>
-                                ))
-                            ) : (
-                                <p className="learner-empty-text">
-                                    No teaching skills added yet.
-                                </p>
-                            )}
-
+                            <small>
+                                skills you want to learn
+                            </small>
                         </div>
-                    </div>
+                    </article>
 
-                    {/* Availability */}
-                    <div className="learner-dashboard-card">
-                        <p className="learner-card-label">
-                            AVAILABILITY
-                        </p>
-
-                        <div className="learner-availability-list">
-
-                            {availability.length > 0 ? (
-                                availability.map((item, index) => (
-                                    <div
-                                        className="learner-availability-item"
-                                        key={`${item}-${index}`}
-                                    >
-                                        <span>✓</span>
-                                        {item}
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="learner-empty-text">
-                                    Availability not added yet.
-                                </p>
-                            )}
-
+                    <article className="overview-card">
+                        <div className="overview-icon green">
+                            ✦
                         </div>
-                    </div>
+
+                        <div>
+                            <span>
+                                Skills You Share
+                            </span>
+
+                            <strong>
+                                {skillsToTeach.length}
+                            </strong>
+
+                            <small>
+                                skills you can teach
+                            </small>
+                        </div>
+                    </article>
+
+                    <article className="overview-card">
+                        <div className="overview-icon orange">
+                            ◷
+                        </div>
+
+                        <div>
+                            <span>
+                                Availability
+                            </span>
+
+                            <strong>
+                                {availability.length}
+                            </strong>
+
+                            <small>
+                                availability slots
+                            </small>
+                        </div>
+                    </article>
+
+                    <article className="overview-card">
+                        <div className="overview-icon blue">
+                            ✓
+                        </div>
+
+                        <div>
+                            <span>
+                                Profile Health
+                            </span>
+
+                            <strong>
+                                {profileScore}%
+                            </strong>
+
+                            <small>
+                                profile readiness
+                            </small>
+                        </div>
+                    </article>
 
                 </section>
 
-                {/* Profile Status */}
-                <section className="learner-profile-status">
+                {/* =========================================
+                    MAIN GRID
+                ========================================= */}
 
-                    <div>
-                        <p className="learner-card-label">
-                            PROFILE STATUS
+                <section className="dashboard-main-grid">
+
+                    {/* SKILL BALANCE */}
+                    <article className="dashboard-panel skill-chart-panel">
+                        <div className="panel-heading">
+                            <div>
+                                <p className="panel-kicker">
+                                    SKILL BALANCE
+                                </p>
+
+                                <h2>
+                                    Your learning direction
+                                </h2>
+                            </div>
+
+                            <span className="panel-badge">
+                                {totalSkills} total
+                            </span>
+                        </div>
+
+                        <div className="skill-chart">
+
+                            <div className="donut-wrapper">
+                                <div
+                                    className="skill-donut"
+                                    style={{
+                                        background: `conic-gradient(
+                                            #7c5cff 0 ${learnPercentage}%,
+                                            #19a974 ${learnPercentage}% 100%
+                                        )`,
+                                    }}
+                                >
+                                    <div className="donut-inner">
+                                        <strong>
+                                            {totalSkills}
+                                        </strong>
+
+                                        <span>
+                                            skills
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="chart-details">
+
+                                <div className="chart-legend">
+                                    <span className="legend-dot learn-dot"></span>
+
+                                    <div>
+                                        <strong>
+                                            {skillsToLearn.length}
+                                        </strong>
+
+                                        <span>
+                                            Want to learn
+                                        </span>
+                                    </div>
+
+                                    <b>
+                                        {learnPercentage}%
+                                    </b>
+                                </div>
+
+                                <div className="chart-legend">
+                                    <span className="legend-dot teach-dot"></span>
+
+                                    <div>
+                                        <strong>
+                                            {skillsToTeach.length}
+                                        </strong>
+
+                                        <span>
+                                            Can teach
+                                        </span>
+                                    </div>
+
+                                    <b>
+                                        {teachPercentage}%
+                                    </b>
+                                </div>
+
+                                <div className="chart-message">
+                                    {skillsToLearn.length >
+                                    skillsToTeach.length
+                                        ? "Your dashboard is focused more on discovering new skills."
+                                        : skillsToTeach.length >
+                                          skillsToLearn.length
+                                        ? "You have a strong sharing profile. Help others while learning."
+                                        : "Your learning and teaching goals are nicely balanced."}
+                                </div>
+
+                            </div>
+                        </div>
+                    </article>
+
+                    {/* PROFILE HEALTH */}
+                    <article className="dashboard-panel health-panel">
+                        <div className="panel-heading">
+                            <div>
+                                <p className="panel-kicker">
+                                    PROFILE HEALTH
+                                </p>
+
+                                <h2>
+                                    Ready to connect?
+                                </h2>
+                            </div>
+
+                            <span className="health-score">
+                                {profileScore}%
+                            </span>
+                        </div>
+
+                        <div className="progress-track">
+                            <div
+                                className="progress-fill"
+                                style={{
+                                    width: `${profileScore}%`,
+                                }}
+                            />
+                        </div>
+
+                        <div className="health-list">
+
+                            <div
+                                className={
+                                    profile?.bio
+                                        ? "health-item done"
+                                        : "health-item"
+                                }
+                            >
+                                <span>
+                                    {profile?.bio
+                                        ? "✓"
+                                        : "○"}
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        About you
+                                    </strong>
+
+                                    <small>
+                                        Add a short introduction
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div
+                                className={
+                                    skillsToLearn.length
+                                        ? "health-item done"
+                                        : "health-item"
+                                }
+                            >
+                                <span>
+                                    {skillsToLearn.length
+                                        ? "✓"
+                                        : "○"}
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Learning goals
+                                    </strong>
+
+                                    <small>
+                                        What do you want to learn?
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div
+                                className={
+                                    skillsToTeach.length
+                                        ? "health-item done"
+                                        : "health-item"
+                                }
+                            >
+                                <span>
+                                    {skillsToTeach.length
+                                        ? "✓"
+                                        : "○"}
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Teaching skills
+                                    </strong>
+
+                                    <small>
+                                        What can you share?
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div
+                                className={
+                                    availability.length
+                                        ? "health-item done"
+                                        : "health-item"
+                                }
+                            >
+                                <span>
+                                    {availability.length
+                                        ? "✓"
+                                        : "○"}
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Availability
+                                    </strong>
+
+                                    <small>
+                                        When can you connect?
+                                    </small>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            className="panel-link"
+                            onClick={onProfile}
+                        >
+                            Improve my profile →
+                        </button>
+                    </article>
+
+                </section>
+
+                {/* =========================================
+                    SECOND ROW
+                ========================================= */}
+
+                <section className="dashboard-secondary-grid">
+
+                    {/* LEARNING ROADMAP */}
+                    <article className="dashboard-panel roadmap-panel">
+                        <div className="panel-heading">
+                            <div>
+                                <p className="panel-kicker">
+                                    LEARNING ROADMAP
+                                </p>
+
+                                <h2>
+                                    What to focus on
+                                </h2>
+                            </div>
+                        </div>
+
+                        {skillsToLearn.length > 0 ? (
+                            <div className="roadmap-list">
+                                {skillsToLearn.map(
+                                    (skill, index) => (
+                                        <div
+                                            className="roadmap-item"
+                                            key={`${skill}-${index}`}
+                                        >
+                                            <div className="roadmap-number">
+                                                {String(
+                                                    index + 1
+                                                ).padStart(
+                                                    2,
+                                                    "0"
+                                                )}
+                                            </div>
+
+                                            <div className="roadmap-content">
+                                                <strong>
+                                                    {skill}
+                                                </strong>
+
+                                                <span>
+                                                    Learning goal
+                                                </span>
+                                            </div>
+
+                                            <div className="roadmap-line">
+                                                <span
+                                                    style={{
+                                                        width: `${Math.max(
+                                                            25,
+                                                            90 -
+                                                                index *
+                                                                    15
+                                                        )}%`,
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                )}
+                            </div>
+                        ) : (
+                            <div className="empty-dashboard">
+                                <span>◎</span>
+                                <strong>
+                                    No learning goals yet
+                                </strong>
+                                <p>
+                                    Add skills you want to learn
+                                    from your profile.
+                                </p>
+                            </div>
+                        )}
+                    </article>
+
+                    {/* WEEKLY AVAILABILITY */}
+                    <article className="dashboard-panel availability-panel">
+                        <div className="panel-heading">
+                            <div>
+                                <p className="panel-kicker">
+                                    WEEKLY PLAN
+                                </p>
+
+                                <h2>
+                                    Your availability
+                                </h2>
+                            </div>
+                        </div>
+
+                        <div className="week-bars">
+
+                            {[
+                                "Mon",
+                                "Tue",
+                                "Wed",
+                                "Thu",
+                                "Fri",
+                                "Sat",
+                                "Sun",
+                            ].map((day, index) => {
+                                const active =
+                                    availability.length >
+                                    0 &&
+                                    index <
+                                        Math.min(
+                                            availability.length,
+                                            7
+                                        );
+
+                                return (
+                                    <div
+                                        className="week-column"
+                                        key={day}
+                                    >
+                                        <div className="bar-area">
+                                            <div
+                                                className={
+                                                    active
+                                                        ? "week-bar active"
+                                                        : "week-bar"
+                                                }
+                                                style={{
+                                                    height: active
+                                                        ? `${
+                                                              35 +
+                                                              ((index +
+                                                                  1) %
+                                                                  4) *
+                                                                  13
+                                                          }%`
+                                                        : "12%",
+                                                }}
+                                            />
+                                        </div>
+
+                                        <span>
+                                            {day}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+
+                        </div>
+
+                        <div className="availability-summary">
+                            <span className="summary-dot"></span>
+
+                            <p>
+                                <strong>
+                                    {availability.length}
+                                </strong>{" "}
+                                availability preference
+                                {availability.length !== 1
+                                    ? "s"
+                                    : ""}{" "}
+                                added
+                            </p>
+                        </div>
+                    </article>
+
+                </section>
+
+                {/* =========================================
+                    QUICK ACTIONS
+                ========================================= */}
+
+                <section className="quick-actions">
+
+                    <div className="quick-actions-heading">
+                        <p className="panel-kicker">
+                            QUICK ACTIONS
                         </p>
 
                         <h2>
-                            {profile?.profileCompleted
-                                ? "Your profile is complete 🎉"
-                                : "Complete your profile"}
+                            Keep moving forward
                         </h2>
-
-                        <p>
-                            {profile?.profileCompleted
-                                ? "Your profile is ready for learning connections."
-                                : "Add your bio, skills and availability to improve your profile."}
-                        </p>
                     </div>
 
-                    <button
-                        onClick={onProfile}
-                        className="learner-primary-button"
-                    >
-                        {profile?.profileCompleted
-                            ? "Edit Profile"
-                            : "Complete Profile"}
-                    </button>
+                    <div className="quick-action-grid">
 
+                        <button
+                            type="button"
+                            onClick={onBookings}
+                            className="quick-action-card"
+                        >
+                            <span className="quick-icon">
+                                ◷
+                            </span>
+
+                            <div>
+                                <strong>
+                                    My Sessions
+                                </strong>
+
+                                <span>
+                                    View bookings and upcoming
+                                    learning sessions
+                                </span>
+                            </div>
+
+                            <b>→</b>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={onProfile}
+                            className="quick-action-card"
+                        >
+                            <span className="quick-icon">
+                                ✎
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Update Profile
+                                </strong>
+
+                                <span>
+                                    Keep your skills and goals
+                                    up to date
+                                </span>
+                            </div>
+
+                            <b>→</b>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={onHome}
+                            className="quick-action-card"
+                        >
+                            <span className="quick-icon">
+                                ⌂
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Discover Skills
+                                </strong>
+
+                                <span>
+                                    Find people to learn and
+                                    exchange skills with
+                                </span>
+                            </div>
+
+                            <b>→</b>
+                        </button>
+
+                    </div>
                 </section>
 
-                {/* Logout */}
-                <button
-                    onClick={onLogout}
-                    className="learner-logout"
-                >
-                    Log out
-                </button>
+                {/* =========================================
+                    FOOTER
+                ========================================= */}
+
+                <footer className="dashboard-footer">
+                    <span>
+                        Skill Exchange
+                    </span>
+
+                    <div>
+                        <button
+                            type="button"
+                            onClick={onProfile}
+                        >
+                            Profile
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={onLogout}
+                        >
+                            Logout
+                        </button>
+                    </div>
+                </footer>
 
             </div>
         </main>

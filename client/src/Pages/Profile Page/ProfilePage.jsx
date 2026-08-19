@@ -4,7 +4,6 @@ import "./ProfilePage.css";
 function ProfilePage({
     token,
     profileStatus,
-    onHome,
     onLogout,
     onMessagesClick,
     onBookings,
@@ -215,90 +214,6 @@ function ProfilePage({
 
     return (
         <main className="profile-page">
-
-            {/* =========================================
-                COLLAPSIBLE SIDEBAR
-            ========================================= */}
-
-            <aside className="profile-sidebar">
-
-                <button
-                    className="sidebar-logo"
-                    onClick={onHome}
-                >
-                    ↗
-                </button>
-
-                <div className="sidebar-navigation">
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onHome}
-                    >
-                        <span className="sidebar-icon">
-                            ⌂
-                        </span>
-
-                        <span className="sidebar-text">
-                            Home
-                        </span>
-                    </button>
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onMessagesClick}
-                    >
-                        <span className="sidebar-icon">
-                            ◇
-                        </span>
-
-                        <span className="sidebar-text">
-                            Messages
-                        </span>
-                    </button>
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onBookings}
-                    >
-                        <span className="sidebar-icon">
-                            ▣
-                        </span>
-
-                        <span className="sidebar-text">
-                            My Sessions
-                        </span>
-                    </button>
-
-                    <button
-                        className="sidebar-item active"
-                    >
-                        <span className="sidebar-icon">
-                            ●
-                        </span>
-
-                        <span className="sidebar-text">
-                            Profile
-                        </span>
-                    </button>
-
-                </div>
-
-                <button
-                    className="sidebar-item sidebar-logout"
-                    onClick={onLogout}
-                >
-                    <span className="sidebar-icon">
-                        ↪
-                    </span>
-
-                    <span className="sidebar-text">
-                        Logout
-                    </span>
-                </button>
-
-            </aside>
-
 
             {/* =========================================
                 MAIN WORKSPACE

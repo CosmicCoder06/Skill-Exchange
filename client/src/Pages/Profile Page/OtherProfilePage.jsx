@@ -4,7 +4,6 @@ import "./OtherProfilePage.css";
 function OtherProfilePage({
     token,
     userId,
-    onBack,
     onMessages,
     onBookSession
 }) {
@@ -79,9 +78,6 @@ function OtherProfilePage({
             <main className="other-profile-loading">
                 <p>Profile not found</p>
 
-                <button onClick={onBack}>
-                    Back
-                </button>
             </main>
         );
     }
@@ -118,13 +114,6 @@ function OtherProfilePage({
     return (
         <main className="other-profile-page">
             <header className="other-profile-topbar">
-                <button
-                    className="other-profile-back"
-                    onClick={onBack}
-                >
-                    ← Back
-                </button>
-
                 <span className="other-profile-label">
                     MEMBER PROFILE
                 </span>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import styles from "./registrationComponent.module.css";
 
-function Register({ onBackHome, onBackToLogin, onRegistered }) {
+function Register({ onBackToLogin, onRegistered }) {
     const [user, setUser] = useState({
         name: "",
         email: "",
@@ -73,14 +73,6 @@ function Register({ onBackHome, onBackToLogin, onRegistered }) {
         <section className={styles.page}>
 
             <div className={styles.card}>
-
-                <button
-                    type="button"
-                    className={styles.backButton}
-                    onClick={onBackHome}
-                >
-                    ← Back to home
-                </button>
 
                 <div className={styles.logo}>
                     S

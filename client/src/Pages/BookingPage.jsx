@@ -5,7 +5,6 @@ function BookingPage({
     token,
     mentorId,
     mentorName,
-    onBack,
     onBookingCreated
 }) {
     const [date, setDate] = useState("");
@@ -108,14 +107,6 @@ function BookingPage({
 
     return (
         <main className="booking-page">
-            <button
-                className="booking-back"
-                onClick={onBack}
-                disabled={loading}
-            >
-                ← Back
-            </button>
-
             <section className="booking-card">
                 <p className="booking-eyebrow">
                     SESSION REQUEST

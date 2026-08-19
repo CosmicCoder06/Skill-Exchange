@@ -64,7 +64,6 @@ export default function ChatPage({
     token,
     onLogout,
     onHome,
-    onBack,
     onProfile,
     onViewProfile,
     initialUserId,
@@ -736,13 +735,6 @@ export default function ChatPage({
                                 : "Reconnecting"}
                         </span>
 
-                        <button
-                            type="button"
-                            className="back-link"
-                            onClick={onBack}
-                        >
-                            ← Back
-                        </button>
                     </div>
                 </header>
 

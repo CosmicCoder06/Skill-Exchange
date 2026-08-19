@@ -378,6 +378,11 @@
     margin: 7px 0 11px;
     color: #74827c;
     font-size: 14px;
+    line-height: 1.45;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 .person-meta {

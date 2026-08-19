@@ -173,14 +173,6 @@ function DiscoverPage({
             </nav>
 
             <header className="discover-header">
-                <button
-                    className="page-back"
-                    onClick={onHome}
-                >
-                    <span>←</span>
-                    Back home
-                </button>
-
                 <div className="discover-kicker">
                     <span></span>
                     COMMUNITY DIRECTORY
