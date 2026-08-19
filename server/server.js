@@ -8,7 +8,6 @@ const cors = require("cors");
 const app = express();
 const server = http.createServer(app);
 
-
 // =========================
 // Database Configuration
 // =========================
@@ -69,12 +68,18 @@ const reviewRoutes =
     require("./routes/reviewRoutes");
 
 // =========================
+// Dashboard Routes
+// =========================
+
+const dashboardRoutes =
+    require("./routes/dashboardRoutes");
+
+// =========================
 // ADMIN ROUTES
 // =========================
 
 const adminRoutes =
     require("./routes/adminRoutes");
-
 
 // =========================
 // Middleware
@@ -133,11 +138,15 @@ app.use("/api", bookingRoutes);
 // Reviews
 app.use("/api", reviewRoutes);
 
+// Dashboard
+// Protected internally by:
+// verifyToken + authorize("mentor"/"learner")
+app.use("/api", dashboardRoutes);
+
 // Admin
 // Protected internally by:
 // verifyToken + authorize("admin")
 app.use("/api", adminRoutes);
-
 
 // =========================
 // Socket.io
@@ -167,3 +176,4 @@ server.listen(port, () => {
         `Your Server is running at port ${port}`
     );
 });
+// @teamcosmiccoders
