@@ -52,28 +52,6 @@ const userSchema = new mongoose.Schema(
             default: false,
         },
 
-        // Existing accounts remain usable; public registration explicitly
-        // sets this to false until the emailed link is confirmed.
-        isEmailVerified: {
-            type: Boolean,
-            default: true,
-        },
-
-        emailVerificationTokenHash: {
-            type: String,
-            select: false,
-        },
-
-        emailVerificationExpiresAt: {
-            type: Date,
-            select: false,
-        },
-
-        emailVerificationSentAt: {
-            type: Date,
-            select: false,
-        },
-
         /*
          * Admin account status.
          *

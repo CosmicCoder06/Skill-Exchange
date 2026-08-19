@@ -11,7 +11,6 @@ import HomePage from "./Pages/HomePage";
 import DiscoverPage from "./Pages/DiscoverPage";
 import BookingPage from "./Pages/BookingPage";
 import MyBookings from "./Pages/MyBookings";
-import EmailVerificationPage from "./Pages/EmailVerificationPage";
 
 // =========================
 // ADMIN
@@ -140,18 +139,6 @@ function App() {
         showLogin,
         setShowLogin
     ] = useState(false);
-
-
-    const [
-        verificationEmail,
-        setVerificationEmail
-    ] = useState("");
-
-
-    const [
-        emailVerificationToken,
-        setEmailVerificationToken
-    ] = useState(() => new URLSearchParams(window.location.search).get("verifyEmail") || "");
 
 
     const [
@@ -574,24 +561,6 @@ function App() {
 
     if (!token) {
 
-        if (emailVerificationToken || verificationEmail) {
-
-            return (
-
-                <EmailVerificationPage
-                    token={emailVerificationToken}
-                    email={verificationEmail}
-                    onBackToLogin={() => {
-                        window.history.replaceState({}, "", window.location.pathname);
-                        setEmailVerificationToken("");
-                        setVerificationEmail("");
-                        setShowRegister(false);
-                        setShowLogin(true);
-                    }}
-                />
-            );
-        }
-
         if (showRegister) {
 
             return (
@@ -622,18 +591,14 @@ function App() {
                     }}
 
 
-                    onRegistered={(email) => {
+                    onRegistered={() => {
 
                         setShowRegister(
                             false
                         );
 
                         setShowLogin(
-                            false
-                        );
-
-                        setVerificationEmail(
-                            email
+                            true
                         );
                     }}
 
@@ -661,18 +626,6 @@ function App() {
 
                         setShowRegister(
                             true
-                        );
-                    }}
-
-
-                    onNeedsVerification={(email) => {
-
-                        setShowLogin(
-                            false
-                        );
-
-                        setVerificationEmail(
-                            email
                         );
                     }}
 
