@@ -1,94 +1,59 @@
-# Student GLA – Project Setup
+# Skill Exchange
 
-## Overview
+Skill Exchange is a peer-to-peer learning platform where people can teach the skills they know, discover mentors, book learning sessions, communicate in real time, and review completed exchanges.
 
-This repository contains the initial setup for the **Student GLA** project. It provides a clean project structure, version control configuration, and documentation to help developers start building the application efficiently.
+The application supports learner, mentor, and administrator roles. Each role receives a focused experience while sharing the same community, booking, profile, and communication system.
 
-## Objectives
+## Features
 
-- Establish a standardized project structure.
-- Configure Git version control.
-- Provide project documentation.
-- Enable easy collaboration among team members.
-- Prepare the foundation for future development.
+- JWT-based registration and login
+- Learner and mentor profiles with skills and availability
+- Community discovery and member profile viewing
+- Session booking and booking-status management
+- Real-time conversations powered by Socket.IO
+- Ratings and reviews for learning exchanges
+- Learner and mentor dashboard components
+- Admin portal for user moderation and platform reports
+- Responsive Skill Exchange interface
 
-## Project Structure
+## Technology Stack
 
+### Client
+
+- React 19
+- Vite
+- Axios
+- Socket.IO Client
+- React Router
+- Vercel Analytics and Speed Insights
+
+### Server
+
+- Node.js and Express
+- MongoDB and Mongoose
+- JSON Web Tokens
+- Socket.IO
+- bcrypt password hashing
+
+## Repository Structure
+
+```text
+Skill-Exchange/
+├── client/                     # React and Vite frontend
+│   ├── public/                 # Static assets
+│   └── src/
+│       ├── Components/         # Reusable UI components
+│       ├── Pages/              # Application screens
+│       ├── context/            # Socket connection state
+│       └── services/           # HTTP service modules
+├── server/                     # Express and Socket.IO backend
+│   ├── Backend Configuration/  # Authentication and legacy routes
+│   ├── controllers/            # Feature request handlers
+│   ├── models/                 # Mongoose models
+│   ├── routes/                 # Feature API routes
+│   ├── scripts/                # Maintenance and seed scripts
+│   ├── sockets/                # Real-time chat handlers
+│   └── tests/                  # Node test suites
+├── .env.example                # Environment variable reference
+└── README.md                   # Project documentation
 ```
-student-gla-project-setup/
-├── src/          # Source code
-├── docs/         # Project documentation
-├── tests/        # Test cases
-├── .gitignore    # Git ignore rules
-└── README.md     # Project documentation
-```
-
-## Prerequisites
-
-Before getting started, ensure you have:
-
-- Git
-- A code editor (e.g., VS Code)
-- Required runtime/framework (to be added based on the project)
-
-## Getting Started
-
-1. Clone the repository:
-
-   ```bash
-   git clone <repository-url>
-   ```
-
-2. Navigate to the project directory:
-
-   ```bash
-   cd student-gla-project-setup
-   ```
-
-3. Create a new feature branch:
-
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-4. Start development.
-
-## Git Workflow
-
-- `main` – Production-ready code
-- `develop` – Integration branch
-- `feature/*` – New features
-- `bugfix/*` – Bug fixes
-- `hotfix/*` – Critical production fixes
-
-## Best Practices
-
-- Write clean and maintainable code.
-- Follow project coding standards.
-- Commit changes with meaningful messages.
-- Update documentation when adding features.
-- Write tests for new functionality.
-
-## Future Enhancements
-
-- Project-specific configuration
-- CI/CD pipeline
-- Automated testing
-- Code quality checks
-- Deployment setup
-
-## Contributing
-
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes.
-4. Push the branch.
-5. Open a Pull Request.
-
-## License
-
-This project is intended for educational purposes. Add an appropriate license if the project will be distributed publicly.
-
-## Author
-
-Student GLA Project Team
