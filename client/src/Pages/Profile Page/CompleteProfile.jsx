@@ -100,6 +100,88 @@ function CompleteProfile({ token, onComplete, onLater }) {
             .map((item) => item.trim())
             .filter(Boolean);
     }
+       function validateProfile() {
+    const bio = formData.bio.trim();
+
+    const skillsToTeach = [
+        ...new Set(
+            asList(formData.skillsToTeach).map((skill) =>
+                skill.toLowerCase()
+            )
+        )
+    ];
+
+    const skillsToLearn = [
+        ...new Set(
+            asList(formData.skillsToLearn).map((skill) =>
+                skill.toLowerCase()
+            )
+        )
+    ];
+
+    if (bio.length < 10) {
+        return "Bio must contain at least 10 characters.";
+    }
+
+    if (skillsToTeach.length === 0) {
+        return "Add at least one skill you can teach.";
+    }
+
+    if (skillsToLearn.length === 0) {
+        return "Add at least one skill you want to learn.";
+    }
+
+    if (
+        formData.hourlyRate !== "" &&
+        (
+            !Number.isFinite(Number(formData.hourlyRate)) ||
+            Number(formData.hourlyRate) < 0
+        )
+    ) {
+        return "Hourly rate must be a valid non-negative number.";
+    }
+
+    const validateUrl = (value, fieldName) => {
+        if (!value.trim()) {
+            return null;
+        }
+
+        try {
+            const url = new URL(value.trim());
+
+            if (url.protocol !== "http:" && url.protocol !== "https:") {
+                return `${fieldName} must use http or https.`;
+            }
+
+            return null;
+        } catch {
+            return `${fieldName} must be a valid URL.`;
+        }
+    };
+
+    const avatarError = validateUrl(
+        formData.avatarUrl,
+        "Profile image URL"
+    );
+
+    if (avatarError) {
+        return avatarError;
+    }
+
+    const coverError = validateUrl(
+        formData.coverImageUrl,
+        "Cover image URL"
+    );
+
+    if (coverError) {
+        return coverError;
+    }
+
+    return "";
+}
+
+
+
 
     // =========================
     // SAVE PROFILE
@@ -115,15 +197,10 @@ function CompleteProfile({ token, onComplete, onLater }) {
             asList(formData.skillsToLearn);
 
         // Required fields
-        if (
-            !formData.bio.trim() ||
-            !skillsToTeach.length ||
-            !skillsToLearn.length
-        ) {
-            setError(
-                "Add your bio, teaching skills, and learning skills to finish your profile."
-            );
+        const validationError = validateProfile();
 
+        if (validationError) {
+            setError(validationError);
             return;
         }
 
