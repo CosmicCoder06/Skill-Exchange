@@ -500,6 +500,8 @@ function AppContent() {
                         onMessages={openNormalChat}
                         onBookings={() => navigateTo("bookings")}
                         onProfile={() => navigateTo("profile")}
+                        onDashboard={() => navigateTo(getDashboardPage(userRole))}
+                        dashboardLabel={userRole === "mentor" ? "Mentor Dashboard" : "Learner Dashboard"}
                         onLogout={handleLogout}
                     />
                 )}

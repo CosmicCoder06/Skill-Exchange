@@ -6,6 +6,8 @@ function AppSidebar({
     onMessages,
     onBookings,
     onProfile,
+    onDashboard,
+    dashboardLabel,
     onLogout
 }) {
     return (
@@ -33,6 +35,11 @@ function AppSidebar({
                 <button className={`sidebar-item ${activePage === "profile" ? "active" : ""}`} onClick={onProfile}>
                     <span className="sidebar-icon">●</span>
                     <span className="sidebar-text">Profile</span>
+                </button>
+
+                <button className={`sidebar-item ${activePage.endsWith("dashboard") ? "active" : ""}`} onClick={onDashboard}>
+                    <span className="sidebar-icon">◫</span>
+                    <span className="sidebar-text">{dashboardLabel}</span>
                 </button>
             </div>
 
