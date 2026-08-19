@@ -12,8 +12,17 @@ import DiscoverPage from "./Pages/DiscoverPage";
 import BookingPage from "./Pages/BookingPage";
 import MyBookings from "./Pages/MyBookings";
 
+// =========================
+// ADMIN
+// =========================
+import AdminPage from "./Pages/Admin Page/admin";
+
 import { SocketProvider } from "./context/SocketContext";
 
+
+// =====================================================
+// PROFILE COMPLETION CHECK
+// =====================================================
 
 const hasCompletedDetails = (profile) => {
 
@@ -21,11 +30,9 @@ const hasCompletedDetails = (profile) => {
         typeof value === "string" &&
         value.trim().length > 0;
 
-
     const hasSkill = (skills) =>
         Array.isArray(skills) &&
         skills.some(hasText);
-
 
     return (
         hasText(profile?.bio) &&
@@ -35,6 +42,10 @@ const hasCompletedDetails = (profile) => {
 };
 
 
+// =====================================================
+// GET USER ID FROM JWT
+// =====================================================
+
 function getCurrentUserId(token) {
 
     try {
@@ -43,17 +54,14 @@ function getCurrentUserId(token) {
             return null;
         }
 
-
         const payload = token
             .split(".")[1]
             .replace(/-/g, "+")
             .replace(/_/g, "/");
 
-
         return JSON.parse(
             atob(payload)
         ).id;
-
 
     } catch (error) {
 
@@ -62,11 +70,54 @@ function getCurrentUserId(token) {
             error
         );
 
+        return null;
+    }
+}
+
+
+// =====================================================
+// GET USER ROLE FROM JWT
+// =====================================================
+
+function getCurrentUserRole(token) {
+
+    try {
+
+        if (!token) {
+            return null;
+        }
+
+        const parts = token.split(".");
+
+        if (parts.length !== 3) {
+            return null;
+        }
+
+        const payload = parts[1]
+            .replace(/-/g, "+")
+            .replace(/_/g, "/");
+
+        const decoded = JSON.parse(
+            atob(payload)
+        );
+
+        return decoded.role || null;
+
+    } catch (error) {
+
+        console.error(
+            "Unable to get user role from token:",
+            error
+        );
 
         return null;
     }
 }
 
+
+// =====================================================
+// APP
+// =====================================================
 
 function App() {
 
@@ -146,6 +197,10 @@ function App() {
     }
 
 
+    // =====================================================
+    // STATE
+    // =====================================================
+
     const [
         profileStatus,
         setProfileStatus
@@ -176,11 +231,6 @@ function App() {
     ] = useState(null);
 
 
-    // =====================================================
-    // NEW:
-    // PAGE FROM WHICH CHAT WAS OPENED
-    // =====================================================
-
     const [
         chatReturnPage,
         setChatReturnPage
@@ -188,16 +238,37 @@ function App() {
 
 
     // =====================================================
+    // CURRENT USER ROLE
+    // =====================================================
+
+    const userRole = getCurrentUserRole(token);
+
+
+    // =====================================================
     // PROFILE CHECK
+    // IMPORTANT:
+    // ADMIN KO PROFILE CHECK NAHI KARNA
     // =====================================================
 
     useEffect(() => {
 
         async function checkProfile() {
 
+            // No token
             if (!token) {
 
                 setProfileStatus(null);
+
+                return;
+            }
+
+
+            // Admin does not need normal profile flow
+            const role = getCurrentUserRole(token);
+
+            if (role === "admin") {
+
+                setProfileStatus(true);
 
                 return;
             }
@@ -240,7 +311,6 @@ function App() {
                     throw new Error(
                         "Unable to check profile status"
                     );
-
                 }
 
 
@@ -286,7 +356,6 @@ function App() {
                     setProfileStatus(
                         false
                     );
-
                 }
 
 
@@ -311,9 +380,7 @@ function App() {
     // LOGIN
     // =====================================================
 
-    function handleLogin(
-        newToken
-    ) {
+    function handleLogin(newToken) {
 
         localStorage.setItem(
             "Token",
@@ -337,7 +404,6 @@ function App() {
         setChatTargetUserId(
             null
         );
-
     }
 
 
@@ -389,11 +455,15 @@ function App() {
             "home"
         );
 
+
+        setProfileStatus(
+            null
+        );
     }
 
 
     // =====================================================
-    // OPEN CHAT
+    // OPEN NORMAL CHAT
     // =====================================================
 
     function openNormalChat(
@@ -411,7 +481,6 @@ function App() {
 
 
         navigateTo("chat");
-
     }
 
 
@@ -419,9 +488,7 @@ function App() {
     // OPEN SESSION CHAT
     // =====================================================
 
-    function openSessionChat(
-        booking
-    ) {
+    function openSessionChat(booking) {
 
         if (!booking) {
             return;
@@ -453,7 +520,6 @@ function App() {
             otherUserId =
                 learnerId;
 
-
         } else if (
             String(currentUserId) ===
             String(learnerId)
@@ -461,7 +527,6 @@ function App() {
 
             otherUserId =
                 mentorId;
-
         }
 
 
@@ -472,12 +537,10 @@ function App() {
                 booking
             );
 
-
             return;
         }
 
 
-        // Join Session -> Chat -> Back -> My Sessions
         setChatReturnPage(
             "bookings"
         );
@@ -489,7 +552,6 @@ function App() {
 
 
         navigateTo("chat");
-
     }
 
 
@@ -514,7 +576,6 @@ function App() {
                         setShowLogin(
                             false
                         );
-
                     }}
 
 
@@ -527,7 +588,6 @@ function App() {
                         setShowLogin(
                             true
                         );
-
                     }}
 
 
@@ -540,11 +600,9 @@ function App() {
                         setShowLogin(
                             true
                         );
-
                     }}
 
                 />
-
             );
         }
 
@@ -559,6 +617,7 @@ function App() {
                         handleLogin
                     }
 
+
                     onCreateAccount={() => {
 
                         setShowLogin(
@@ -568,11 +627,9 @@ function App() {
                         setShowRegister(
                             true
                         );
-
                     }}
 
                 />
-
             );
         }
 
@@ -594,13 +651,39 @@ function App() {
                     )
                 }
             />
+        );
+    }
+
+
+    // =====================================================
+    // ADMIN APPLICATION
+    // =====================================================
+    // IMPORTANT:
+    // Admin NEVER enters:
+    // CompleteProfile
+    // HomePage
+    // ProfilePage
+    // ChatPage
+    // MyBookings
+    //
+    // Admin gets its own dashboard directly.
+    // =====================================================
+
+    if (userRole === "admin") {
+
+        return (
+
+            <AdminPage
+                token={token}
+                onLogout={handleLogout}
+            />
 
         );
     }
 
 
     // =====================================================
-    // PROFILE LOADING
+    // NORMAL USER PROFILE LOADING
     // =====================================================
 
     if (profileStatus === null) {
@@ -617,13 +700,12 @@ function App() {
             >
                 Loading...
             </div>
-
         );
     }
 
 
     // =====================================================
-    // MAIN APPLICATION
+    // NORMAL USER APPLICATION
     // =====================================================
 
     return (
@@ -661,7 +743,6 @@ function App() {
                         setPage(
                             "profile"
                         );
-
                     }}
 
 
@@ -681,7 +762,6 @@ function App() {
                         setPage(
                             "profile"
                         );
-
                     }}
 
                 />
@@ -703,9 +783,11 @@ function App() {
 
                     onProfile={() => {
 
-                        setViewingUserId(null)
-                        navigateTo("profile")
+                        setViewingUserId(null);
 
+                        navigateTo(
+                            "profile"
+                        );
                     }}
 
 
@@ -737,12 +819,11 @@ function App() {
 
                     onProfile={() => {
 
-                        setViewingUserId(null)
+                        setViewingUserId(null);
 
                         navigateTo(
                             "profile"
-                        )
-
+                        );
                     }}
 
 
@@ -751,18 +832,22 @@ function App() {
                         const id =
                             userId?._id ||
                             userId?.id ||
-                            userId
+                            userId;
+
 
                         if (!id) {
-                            return
+                            return;
                         }
+
 
                         setViewingUserId(
                             String(id)
-                        )
+                        );
 
-                        navigateTo("user-profile")
 
+                        navigateTo(
+                            "user-profile"
+                        );
                     }}
 
 
@@ -826,7 +911,6 @@ function App() {
                         setProfileStatus(
                             false
                         );
-
                     }}
 
                 />
@@ -879,7 +963,6 @@ function App() {
                         navigateTo(
                             "booking"
                         );
-
                     }}
 
                 />
@@ -962,26 +1045,26 @@ function App() {
                     }
 
 
-                    // Sidebar Home
                     onHome={() =>
                         resetNavigation("home")
                     }
 
 
-                    // TOP BACK BUTTON
                     onBack={() =>
-                        goBack("home")
+                        goBack(
+                            chatReturnPage ||
+                            "home"
+                        )
                     }
 
 
                     onProfile={() => {
 
-                        setViewingUserId(null)
+                        setViewingUserId(null);
 
                         navigateTo(
                             "profile"
-                        )
-
+                        );
                     }}
 
 
@@ -990,18 +1073,22 @@ function App() {
                         const id =
                             userId?._id ||
                             userId?.id ||
-                            userId
+                            userId;
+
 
                         if (!id) {
-                            return
+                            return;
                         }
+
 
                         setViewingUserId(
                             String(id)
-                        )
+                        );
 
-                        navigateTo("user-profile")
 
+                        navigateTo(
+                            "user-profile"
+                        );
                     }}
 
 
@@ -1021,7 +1108,6 @@ function App() {
             )}
 
         </SocketProvider>
-
     );
 }
 
