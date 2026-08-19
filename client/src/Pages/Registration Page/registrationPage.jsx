@@ -10,3 +10,4 @@ function RegistrationPage({ onBackToLogin, onRegistered }) {
 }
 
 export default RegistrationPage;
+// @teamcosmiccoders

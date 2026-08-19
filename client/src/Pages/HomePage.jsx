@@ -23,3 +23,4 @@ function HomePage({ onDiscover, onProfile, onMessages, publicMode = false, onLog
     </main>;
 }
 export default HomePage;
+// @teamcosmiccoders

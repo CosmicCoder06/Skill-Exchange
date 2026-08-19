@@ -91,6 +91,10 @@ const getSessionDate = (booking) => {
         : dateTime.getTime();
 };
 
+const isMissedSession = (booking) =>
+    ["accepted", "pending"].includes(booking?.status) &&
+    getSessionDate(booking) < Date.now();
+
 const getCreatedDate = (booking) => {
     const date = new Date(
         booking?.createdAt
@@ -581,6 +585,8 @@ function MyBookings({
             booking.status ===
             "accepted";
 
+        const isMissed = isMissedSession(booking);
+
         const alreadyReviewed =
             reviewedBookings[
                 booking._id
@@ -647,13 +653,18 @@ function MyBookings({
 
                 <div className="booking-status-row">
                     <span
-                        className={`booking-status ${booking.status}`}
+                        className={`booking-status ${isMissed ? "missed" : booking.status}`}
                     >
-                        {booking.status}
+                        {isMissed ? "Session missed" : booking.status}
                     </span>
                 </div>
 
-                {isAccepted && (
+                {isMissed ? (
+                    <div className="booking-message missed-session">
+                        <span>Session status</span>
+                        <p>This session date has passed and is marked as missed.</p>
+                    </div>
+                ) : isAccepted && (
                     <div className="booking-message">
                         <span>
                             Session status
@@ -725,7 +736,7 @@ function MyBookings({
                     </div>
                 )}
 
-                {isAccepted && (
+                {isAccepted && !isMissed && (
                     <button
                         className="join-session-button"
                         onClick={() => {
@@ -742,7 +753,7 @@ function MyBookings({
                     </button>
                 )}
 
-                {isAccepted && (
+                {isAccepted && !isMissed && (
                     <button
                         className="complete-session-button"
                         onClick={() =>
@@ -1231,3 +1242,4 @@ function MyBookings({
 }
 
 export default MyBookings;
+// @teamcosmiccoders

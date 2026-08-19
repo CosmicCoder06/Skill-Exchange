@@ -8,6 +8,7 @@ function AppSidebar({
     onProfile,
     onDashboard,
     dashboardLabel,
+    onAccount,
     onLogout
 }) {
     return (
@@ -41,6 +42,11 @@ function AppSidebar({
                     <span className="sidebar-icon">◫</span>
                     <span className="sidebar-text">{dashboardLabel}</span>
                 </button>
+
+                <button className={`sidebar-item ${activePage === "account" ? "active" : ""}`} onClick={onAccount}>
+                    <span className="sidebar-icon">⚙</span>
+                    <span className="sidebar-text">Account</span>
+                </button>
             </div>
 
             <button className="sidebar-item sidebar-logout" onClick={onLogout}>
@@ -52,3 +58,4 @@ function AppSidebar({
 }
 
 export default AppSidebar;
+// @teamcosmiccoders

@@ -5,7 +5,8 @@ const verifyToken = require("../Backend Configuration/Configuration Folders/Midd
 const {
     getMyProfile,
     updateProfile,
-    getUserProfile
+    getUserProfile,
+    deactivateMyAccount
 } = require("../controllers/profileController");
 
 
@@ -27,6 +28,8 @@ router.put(
     updateProfile
 );
 
+router.put("/account/deactivate", verifyToken, deactivateMyAccount);
+
 
 // View other user's profile
 router.get(
@@ -37,3 +40,4 @@ router.get(
 
 
 module.exports = router;
+// @teamcosmiccoders
