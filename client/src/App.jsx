@@ -315,15 +315,7 @@ function AppContent() {
 
         setToken(newToken);
 
-        const role =
-            getCurrentUserRole(newToken);
-
-        const dashboardPage =
-            getDashboardPage(role);
-
-        resetNavigation(
-            dashboardPage
-        );
+        resetNavigation("profile");
 
         setChatTargetUserId(null);
     }
