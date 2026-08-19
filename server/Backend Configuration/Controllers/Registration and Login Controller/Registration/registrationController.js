@@ -1,27 +1,25 @@
 const User = require("../../../Models/UserSchema/user");
-
 const {
-  generateAccessToken,
-  generateRefreshToken,
-} = require("../../../../Utils/generateToken");
-
-const refreshCookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-};
+  buildEmailVerificationUrl,
+  createEmailVerificationToken,
+} = require("../../../../Utils/emailVerification");
+const { sendVerificationEmail } = require("../../../../services/emailService");
 
 // @route POST /api/auth/register
 // @access Public
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, password, role } = req.body;
+    const email = typeof req.body.email === "string" ? req.body.email.trim().toLowerCase() : "";
 
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Name, email and password are required",
       });
+    }
+
+    if (role && !["learner", "mentor"].includes(role)) {
+      return res.status(400).json({ message: "Choose either learner or mentor" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -32,36 +30,45 @@ const registerUser = async (req, res) => {
       });
     }
 
+    const verification = createEmailVerificationToken();
     const user = await User.create({
       name,
       email,
       password,
-      role,
+      role: role || "learner",
+      isEmailVerified: false,
+      emailVerificationTokenHash: verification.tokenHash,
+      emailVerificationExpiresAt: verification.expiresAt,
     });
 
-    const accessToken = generateAccessToken(user._id, user.role);
-    const refreshToken = generateRefreshToken(user._id);
-
-    user.refreshToken = refreshToken;
-    await user.save();
-
-    res.cookie("refreshToken", refreshToken, refreshCookieOptions);
-
-    res.status(201).json({
-      user: {
-        id: user._id,
+    let emailSent = false;
+    try {
+      await sendVerificationEmail({
         name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      accessToken,
+        to: user.email,
+        verificationUrl: buildEmailVerificationUrl(verification.rawToken),
+      });
+      user.emailVerificationSentAt = new Date();
+      await user.save();
+      emailSent = true;
+    } catch (emailError) {
+      console.error("Initial verification email failed:", emailError.message);
+    }
+
+    return res.status(emailSent ? 201 : 202).json({
+      code: emailSent ? "VERIFICATION_EMAIL_SENT" : "EMAIL_PENDING_DELIVERY",
+      email: user.email,
+      emailSent,
+      requiresEmailVerification: true,
+      message: emailSent
+        ? "Account created. Check your email to verify your account."
+        : "Account created, but the verification email could not be sent. Use resend after email delivery is configured.",
     });
   } catch (error) {
-    console.error(error);
+    console.error("Registration failed:", error.message);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Registration failed",
-      error: error.message,
     });
   }
 };
