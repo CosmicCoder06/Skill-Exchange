@@ -1,0 +1,23 @@
+.theme-toggle {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 1000;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(23, 107, 78, 0.25);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: #176b4e;
+    cursor: pointer;
+    font-size: 19px;
+    line-height: 1;
+}
+
+.theme-toggle:hover {
+    background: #ffffff;
+}
+
+html[data-theme="dark"] .theme-toggle {
+    filter: invert(1) hue-rotate(180deg);
+}

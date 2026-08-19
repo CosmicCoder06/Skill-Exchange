@@ -16,6 +16,23 @@ body {
   color: #10251d;
 }
 
+html[data-theme="dark"] {
+  background: #0d1511;
+}
+
+html[data-theme="dark"] body {
+  background: #0d1511;
+}
+
+html[data-theme="dark"] #root {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html[data-theme="dark"] #root img,
+html[data-theme="dark"] #root video {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 button,
 input,
 textarea {
