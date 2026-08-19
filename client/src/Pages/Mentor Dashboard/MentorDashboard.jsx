@@ -60,12 +60,6 @@ function MentorDashboard({ token, onHome, onProfile, onLogout }) {
 
                     <p>{error}</p>
 
-                    <button
-                        onClick={onHome}
-                        className="dashboard-primary"
-                    >
-                        Back Home
-                    </button>
                 </div>
             </main>
         );

@@ -148,7 +148,6 @@ const sortBookings = (bookings) => {
 
 function MyBookings({
     token,
-    onBack,
     onJoinSession
 }) {
     const [bookings, setBookings] =
@@ -831,13 +830,6 @@ function MyBookings({
         <main className="bookings-page">
             <header className="bookings-header">
                 <div>
-                    <button
-                        className="back-btn"
-                        onClick={onBack}
-                    >
-                        ← Back
-                    </button>
-
                     <p className="bookings-eyebrow">
                         SESSIONS
                     </p>

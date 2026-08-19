@@ -176,15 +176,6 @@ function AppContent() {
         navigateTo(nextPage, { replace: true });
     }
 
-    function goBack(fallbackPage = "home") {
-        if (window.history.length > 1) {
-            navigate(-1);
-            return;
-        }
-
-        navigateTo(fallbackPage);
-    }
-
     // =====================================================
     // STATE
     // =====================================================
@@ -203,9 +194,6 @@ function AppContent() {
 
     const [chatTargetUserId, setChatTargetUserId] =
         useState(null);
-
-    const [chatReturnPage, setChatReturnPage] =
-        useState("home");
 
     // =====================================================
     // CURRENT USER ROLE
@@ -365,8 +353,6 @@ function AppContent() {
 
         setChatTargetUserId(null);
 
-        setChatReturnPage("home");
-
         setProfileStatus(null);
     }
 
@@ -374,13 +360,7 @@ function AppContent() {
     // OPEN NORMAL CHAT
     // =====================================================
 
-    function openNormalChat(
-        returnPage = "home"
-    ) {
-        setChatReturnPage(
-            returnPage
-        );
-
+    function openNormalChat() {
         setChatTargetUserId(null);
 
         navigateTo("chat");
@@ -429,10 +409,6 @@ function AppContent() {
             return;
         }
 
-        setChatReturnPage(
-            "bookings"
-        );
-
         setChatTargetUserId(
             otherUserId
         );
@@ -448,9 +424,6 @@ function AppContent() {
         if (page === "register") {
             return (
                 <RegistrationPage
-                    onBackHome={() => {
-                        navigateTo("home");
-                    }}
                     onBackToLogin={() => {
                         navigateTo("login");
                     }}
@@ -573,6 +546,9 @@ function AppContent() {
                             "profile"
                         );
                     }}
+                    onBookings={() =>
+                        navigateTo("bookings")
+                    }
                     onLogout={
                         handleLogout
                     }
@@ -635,9 +611,7 @@ function AppContent() {
 
                 <DiscoverPage
                     token={token}
-                    onHome={() =>
-                        goBack("home")
-                    }
+                    onHome={() => navigateTo("home")}
                     onProfile={() => {
                         setViewingUserId(null);
 
@@ -676,9 +650,7 @@ function AppContent() {
                     profileStatus={
                         profileStatus
                     }
-                    onHome={() =>
-                        goBack("home")
-                    }
+                    onHome={() => navigateTo("home")}
                     onLogout={
                         handleLogout
                     }
@@ -714,7 +686,6 @@ function AppContent() {
                     userId={
                         routeId || viewingUserId
                     }
-                    onBack={() => navigateTo("discover")}
                     onMessages={() =>
                         openNormalChat(
                             "user-profile"
@@ -750,7 +721,6 @@ function AppContent() {
                     mentorName={
                         bookingMentorName
                     }
-                    onBack={() => navigateTo("user-profile", { path: `/profile/${viewingUserId}` })}
                     onBookingCreated={() =>
                         navigateTo(
                             "bookings"
@@ -766,7 +736,6 @@ function AppContent() {
 
                 <MyBookings
                     token={token}
-                    onBack={() => navigateTo("profile")}
                     onJoinSession={
                         openSessionChat
                     }
@@ -788,7 +757,6 @@ function AppContent() {
                             "home"
                         )
                     }
-                    onBack={() => navigateTo(chatReturnPage || "home")}
                     onProfile={() => {
                         setViewingUserId(null);
 
