@@ -197,7 +197,7 @@ function AppContent() {
         useState(null);
 
     // =====================================================
-    // CURRENT USER ROLE
+    // CURRENT USER ROLE??????????
     // =====================================================
 
     const userRole = getCurrentUserRole(token);
