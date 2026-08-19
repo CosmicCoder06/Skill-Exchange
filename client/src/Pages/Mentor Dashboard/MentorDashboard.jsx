@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./MentorDashboard.css";
 
-function MentorDashboard({ token, onHome, onProfile, onLogout }) {
+function MentorDashboard({ token, onHome, onProfile, onBookings, onLogout }) {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -106,6 +106,13 @@ function MentorDashboard({ token, onHome, onProfile, onLogout }) {
                             className="dashboard-primary"
                         >
                             My Profile
+                        </button>
+
+                        <button
+                            onClick={onBookings}
+                            className="dashboard-secondary"
+                        >
+                            My Sessions
                         </button>
                     </div>
                 </header>
@@ -284,3 +291,4 @@ function MentorDashboard({ token, onHome, onProfile, onLogout }) {
 }
 
 export default MentorDashboard;
+// @teamcosmiccoders

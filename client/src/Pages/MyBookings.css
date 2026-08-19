@@ -4,6 +4,8 @@
 
 .bookings-page {
     width: min(1480px, calc(100% - 48px));
+    max-width: calc(100% - 48px);
+    min-width: 0;
     margin: 0 auto;
     padding: 45px 0 80px;
 }
@@ -417,3 +419,10 @@
         padding: 20px;
     }
 }
+
+.booking-calendar-section,
+.booking-calendar {
+    min-width: 0;
+    max-width: 100%;
+}
+/* @teamcosmiccoders */

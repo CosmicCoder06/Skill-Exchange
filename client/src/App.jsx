@@ -13,6 +13,7 @@ import DiscoverPage from "./Pages/DiscoverPage";
 import BookingPage from "./Pages/BookingPage";
 import MyBookings from "./Pages/MyBookings";
 import AppSidebar from "./Components/AppSidebar";
+import AppFooter from "./Components/AppFooter";
 
 // =========================
 // DASHBOARDS
@@ -155,6 +156,7 @@ function App() {
     return (
         <BrowserRouter>
             <AppContent />
+            <AppFooter />
         </BrowserRouter>
     );
 }
@@ -184,6 +186,10 @@ function AppContent() {
     const [profileStatus, setProfileStatus] =
         useState(null);
 
+    const showSharedSidebar =
+        profileStatus !== false &&
+        !["home", "chat"].includes(page);
+
     const [viewingUserId, setViewingUserId] =
         useState(null);
 
@@ -197,7 +203,7 @@ function AppContent() {
         useState(null);
 
     // =====================================================
-    // CURRENT USER ROLE
+    // CURRENT USER ROLE??????????
     // =====================================================
 
     const userRole = getCurrentUserRole(token);
@@ -493,7 +499,7 @@ function AppContent() {
             token={token}
         >
             <div className={`app-page-with-sidebar ${page === "profile" ? "app-page-profile" : ""}`}>
-                {page !== "home" && (
+                {showSharedSidebar && (
                     <AppSidebar
                         activePage={page === "user-profile" ? "discover" : page}
                         onHome={() => navigateTo("home")}
@@ -578,6 +584,7 @@ function AppContent() {
                             "profile"
                         );
                     }}
+                    onBookings={() => navigateTo("bookings")}
                     onLogout={
                         handleLogout
                     }
@@ -798,3 +805,4 @@ function AppContent() {
 }
 
 export default App;
+// @teamcosmiccoders

@@ -118,6 +118,31 @@
 .about-text {
     color: #6f7e78;
     line-height: 1.6;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+.mentor-dashboard .dashboard-card {
+    box-shadow: 0 14px 34px rgba(23, 107, 78, .06);
+}
+
+.mentor-dashboard .mentor-stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.mentor-dashboard .mentor-stat-card::after {
+    content: "";
+    position: absolute;
+    right: -18px;
+    bottom: -26px;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: rgba(223, 245, 233, .7);
 }
 
 .card-button {
@@ -248,3 +273,4 @@
         font-size: 26px;
     }
 }
+/* @teamcosmiccoders */
