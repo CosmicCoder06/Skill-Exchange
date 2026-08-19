@@ -162,10 +162,14 @@ export default function ChatPage({
         )
 
         if (existing) {
-            initialHandled.current = true
-            setSelectedId(existing._id)
-            return
-        }
+    initialHandled.current = true
+
+    queueMicrotask(() => {
+        setSelectedId(existing._id)
+    })
+
+    return
+}
 
         async function createInitialChat() {
             try {
@@ -193,15 +197,14 @@ export default function ChatPage({
         createInitialChat()
     }, [initialUserId, loading, conversations])
 
-    useEffect(() => {
-        if (!selectedId) {
-            setMessages([])
-            return
-        }
+  useEffect(() => {
+    if (!selectedId) {
+        return
+    }
 
-        let active = true
+    let active = true
 
-        fetchMessages(selectedId)
+    fetchMessages(selectedId)
             .then((result) => {
                 if (active) setMessages(result)
             })

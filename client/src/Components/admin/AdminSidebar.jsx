@@ -1,7 +1,6 @@
 export default function AdminSidebar({
     activeSection,
     onSectionChange,
-    onHome,
     onLogout,
 }) {
     const items = [
@@ -24,7 +23,6 @@ export default function AdminSidebar({
 
     return (
         <aside className="admin-sidebar">
-
             <button
                 type="button"
                 className="admin-brand"
@@ -63,9 +61,7 @@ export default function AdminSidebar({
                                 : "admin-nav-item"
                         }
                         onClick={() =>
-                            onSectionChange(
-                                item.id
-                            )
+                            onSectionChange(item.id)
                         }
                     >
                         <span>
@@ -80,7 +76,6 @@ export default function AdminSidebar({
             </nav>
 
             <div className="admin-sidebar-bottom">
-
                 <div className="admin-protected">
                     <span>✦</span>
 
@@ -102,9 +97,7 @@ export default function AdminSidebar({
                 >
                     ↪ Log out
                 </button>
-
             </div>
-
         </aside>
     );
 }

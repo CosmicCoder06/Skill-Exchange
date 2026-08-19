@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-function UpdateRegisterCard({ user, onClose, id }) {
+function UpdateRegisterCard({ onClose, id }) {
     const [formData, setFormData] = useState({
         name: "",
         email: ""
@@ -33,7 +33,6 @@ function UpdateRegisterCard({ user, onClose, id }) {
                 name: "",
                 email: ""
             });
-
         } catch (error) {
             console.log(error);
         }

@@ -56,23 +56,27 @@ function getAdminId(token) {
     );
 }
 
-export default function AdminPage({ token, onHome, onLogout }) {
-    const [activeSection, setActiveSection] = useState("overview");
+export default function AdminPage({ token, onLogout })  {
+    const [activeSection, setActiveSection] =
+        useState("overview");
 
     const [overview, setOverview] = useState(null);
     const [users, setUsers] = useState([]);
     const [reports, setReports] = useState(null);
 
     const [loading, setLoading] = useState(true);
-    const [sectionLoading, setSectionLoading] = useState(false);
+    const [sectionLoading, setSectionLoading] =
+        useState(false);
 
     const [error, setError] = useState("");
 
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
-    const [statusFilter, setStatusFilter] = useState("all");
+    const [statusFilter, setStatusFilter] =
+        useState("all");
 
-    const [busyUserId, setBusyUserId] = useState(null);
+    const [busyUserId, setBusyUserId] =
+        useState(null);
 
     const adminName = useMemo(
         () => getAdminName(token),
@@ -89,15 +93,19 @@ export default function AdminPage({ token, onHome, onLogout }) {
             setLoading(true);
             setError("");
 
-            const result = await getAdminOverview(token);
+            const result =
+                await getAdminOverview(token);
 
             setOverview(result);
         } catch (err) {
-            console.error("Admin overview error:", err);
+            console.error(
+                "Admin overview error:",
+                err
+            );
 
             setError(
                 err?.message ||
-                "Unable to load admin overview."
+                    "Unable to load admin overview."
             );
         } finally {
             setLoading(false);
@@ -107,7 +115,11 @@ export default function AdminPage({ token, onHome, onLogout }) {
     useEffect(() => {
         if (!token) return;
 
+        // The function performs remote data loading
+        // and updates component state.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadOverview();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token]);
 
     useEffect(() => {
@@ -119,18 +131,25 @@ export default function AdminPage({ token, onHome, onLogout }) {
                 setError("");
 
                 if (activeSection === "members") {
-                    const result = await getAdminUsers(token);
+                    const result =
+                        await getAdminUsers(token);
 
                     if (!mounted) return;
 
                     const userList =
                         Array.isArray(result)
                             ? result
-                            : Array.isArray(result?.users)
+                            : Array.isArray(
+                                result?.users
+                            )
                                 ? result.users
-                                : Array.isArray(result?.data?.users)
+                                : Array.isArray(
+                                    result?.data?.users
+                                )
                                     ? result.data.users
-                                    : Array.isArray(result?.data)
+                                    : Array.isArray(
+                                        result?.data
+                                    )
                                         ? result.data
                                         : [];
 
@@ -154,7 +173,7 @@ export default function AdminPage({ token, onHome, onLogout }) {
                 if (mounted) {
                     setError(
                         err?.message ||
-                        "Unable to load this section."
+                            "Unable to load this section."
                     );
                 }
             } finally {
@@ -202,8 +221,10 @@ export default function AdminPage({ token, onHome, onLogout }) {
 
             const matchesStatus =
                 statusFilter === "all" ||
-                (statusFilter === "active" && active) ||
-                (statusFilter === "suspended" && !active);
+                (statusFilter === "active" &&
+                    active) ||
+                (statusFilter === "suspended" &&
+                    !active);
 
             return (
                 matchesSearch &&
@@ -259,7 +280,7 @@ export default function AdminPage({ token, onHome, onLogout }) {
 
             setError(
                 err?.message ||
-                "Unable to update member."
+                    "Unable to update member."
             );
         } finally {
             setBusyUserId(null);
@@ -269,7 +290,10 @@ export default function AdminPage({ token, onHome, onLogout }) {
     async function handleDeleteUser(user) {
         const confirmed =
             window.confirm(
-                `Delete ${user?.name || "this member"} permanently?\n\nThis action cannot be undone.`
+                `Delete ${
+                    user?.name ||
+                    "this member"
+                } permanently?\n\nThis action cannot be undone.`
             );
 
         if (!confirmed) return;
@@ -300,7 +324,7 @@ export default function AdminPage({ token, onHome, onLogout }) {
 
             setError(
                 err?.message ||
-                "Unable to delete member."
+                    "Unable to delete member."
             );
         } finally {
             setBusyUserId(null);
@@ -344,7 +368,7 @@ export default function AdminPage({ token, onHome, onLogout }) {
 
             setError(
                 err?.message ||
-                "Unable to remove profile photo."
+                    "Unable to remove profile photo."
             );
 
             throw err;
@@ -382,18 +406,16 @@ export default function AdminPage({ token, onHome, onLogout }) {
 
     return (
         <main className="admin-page">
-
             <AdminSidebar
                 activeSection={activeSection}
-                onSectionChange={setActiveSection}
-                onHome={onHome}
+                onSectionChange={
+                    setActiveSection
+                }
                 onLogout={onLogout}
             />
 
             <section className="admin-workspace">
-
                 <header className="admin-header">
-
                     <div className="admin-heading">
                         <p className="admin-eyebrow">
                             {meta.eyebrow}
@@ -407,7 +429,6 @@ export default function AdminPage({ token, onHome, onLogout }) {
                     </div>
 
                     <div className="admin-header-user">
-
                         <div className="admin-avatar">
                             {adminName
                                 .charAt(0)
@@ -423,9 +444,7 @@ export default function AdminPage({ token, onHome, onLogout }) {
                                 Administrator
                             </span>
                         </div>
-
                     </div>
-
                 </header>
 
                 {error && (
@@ -447,9 +466,10 @@ export default function AdminPage({ token, onHome, onLogout }) {
 
                 {loading &&
                     activeSection ===
-                    "overview" && (
+                        "overview" && (
                         <div className="admin-loading">
                             <div className="admin-spinner" />
+
                             <p>
                                 Loading platform data...
                             </p>
@@ -458,7 +478,7 @@ export default function AdminPage({ token, onHome, onLogout }) {
 
                 {!loading &&
                     activeSection ===
-                    "overview" && (
+                        "overview" && (
                         <AdminOverview
                             overview={overview}
                             onOpenUsers={() =>
@@ -475,147 +495,165 @@ export default function AdminPage({ token, onHome, onLogout }) {
                     )}
 
                 {activeSection ===
-                    "members" && (
-                        sectionLoading ? (
-                            <div className="admin-loading">
-                                <div className="admin-spinner" />
-                                <p>
-                                    Loading members...
-                                </p>
+                    "members" &&
+                    (sectionLoading ? (
+                        <div className="admin-loading">
+                            <div className="admin-spinner" />
+
+                            <p>
+                                Loading members...
+                            </p>
+                        </div>
+                    ) : (
+                        <section className="admin-content-section">
+                            <div className="admin-section-heading">
+                                <div>
+                                    <p className="admin-eyebrow">
+                                        {
+                                            filteredUsers.length
+                                        }{" "}
+                                        MEMBERS
+                                    </p>
+
+                                    <h2>
+                                        Manage community
+                                    </h2>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="admin-outline-button"
+                                    onClick={() =>
+                                        setActiveSection(
+                                            "members"
+                                        )
+                                    }
+                                >
+                                    ↻ Refresh
+                                </button>
                             </div>
-                        ) : (
-                            <section className="admin-content-section">
 
-                                <div className="admin-section-heading">
+                            <div className="admin-users-panel">
+                                <div className="admin-users-toolbar">
+                                    <label className="admin-search">
+                                        <span>⌕</span>
 
-                                    <div>
-                                        <p className="admin-eyebrow">
-                                            {filteredUsers.length} MEMBERS
-                                        </p>
+                                        <input
+                                            type="search"
+                                            placeholder="Search by name or email..."
+                                            value={
+                                                search
+                                            }
+                                            onChange={(
+                                                e
+                                            ) =>
+                                                setSearch(
+                                                    e
+                                                        .target
+                                                        .value
+                                                )
+                                            }
+                                        />
+                                    </label>
 
-                                        <h2>
-                                            Manage community
-                                        </h2>
-                                    </div>
-
-                                    <button
-                                        type="button"
-                                        className="admin-outline-button"
-                                        onClick={() =>
-                                            setActiveSection(
-                                                "members"
+                                    <select
+                                        value={
+                                            roleFilter
+                                        }
+                                        onChange={(
+                                            e
+                                        ) =>
+                                            setRoleFilter(
+                                                e
+                                                    .target
+                                                    .value
                                             )
                                         }
                                     >
-                                        ↻ Refresh
-                                    </button>
+                                        <option value="all">
+                                            All roles
+                                        </option>
 
+                                        <option value="learner">
+                                            Learners
+                                        </option>
+
+                                        <option value="mentor">
+                                            Mentors
+                                        </option>
+
+                                        <option value="admin">
+                                            Admins
+                                        </option>
+                                    </select>
+
+                                    <select
+                                        value={
+                                            statusFilter
+                                        }
+                                        onChange={(
+                                            e
+                                        ) =>
+                                            setStatusFilter(
+                                                e
+                                                    .target
+                                                    .value
+                                            )
+                                        }
+                                    >
+                                        <option value="all">
+                                            All status
+                                        </option>
+
+                                        <option value="active">
+                                            Active
+                                        </option>
+
+                                        <option value="suspended">
+                                            Suspended
+                                        </option>
+                                    </select>
                                 </div>
 
-                                <div className="admin-users-panel">
-
-                                    <div className="admin-users-toolbar">
-
-                                        <label className="admin-search">
-                                            <span>⌕</span>
-
-                                            <input
-                                                type="search"
-                                                placeholder="Search by name or email..."
-                                                value={search}
-                                                onChange={(e) =>
-                                                    setSearch(
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                        </label>
-
-                                        <select
-                                            value={roleFilter}
-                                            onChange={(e) =>
-                                                setRoleFilter(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-                                            <option value="all">
-                                                All roles
-                                            </option>
-
-                                            <option value="learner">
-                                                Learners
-                                            </option>
-
-                                            <option value="mentor">
-                                                Mentors
-                                            </option>
-
-                                            <option value="admin">
-                                                Admins
-                                            </option>
-                                        </select>
-
-                                        <select
-                                            value={statusFilter}
-                                            onChange={(e) =>
-                                                setStatusFilter(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-                                            <option value="all">
-                                                All status
-                                            </option>
-
-                                            <option value="active">
-                                                Active
-                                            </option>
-
-                                            <option value="suspended">
-                                                Suspended
-                                            </option>
-                                        </select>
-
-                                    </div>
-
-                                    <AdminUserTable
-                                        users={filteredUsers}
-                                        currentUserId={adminId}
-                                        busyUserId={busyUserId}
-                                        onUpdate={
-                                            handleUpdateUser
-                                        }
-                                        onDelete={
-                                            handleDeleteUser
-                                        }
-                                        onRemovePhoto={
-                                            handleRemovePhoto
-                                        }
-                                    />
-
-                                </div>
-
-                            </section>
-                        )
-                    )}
+                                <AdminUserTable
+                                    users={
+                                        filteredUsers
+                                    }
+                                    currentUserId={
+                                        adminId
+                                    }
+                                    busyUserId={
+                                        busyUserId
+                                    }
+                                    onUpdate={
+                                        handleUpdateUser
+                                    }
+                                    onDelete={
+                                        handleDeleteUser
+                                    }
+                                    onRemovePhoto={
+                                        handleRemovePhoto
+                                    }
+                                />
+                            </div>
+                        </section>
+                    ))}
 
                 {activeSection ===
-                    "reports" && (
-                        sectionLoading ? (
-                            <div className="admin-loading">
-                                <div className="admin-spinner" />
-                                <p>
-                                    Loading analytics...
-                                </p>
-                            </div>
-                        ) : (
-                            <AdminReports
-                                reports={reports}
-                            />
-                        )
-                    )}
+                    "reports" &&
+                    (sectionLoading ? (
+                        <div className="admin-loading">
+                            <div className="admin-spinner" />
 
+                            <p>
+                                Loading analytics...
+                            </p>
+                        </div>
+                    ) : (
+                        <AdminReports
+                            reports={reports}
+                        />
+                    ))}
             </section>
         </main>
     );
