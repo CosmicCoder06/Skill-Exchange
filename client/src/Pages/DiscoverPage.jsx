@@ -146,7 +146,7 @@ function DiscoverPage({
                     onClick={onHome}
                 >
                     <span className="logo-mark">↗</span>
-                    SkillSphere
+                    SkillExchange
                 </button>
 
                 <div className="nav-links">

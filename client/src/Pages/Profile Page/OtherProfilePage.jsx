@@ -122,7 +122,7 @@ function OtherProfilePage({
                     className="other-profile-back"
                     onClick={onBack}
                 >
-                    ← Back to discover
+                    ← Back
                 </button>
 
                 <span className="other-profile-label">

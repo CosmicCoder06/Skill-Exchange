@@ -1,45 +1,101 @@
 import { useState } from "react";
 import "./ChatPremium.css";
 
+
+const MAX_MESSAGE_LENGTH =
+    256;
+
+
 export default function MessageInput({
+
     disabled,
     onSend,
     onTyping
-}) {
-    const [content, setContent] = useState("");
 
-    async function handleSubmit(event) {
+}) {
+
+    const [
+        content,
+        setContent
+    ] = useState("");
+
+
+    async function handleSubmit(
+        event
+    ) {
+
         event.preventDefault();
 
-        const cleanContent = content.trim();
 
-        if (!cleanContent || disabled) {
+        const cleanContent =
+            content.trim();
+
+
+        if (
+            !cleanContent ||
+            disabled
+        ) {
             return;
         }
 
+
         setContent("");
+
         onTyping(false);
 
-        const sent = await onSend(cleanContent);
+
+        const sent =
+            await onSend(
+                cleanContent
+            );
+
 
         if (!sent) {
-            setContent(cleanContent);
-            onTyping(true);
+
+            setContent(
+                cleanContent
+            );
+
+            onTyping(
+                true
+            );
+
         }
+
     }
 
-    function handleChange(event) {
-        const value = event.target.value;
 
-        setContent(value);
-        onTyping(Boolean(value.trim()));
+    function handleChange(
+        event
+    ) {
+
+        const value =
+            event.target.value;
+
+
+        setContent(
+            value
+        );
+
+
+        onTyping(
+            Boolean(
+                value.trim()
+            )
+        );
+
     }
+
 
     return (
+
         <form
             className="message-input"
-            onSubmit={handleSubmit}
+            onSubmit={
+                handleSubmit
+            }
         >
+
             <label
                 className="sr-only"
                 htmlFor="chat-message"
@@ -47,24 +103,44 @@ export default function MessageInput({
                 Message
             </label>
 
+
             <textarea
                 id="chat-message"
-                value={content}
-                onChange={handleChange}
+                value={
+                    content
+                }
+                onChange={
+                    handleChange
+                }
                 placeholder="Write a message..."
-                maxLength={2000}
+                maxLength={
+                    MAX_MESSAGE_LENGTH
+                }
                 rows={1}
-                disabled={disabled}
-                onKeyDown={(event) => {
+                disabled={
+                    disabled
+                }
+                onKeyDown={(
+                    event
+                ) => {
+
                     if (
-                        event.key === "Enter" &&
+                        event.key ===
+                            "Enter" &&
                         !event.shiftKey
                     ) {
+
                         event.preventDefault();
-                        event.currentTarget.form.requestSubmit();
+
+                        event.currentTarget
+                            .form
+                            .requestSubmit();
+
                     }
+
                 }}
             />
+
 
             <button
                 type="submit"
@@ -74,8 +150,13 @@ export default function MessageInput({
                 }
                 aria-label="Send message"
             >
-                <span>↑</span>
+                <span>
+                    ↑
+                </span>
             </button>
+
         </form>
+
     );
+
 }

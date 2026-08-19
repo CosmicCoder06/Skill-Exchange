@@ -1,0 +1,433 @@
+/* =========================================================
+   COMPLETE PROFILE
+   Clean Skill Exchange style
+   No card / no cover image
+   ========================================================= */
+
+.completion-page {
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 70px 7vw 90px;
+
+    background:
+        radial-gradient(
+            circle at 8% 12%,
+            rgba(214, 244, 229, 0.75),
+            transparent 30%
+        ),
+        #f7faf7;
+
+    color: #10251f;
+}
+
+.completion-panel {
+    width: min(1100px, 100%);
+    margin: 0 auto;
+}
+
+/* =========================
+   INTRO
+   ========================= */
+
+.completion-intro {
+    max-width: 850px;
+    margin-bottom: 58px;
+}
+
+.completion-kicker {
+    display: block;
+
+    margin-bottom: 16px;
+
+    color: #147456;
+
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.completion-intro h1 {
+    margin: 0;
+
+    color: #10251f;
+
+    font-size: clamp(48px, 6vw, 76px);
+    line-height: 0.98;
+    letter-spacing: -4px;
+    font-weight: 800;
+}
+
+.completion-intro > p {
+    max-width: 680px;
+
+    margin: 24px 0 0;
+
+    color: #61736d;
+
+    font-size: 18px;
+    line-height: 1.65;
+}
+
+/* =========================
+   PROGRESS
+   ========================= */
+
+.completion-progress {
+    display: flex;
+    gap: 7px;
+
+    width: 230px;
+
+    margin-top: 30px;
+}
+
+.completion-progress span {
+    flex: 1;
+
+    height: 4px;
+
+    border-radius: 99px;
+
+    background: #dce7e2;
+}
+
+.completion-progress span:first-child,
+.completion-progress span:nth-child(2) {
+    background: #19795b;
+}
+
+/* =========================
+   FORM
+   ========================= */
+
+.completion-form {
+    width: 100%;
+}
+
+/* =========================
+   FORM HEADING
+   ========================= */
+
+.form-heading {
+    padding-bottom: 25px;
+
+    margin-bottom: 35px;
+
+    border-bottom: 1px solid #dce5e1;
+}
+
+.form-heading h2 {
+    margin: 0;
+
+    color: #10251f;
+
+    font-size: 34px;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+}
+
+.form-heading p {
+    margin: 10px 0 0;
+
+    color: #71817b;
+
+    font-size: 15px;
+}
+
+.form-heading b {
+    color: #147456;
+}
+
+/* =========================
+   LABELS
+   ========================= */
+
+.completion-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+
+    margin-bottom: 30px;
+
+    color: #18352c;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.completion-form label > b {
+    color: #c58a00;
+}
+
+/* =========================
+   INPUTS
+   ========================= */
+
+.completion-form input,
+.completion-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    border: none;
+    border-bottom: 1px solid #cbd9d3;
+    border-radius: 0;
+
+    background: transparent;
+
+    color: #10251f;
+
+    font-family: inherit;
+    font-size: 17px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        padding 0.2s ease;
+}
+
+.completion-form input {
+    height: 52px;
+    padding: 0 2px;
+}
+
+.completion-form textarea {
+    min-height: 125px;
+
+    padding: 10px 2px;
+
+    resize: vertical;
+
+    line-height: 1.65;
+}
+
+.completion-form input::placeholder,
+.completion-form textarea::placeholder {
+    color: #9aa9a4;
+}
+
+.completion-form input:hover,
+.completion-form textarea:hover {
+    border-color: #9eb9ad;
+}
+
+.completion-form input:focus,
+.completion-form textarea:focus {
+    border-color: #147456;
+
+    box-shadow: 0 2px 0 #147456;
+}
+
+/* =========================
+   SMALL HELP TEXT
+   ========================= */
+
+.completion-form small {
+    margin-top: -2px;
+
+    color: #7c8c86;
+
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+/* =========================
+   TWO COLUMN AREAS
+   ========================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    column-gap: 70px;
+
+    margin-bottom: 0;
+}
+
+/* =========================
+   ERROR
+   ========================= */
+
+.form-error {
+    margin: 5px 0 25px;
+
+    color: #b54438;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* =========================
+   ACTIONS
+   ========================= */
+
+.completion-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 14px;
+
+    margin-top: 38px;
+    padding-top: 28px;
+
+    border-top: 1px solid #dce5e1;
+}
+
+.completion-actions button {
+    min-height: 50px;
+
+    padding: 0 26px;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+
+    font-size: 15px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.completion-actions button:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+/* =========================
+   SKIP
+   ========================= */
+
+.skip-button {
+    border: 1px solid #cddbd5;
+
+    background: transparent;
+
+    color: #17674f;
+}
+
+.skip-button:hover:not(:disabled) {
+    background: #edf6f1;
+
+    border-color: #9dbdae;
+}
+
+/* =========================
+   SAVE
+   ========================= */
+
+.save-button {
+    border: 1px solid #147456;
+
+    background: #147456;
+
+    color: white;
+
+    box-shadow: 0 10px 22px rgba(20, 116, 86, 0.16);
+}
+
+.save-button:hover:not(:disabled) {
+    background: #105f47;
+
+    box-shadow: 0 14px 28px rgba(20, 116, 86, 0.22);
+}
+
+.completion-actions button:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+/* =========================
+   TABLET
+   ========================= */
+
+@media (max-width: 900px) {
+    .completion-page {
+        padding: 55px 6vw 75px;
+    }
+
+    .completion-intro h1 {
+        font-size: clamp(46px, 8vw, 64px);
+    }
+
+    .form-grid {
+        column-gap: 35px;
+    }
+}
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 680px) {
+    .completion-page {
+        padding: 38px 22px 60px;
+    }
+
+    .completion-intro {
+        margin-bottom: 42px;
+    }
+
+    .completion-intro h1 {
+        font-size: 44px;
+        letter-spacing: -2.5px;
+    }
+
+    .completion-intro > p {
+        margin-top: 18px;
+
+        font-size: 16px;
+    }
+
+    .form-heading h2 {
+        font-size: 28px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+
+        column-gap: 0;
+    }
+
+    .completion-form input {
+        height: 50px;
+    }
+
+    .completion-actions {
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+    }
+
+    .completion-actions button {
+        width: 100%;
+    }
+}
+
+/* =========================
+   SMALL MOBILE
+   ========================= */
+
+@media (max-width: 420px) {
+    .completion-page {
+        padding: 30px 16px 50px;
+    }
+
+    .completion-intro h1 {
+        font-size: 37px;
+    }
+
+    .completion-form textarea {
+        min-height: 110px;
+    }
+}

@@ -31,6 +31,7 @@ function ProfilePage({
 
     const [reviewsLoading, setReviewsLoading] = useState(true);
     const [deleting, setDeleting] = useState(false);
+    const [showPhoto, setShowPhoto] = useState(false);
 
     useEffect(() => {
         async function fetchProfile() {
@@ -312,11 +313,13 @@ function ProfilePage({
                     <div className="profile-brand">
 
                         <strong>
-                            SKILLSPHERE
+                            MY SPACE
                         </strong>
 
                         <span>
-                            Your personal learning space
+                            {String(profile.role || "learner").toLowerCase() === "mentor"
+                                ? "Your mentor profile"
+                                : "Your learning profile"}
                         </span>
 
                     </div>
@@ -324,15 +327,17 @@ function ProfilePage({
                     <div className="profile-header-actions">
 
                         <button
+                            className="profile-header-link"
                             onClick={onMessagesClick}
                         >
-                            Messages →
+                            Messages <span>→</span>
                         </button>
 
                         <button
+                            className="profile-header-link"
                             onClick={onBookings}
                         >
-                            My Sessions →
+                            My Sessions <span>→</span>
                         </button>
 
                     </div>
@@ -393,13 +398,46 @@ function ProfilePage({
 
                 <section className="profile-identity">
 
-                    <div className="profile-photo-wrapper">
+                    <div
+                        className="profile-photo-wrapper"
+                        role={profile.avatarUrl ? "button" : undefined}
+                        tabIndex={profile.avatarUrl ? 0 : undefined}
+                        aria-label={
+                            profile.avatarUrl
+                                ? "View profile photo"
+                                : undefined
+                        }
+                        onClick={() => {
+                            if (profile.avatarUrl) {
+                                setShowPhoto(true);
+                            }
+                        }}
+                        onKeyDown={(event) => {
+                            if (
+                                profile.avatarUrl &&
+                                (event.key === "Enter" || event.key === " ")
+                            ) {
+                                event.preventDefault();
+                                setShowPhoto(true);
+                            }
+                        }}
+                    >
+
+                        <div className="profile-photo-fallback-letter">
+                            {initials}
+                        </div>
 
                         {profile.avatarUrl ? (
                             <img
                                 className="profile-photo"
                                 src={profile.avatarUrl}
                                 alt={`${profile.name}'s profile`}
+                                onError={(event) => {
+                                    event.currentTarget.style.display = "none";
+                                    event.currentTarget.parentElement.classList.add(
+                                        "profile-photo-failed"
+                                    );
+                                }}
                             />
                         ) : (
                             <div className="profile-photo profile-photo-fallback">
@@ -447,21 +485,7 @@ function ProfilePage({
                     <div className="profile-actions">
 
                         <button
-                            className="secondary-action"
-                            onClick={onMessagesClick}
-                        >
-                            Messages
-                        </button>
-
-                        <button
-                            className="secondary-action"
-                            onClick={onBookings}
-                        >
-                            My Sessions
-                        </button>
-
-                        <button
-                            className="primary-action"
+                            className="primary-action profile-edit-only"
                             onClick={onCompleteProfile}
                         >
                             {complete
@@ -656,140 +680,152 @@ function ProfilePage({
                         </section>
 
 
-                        {/* REVIEWS */}
+                        {/* COMMUNITY FEEDBACK */}
 
-                        <section className="profile-section">
+                        <section className="profile-reviews-section">
 
-                            <div className="section-label">
-                                COMMUNITY FEEDBACK
+                            <div className="reviews-heading">
+
+                                <div>
+                                    <p className="profile-eyebrow">
+                                        COMMUNITY FEEDBACK
+                                    </p>
+
+                                    <h2>
+                                        Ratings & Reviews
+                                    </h2>
+                                </div>
+
+                                <div className="overall-rating">
+
+                                    <strong>
+                                        {totalReviews
+                                            ? stats.average.toFixed(1)
+                                            : "—"}
+                                    </strong>
+
+                                    <span>
+                                        ★★★★★
+                                    </span>
+
+                                    <small>
+                                        {totalReviews
+                                            ? `${totalReviews} ${
+                                                  totalReviews === 1
+                                                      ? "review"
+                                                      : "reviews"
+                                              }`
+                                            : "No reviews yet"}
+                                    </small>
+
+                                </div>
+
                             </div>
 
-                            <div className="section-body">
 
-                                <div className="reviews-heading">
-
-                                    <div>
-                                        <h2>
-                                            Ratings & Reviews
-                                        </h2>
-
-                                        <p>
-                                            Your reputation inside
-                                            the SkillSphere community.
-                                        </p>
-                                    </div>
-
-                                    <div className="overall-rating">
-
-                                        <strong>
-                                            {stats.average
-                                                ? stats.average.toFixed(1)
-                                                : "—"}
-                                        </strong>
-
-                                        <span>
-                                            ★★★★★
-                                        </span>
-
-                                    </div>
-
+                            {reviewsLoading ? (
+                                <div className="reviews-empty">
+                                    Loading ratings...
                                 </div>
+                            ) : (
+                                <>
 
+                                    {totalReviews > 0 && (
+                                        <div className="rating-breakdown">
 
-                                <div className="rating-breakdown">
+                                            {[5, 4, 3, 2, 1].map(
+                                                (star) => {
+                                                    const count =
+                                                        distribution[star] || 0;
 
-                                    {[5, 4, 3, 2, 1].map(
-                                        (rating) => (
-                                            <div
-                                                className="rating-row"
-                                                key={rating}
-                                            >
+                                                    return (
+                                                        <div
+                                                            className="rating-row"
+                                                            key={star}
+                                                        >
+                                                            <span>
+                                                                {star} ★
+                                                            </span>
 
-                                                <span>
-                                                    {rating}
-                                                </span>
+                                                            <div className="rating-bar">
+                                                                <div
+                                                                    className="rating-bar-fill"
+                                                                    style={{
+                                                                        width: `${ratingPercentage(
+                                                                            star
+                                                                        )}%`
+                                                                    }}
+                                                                />
+                                                            </div>
 
-                                                <div className="rating-track">
+                                                            <small>
+                                                                {count}
+                                                            </small>
+                                                        </div>
+                                                    );
+                                                }
+                                            )}
 
-                                                    <div
-                                                        style={{
-                                                            width:
-                                                                `${ratingPercentage(
-                                                                    rating
-                                                                )}%`
-                                                        }}
-                                                    />
-
-                                                </div>
-
-                                                <span>
-                                                    {
-                                                        distribution[
-                                                            rating
-                                                        ]
-                                                    }
-                                                </span>
-
-                                            </div>
-                                        )
+                                        </div>
                                     )}
 
-                                </div>
 
+                                    {reviewsData.reviews.length > 0 ? (
+                                        <div className="reviews-list">
 
-                                <div className="reviews-list">
+                                            {reviewsData.reviews.map(
+                                                (review) => (
+                                                    <article
+                                                        className="review-card"
+                                                        key={review._id}
+                                                    >
 
-                                    {reviewsLoading ? (
-                                        <div className="reviews-empty">
-                                            Loading reviews...
-                                        </div>
-                                    ) : reviewsData.reviews.length ? (
-                                        reviewsData.reviews.map(
-                                            (review) => (
-                                                <article
-                                                    className="review-item"
-                                                    key={review._id}
-                                                >
+                                                        <div className="review-card-top">
 
-                                                    <div className="review-user">
-
-                                                        <div className="review-avatar">
-                                                            {review
-                                                                .reviewer
-                                                                ?.name
-                                                                ?.charAt(
-                                                                    0
-                                                                )
-                                                                ?.toUpperCase() ||
-                                                                "?"}
-                                                        </div>
-
-                                                        <div>
-
-                                                            <strong>
+                                                            <div className="reviewer-avatar">
                                                                 {review
                                                                     .reviewer
-                                                                    ?.name ||
-                                                                    "Member"}
-                                                            </strong>
+                                                                    ?.name
+                                                                    ?.charAt(0)
+                                                                    ?.toUpperCase() ||
+                                                                    "U"}
+                                                            </div>
 
-                                                            <span>
+                                                            <div>
+                                                                <strong>
+                                                                    {review
+                                                                        .reviewer
+                                                                        ?.name ||
+                                                                        "Member"}
+                                                                </strong>
+
+                                                                <span className="reviewer-role">
+                                                                    {review
+                                                                        .reviewer
+                                                                        ?.role ||
+                                                                        "Learner"}
+                                                                </span>
+                                                            </div>
+
+                                                            <span className="review-date">
                                                                 {review.createdAt
                                                                     ? new Date(
                                                                           review.createdAt
-                                                                      ).toLocaleDateString()
+                                                                      ).toLocaleDateString(
+                                                                          "en-IN",
+                                                                          {
+                                                                              day: "numeric",
+                                                                              month: "short",
+                                                                              year: "numeric"
+                                                                          }
+                                                                      )
                                                                     : ""}
                                                             </span>
 
                                                         </div>
 
-                                                    </div>
-
-
-                                                    <div className="review-content">
 
                                                         <div className="review-stars">
-
                                                             {"★".repeat(
                                                                 review.rating
                                                             )}
@@ -800,43 +836,39 @@ function ProfilePage({
                                                                         review.rating
                                                                 )}
                                                             </span>
-
                                                         </div>
 
-                                                        <p>
-                                                            {review.comment ||
-                                                                "No written comment was added."}
-                                                        </p>
+                                                        {review.comment && (
+                                                            <p className="review-comment">
+                                                                “
+                                                                {review.comment}
+                                                                ”
+                                                            </p>
+                                                        )}
 
-                                                    </div>
+                                                    </article>
+                                                )
+                                            )}
 
-                                                </article>
-                                            )
-                                        )
+                                        </div>
                                     ) : (
                                         <div className="reviews-empty">
+                                            <div>⭐</div>
 
-                                            <span>
-                                                ☆
-                                            </span>
-
-                                            <strong>
+                                            <h3>
                                                 No reviews yet
-                                            </strong>
+                                            </h3>
 
                                             <p>
-                                                Complete a skill
-                                                exchange to start
-                                                building your
+                                                Complete a skill exchange
+                                                to start building your
                                                 reputation.
                                             </p>
-
                                         </div>
                                     )}
 
-                                </div>
-
-                            </div>
+                                </>
+                            )}
 
                         </section>
 
@@ -973,6 +1005,37 @@ function ProfilePage({
                     </aside>
 
                 </section>
+
+                {showPhoto && profile.avatarUrl && (
+                    <div
+                        className="profile-photo-lightbox"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Profile photo viewer"
+                        onClick={() => setShowPhoto(false)}
+                    >
+                        <button
+                            type="button"
+                            className="profile-photo-lightbox-close"
+                            aria-label="Close profile photo"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                setShowPhoto(false);
+                            }}
+                        >
+                            ×
+                        </button>
+
+                        <img
+                            className="profile-photo-lightbox-image"
+                            src={profile.avatarUrl}
+                            alt={`${profile.name}'s profile`}
+                            onClick={(event) =>
+                                event.stopPropagation()
+                            }
+                        />
+                    </div>
+                )}
 
             </section>
 
