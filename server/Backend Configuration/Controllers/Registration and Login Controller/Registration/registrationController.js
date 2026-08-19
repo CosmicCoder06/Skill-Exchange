@@ -1,9 +1,16 @@
 const User = require("../../../Models/UserSchema/user");
+
 const {
-  buildEmailVerificationUrl,
-  createEmailVerificationToken,
-} = require("../../../../Utils/emailVerification");
-const { sendVerificationEmail } = require("../../../../services/emailService");
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../../../../Utils/generateToken");
+
+const refreshCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
 
 // @route POST /api/auth/register
 // @access Public
@@ -30,45 +37,36 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const verification = createEmailVerificationToken();
     const user = await User.create({
       name,
       email,
       password,
       role: role || "learner",
-      isEmailVerified: false,
-      emailVerificationTokenHash: verification.tokenHash,
-      emailVerificationExpiresAt: verification.expiresAt,
     });
 
-    let emailSent = false;
-    try {
-      await sendVerificationEmail({
-        name: user.name,
-        to: user.email,
-        verificationUrl: buildEmailVerificationUrl(verification.rawToken),
-      });
-      user.emailVerificationSentAt = new Date();
-      await user.save();
-      emailSent = true;
-    } catch (emailError) {
-      console.error("Initial verification email failed:", emailError.message);
-    }
+    const accessToken = generateAccessToken(user._id, user.role);
+    const refreshToken = generateRefreshToken(user._id);
 
-    return res.status(emailSent ? 201 : 202).json({
-      code: emailSent ? "VERIFICATION_EMAIL_SENT" : "EMAIL_PENDING_DELIVERY",
-      email: user.email,
-      emailSent,
-      requiresEmailVerification: true,
-      message: emailSent
-        ? "Account created. Check your email to verify your account."
-        : "Account created, but the verification email could not be sent. Use resend after email delivery is configured.",
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.cookie("refreshToken", refreshToken, refreshCookieOptions);
+
+    res.status(201).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      accessToken,
     });
   } catch (error) {
-    console.error("Registration failed:", error.message);
+    console.error(error);
 
-    return res.status(500).json({
+    res.status(500).json({
       message: "Registration failed",
+      error: error.message,
     });
   }
 };
