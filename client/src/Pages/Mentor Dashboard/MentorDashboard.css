@@ -1,12 +1,12 @@
 .mentor-dashboard {
     min-height: 100vh;
-    padding: 40px 24px;
-    background: #f7f8fc;
+    padding: 48px 36px;
+    background: radial-gradient(circle at 8% 8%, #d8f1e2, transparent 26%), #f7faf7;
     box-sizing: border-box;
 }
 
 .mentor-dashboard-container {
-    width: min(1150px, 100%);
+    width: min(1220px, 100%);
     margin: 0 auto;
 }
 
@@ -15,7 +15,11 @@
     justify-content: space-between;
     align-items: center;
     gap: 24px;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
+    padding: 30px;
+    border: 1px solid #dfe8e3;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, .84);
 }
 
 .dashboard-label,
@@ -24,18 +28,18 @@
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 1.5px;
-    color: #777;
+    color: #39715a;
 }
 
 .mentor-dashboard-header h1 {
     margin: 0;
-    font-size: 38px;
-    color: #1c1c1c;
+    font-size: clamp(32px, 4vw, 48px);
+    color: #15231f;
 }
 
 .dashboard-subtitle {
     margin-top: 10px;
-    color: #666;
+    color: #6f7e78;
 }
 
 .dashboard-actions {
@@ -48,7 +52,7 @@
 .card-button,
 .mentor-logout {
     border: none;
-    border-radius: 8px;
+    border-radius: 999px;
     padding: 11px 18px;
     cursor: pointer;
     font-size: 14px;
@@ -56,40 +60,41 @@
 }
 
 .dashboard-primary {
-    background: #111;
+    background: #176b4e;
     color: white;
 }
 
 .dashboard-secondary {
-    background: white;
-    border: 1px solid #ddd;
-    color: #222;
+    background: #eef5f1;
+    border: 1px solid #dce8e1;
+    color: #176b4e;
 }
 
 .mentor-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: 14px;
     margin-bottom: 25px;
 }
 
 .mentor-stat-card {
     background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 14px;
-    padding: 22px;
+    border: 1px solid #dfe8e3;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 12px 28px rgba(23, 107, 78, .06);
 }
 
 .mentor-stat-card span {
     display: block;
-    color: #777;
+    color: #6f7e78;
     font-size: 14px;
     margin-bottom: 10px;
 }
 
 .mentor-stat-card strong {
-    font-size: 28px;
-    color: #171717;
+    font-size: 30px;
+    color: #176b4e;
 }
 
 .mentor-dashboard-grid {
@@ -100,8 +105,8 @@
 
 .dashboard-card {
     background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 16px;
+    border: 1px solid #dfe8e3;
+    border-radius: 20px;
     padding: 25px;
     min-height: 180px;
 }
@@ -111,14 +116,14 @@
 }
 
 .about-text {
-    color: #666;
+    color: #6f7e78;
     line-height: 1.6;
 }
 
 .card-button {
     margin-top: 15px;
-    background: #f0f0f0;
-    color: #222;
+    background: #eef5f1;
+    color: #176b4e;
 }
 
 .skill-list {
@@ -134,17 +139,17 @@
 }
 
 .skill-pill.teach {
-    background: #e8f7ed;
-    color: #19733b;
+    background: #dff5e9;
+    color: #176b4e;
 }
 
 .skill-pill.learn {
-    background: #edf1ff;
-    color: #3855a5;
+    background: #e8f4ef;
+    color: #176b4e;
 }
 
 .empty-text {
-    color: #888;
+    color: #6f7e78;
 }
 
 .availability-list {
@@ -155,8 +160,8 @@
 
 .availability-item {
     padding: 10px 12px;
-    background: #f7f7f7;
-    border-radius: 8px;
+    background: #f3f8f4;
+    border-radius: 10px;
 }
 
 .availability-item span {
@@ -166,9 +171,9 @@
 .mentor-profile-status {
     margin-top: 20px;
     padding: 25px;
-    border-radius: 16px;
-    background: white;
-    border: 1px solid #e5e5e5;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #dfe8e3;
 
     display: flex;
     justify-content: space-between;
@@ -182,7 +187,7 @@
 
 .mentor-profile-status p:last-child {
     margin: 0;
-    color: #666;
+    color: #6f7e78;
 }
 
 .mentor-logout {

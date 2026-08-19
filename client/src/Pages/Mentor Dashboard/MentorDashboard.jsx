@@ -68,6 +68,9 @@ function MentorDashboard({ token, onHome, onProfile, onLogout }) {
     const skillsToTeach = profile?.skillsToTeach || [];
     const skillsToLearn = profile?.skillsToLearn || [];
     const availability = profile?.availability || [];
+    const completedSessions = profile?.completedSessions || profile?.sessionsCompleted || 0;
+    const upcomingBookings = profile?.upcomingBookings || profile?.upcomingSessions || 0;
+    const averageRating = profile?.averageRating || profile?.rating || 0;
 
     return (
         <main className="mentor-dashboard">
@@ -111,26 +114,24 @@ function MentorDashboard({ token, onHome, onProfile, onLogout }) {
                 <section className="mentor-stats">
 
                     <div className="mentor-stat-card">
-                        <span>Skills to Teach</span>
-                        <strong>{skillsToTeach.length}</strong>
+                        <span>Sessions completed</span>
+                        <strong>{completedSessions}</strong>
                     </div>
 
                     <div className="mentor-stat-card">
-                        <span>Skills to Learn</span>
-                        <strong>{skillsToLearn.length}</strong>
+                        <span>Average rating</span>
+                        <strong>{averageRating ? `${Number(averageRating).toFixed(1)} ★` : "—"}</strong>
                     </div>
 
                     <div className="mentor-stat-card">
-                        <span>Availability</span>
-                        <strong>{availability.length}</strong>
+                        <span>Upcoming bookings</span>
+                        <strong>{upcomingBookings}</strong>
                     </div>
 
                     <div className="mentor-stat-card">
-                        <span>Hourly Rate</span>
+                        <span>Teaching skills</span>
                         <strong>
-                            {profile?.hourlyRate
-                                ? `₹${profile.hourlyRate}`
-                                : "Open"}
+                            {skillsToTeach.length}
                         </strong>
                     </div>
 
