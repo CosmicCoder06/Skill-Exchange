@@ -170,3 +170,92 @@ Authorization: Bearer <access-token>
 ## Real-Time Chat
 
 Socket.IO authenticates connections with the same access token. The chat flow uses conversation rooms and events including `join_conversation`, `leave_conversation`, `send_message`, `receive_message`, `typing_start`, `typing_stop`, `message_updated`, `message_deleted`, and `messages_read`.
+
+## Verification Commands
+
+Run backend tests from the `server` directory:
+
+```bash
+npm test
+```
+
+Run frontend linting and create a production build from the `client` directory:
+
+```bash
+npm run lint
+npm run build
+```
+
+Before opening a pull request, run the checks affected by your change and include their results in the PR description.
+
+## Troubleshooting
+
+### MongoDB does not connect
+
+- Confirm that `MONGO_URI` exists in `server/.env`.
+- For MongoDB Atlas, confirm that the current IP address is allowed and the database credentials are correct.
+- For local MongoDB, confirm that the database service is running.
+
+### Client requests fail
+
+- Confirm that `VITE_API_URL` includes the `/api` prefix.
+- Restart the Vite development server after changing `client/.env`.
+- Confirm that `CLIENT_URL` on the server exactly matches the frontend origin.
+
+### Socket.IO does not connect
+
+- Confirm that `VITE_SOCKET_URL` points to the server origin without `/api`.
+- Check that the access token is present and has not expired.
+- Confirm that the client origin is allowed by the server CORS configuration.
+
+### Protected routes return `401`
+
+- Log in again to obtain a fresh access token.
+- Confirm that `JWT_ACCESS_SECRET` is configured and has not changed since the token was created.
+- Send the token using the `Authorization: Bearer <access-token>` header.
+
+### Admin login is unavailable
+
+- Configure the `ADMIN_*` values in `server/.env`.
+- Run `node scripts/seedAdmin.js` from the `server` directory.
+- Restart the server and log in with the configured administrator account.
+
+## Git Workflow
+
+- `main` contains production-ready code.
+- `develop` is the integration branch for completed team work.
+- `feature/*` branches contain isolated features or documentation changes.
+
+Create new work from the latest `develop` branch:
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feature/your-module-name
+git push -u origin feature/your-module-name
+```
+
+Commit and publish your work from the feature branch:
+
+```bash
+git add <changed-files>
+git commit -m "Describe the completed change"
+git push
+```
+
+Open a pull request with `develop` as the base branch. Never push feature work directly to `main` or `develop`.
+
+## Contributing
+
+1. Check existing branches and pull requests to avoid duplicating another member's module.
+2. Keep each pull request focused on one feature, fix, test suite, or documentation area.
+3. Use logical commits that each represent a complete, reviewable change.
+4. Add or update tests when application behavior changes.
+5. Update this README when setup, environment variables, routes, or workflows change.
+6. Explain the change, its purpose, and verification results in the pull request description.
+
+Avoid empty commits and one-line commit splitting. Meaningful history makes reviews, debugging, and team collaboration easier.
+
+## Educational Use
+
+Skill Exchange is a collaborative academic project. Add a formal license before reusing or distributing the project outside its intended educational context.
