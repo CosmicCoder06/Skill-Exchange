@@ -1,9 +1,8 @@
 const User = require("../../../Models/UserSchema/user");
 const {
-  buildEmailVerificationUrl,
-  createEmailVerificationToken,
+  createEmailVerificationOtp,
 } = require("../../../../Utils/emailVerification");
-const { sendVerificationEmail } = require("../../../../services/emailService");
+const { sendVerificationOtp } = require("../../../../services/emailService");
 
 // @route POST /api/auth/register
 // @access Public
@@ -30,23 +29,24 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const verification = createEmailVerificationToken();
+    const verification = createEmailVerificationOtp();
     const user = await User.create({
       name,
       email,
       password,
       role: role || "learner",
       isEmailVerified: false,
-      emailVerificationTokenHash: verification.tokenHash,
+      emailVerificationOtpHash: verification.otpHash,
+      emailVerificationOtpAttempts: 0,
       emailVerificationExpiresAt: verification.expiresAt,
     });
 
     let emailSent = false;
     try {
-      await sendVerificationEmail({
+      await sendVerificationOtp({
         name: user.name,
         to: user.email,
-        verificationUrl: buildEmailVerificationUrl(verification.rawToken),
+        otp: verification.otp,
       });
       user.emailVerificationSentAt = new Date();
       await user.save();
@@ -56,13 +56,13 @@ const registerUser = async (req, res) => {
     }
 
     return res.status(emailSent ? 201 : 202).json({
-      code: emailSent ? "VERIFICATION_EMAIL_SENT" : "EMAIL_PENDING_DELIVERY",
+      code: emailSent ? "VERIFICATION_OTP_SENT" : "EMAIL_PENDING_DELIVERY",
       email: user.email,
       emailSent,
       requiresEmailVerification: true,
       message: emailSent
-        ? "Account created. Check your email to verify your account."
-        : "Account created, but the verification email could not be sent. Use resend after email delivery is configured.",
+        ? "Account created. Enter the verification code sent to your email."
+        : "Account created, but the verification code could not be sent. Use resend after email delivery is configured.",
     });
   } catch (error) {
     console.error("Registration failed:", error.message);

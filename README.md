@@ -6,7 +6,7 @@ The application supports learner, mentor, and administrator roles. Each role rec
 
 ## Features
 
-- JWT-based registration, email verification, and login
+- JWT-based registration, email OTP verification, and login
 - Learner and mentor profiles with skills and availability
 - Community discovery and member profile viewing
 - Session booking and booking-status management
@@ -114,12 +114,16 @@ MONGO_URI=mongodb://127.0.0.1:27017/skill-exchange
 CLIENT_URL=http://localhost:5173
 JWT_ACCESS_SECRET=replace-with-a-long-random-secret
 JWT_REFRESH_SECRET=replace-with-another-long-random-secret
+EMAIL_OTP_SECRET=replace-with-a-separate-long-random-secret
+RESEND_API_KEY=re_xxxxxxxxx
+EMAIL_FROM=Skill Exchange <no-reply@your-verified-domain.com>
+
+# Optional SMTP fallback for local or paid hosting
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your-smtp-username
 SMTP_PASS=your-smtp-password
-EMAIL_FROM=Skill Exchange <no-reply@example.com>
 ADMIN_NAME=Skill Exchange Admin
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=replace-with-a-secure-password
@@ -134,7 +138,7 @@ VITE_SOCKET_URL=http://localhost:5000
 
 Do not commit either `.env` file. Vite exposes variables prefixed with `VITE_` to browser code, so never place secrets in the client environment file.
 
-For Gmail SMTP, use an app password instead of your normal account password. In production, add the same server variables to the backend hosting provider and set `CLIENT_URL` to the deployed frontend URL so verification links open the correct application.
+Resend is the preferred production delivery method because it sends over HTTPS and works on hosts that block SMTP, including Render Free. Verify a sender domain in Resend and use an address from that domain for `EMAIL_FROM`. SMTP remains an optional fallback when `RESEND_API_KEY` is absent. For Gmail SMTP, use an app password instead of your normal account password. Set `CLIENT_URL` to the deployed frontend URL.
 
 ## Create an Administrator
 
@@ -158,7 +162,8 @@ Authorization: Bearer <access-token>
 | --- | --- | --- | --- |
 | Authentication | `POST` | `/api/registration/api` | Register a learner or mentor |
 | Authentication | `POST` | `/api/auth/verify-email` | Verify a registration token |
-| Authentication | `POST` | `/api/auth/resend-verification` | Request another verification email |
+| Authentication | `POST` | `/api/auth/verify-email-otp` | Verify a six-digit email code |
+| Authentication | `POST` | `/api/auth/resend-verification` | Request another verification code |
 | Authentication | `POST` | `/api/loginRoute/api` | Log in and receive an access token |
 | Profile | `GET` | `/api/profile/me` | Read the current profile |
 | Profile | `PUT` | `/api/profile/update` | Update the current profile |
@@ -226,9 +231,12 @@ Before opening a pull request, run the checks affected by your change and includ
 
 ### Verification emails are not delivered
 
-- Confirm that every `SMTP_*` variable and `EMAIL_FROM` exists in `server/.env`.
+- On Render Free, configure `RESEND_API_KEY` and `EMAIL_FROM`; outbound SMTP ports are blocked.
+- Confirm the sending domain is verified in Resend and `EMAIL_FROM` uses that domain.
+- Use the Resend dashboard logs to inspect rejected or bounced messages.
+- If using the SMTP fallback, confirm every `SMTP_*` variable and `EMAIL_FROM` exists in `server/.env`.
 - For providers such as Gmail, use an app password and ensure SMTP access is enabled.
-- Confirm that `CLIENT_URL` is the exact frontend origin; it is used to build the verification link.
+- Confirm that the deployed frontend and backend API URLs point to the current production services.
 - Check the server log for a mail-provider authentication or connection error.
 
 ### Admin login is unavailable
