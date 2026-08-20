@@ -1809,17 +1809,29 @@
     .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* The legacy dark theme inverts the app root. Keep the operational sidebar
+   in its intended dark-green treatment instead of rendering it pale. */
 html[data-theme="dark"] .admin-sidebar {
-    width: 230px;
-    min-width: 230px;
-    height: 100vh;
-    min-height: 100vh;
-    background: #0a2118 !important;
+    filter: invert(1) hue-rotate(180deg);
 }
 
-@media (min-width: 801px) and (max-width: 1150px) {
+@media (min-width: 801px) {
+    html[data-theme="dark"] .admin-page {
+        height: 100vh;
+        overflow: hidden;
+    }
+
     html[data-theme="dark"] .admin-sidebar {
-        width: 210px;
-        min-width: 210px;
+        position: fixed;
+        inset: 0 auto 0 0;
+        height: 100vh;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
+
+    html[data-theme="dark"] .admin-workspace {
+        height: 100vh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
     }
 }
