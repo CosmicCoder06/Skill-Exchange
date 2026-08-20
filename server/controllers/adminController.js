@@ -133,8 +133,17 @@ async function updateUser(req, res) {
     }
 
     const editingSelf = String(req.user.id) === String(id);
-    if (editingSelf && ((updates.role && updates.role !== "admin") || updates.isActive === false)) {
-      return res.status(400).json({ message: "You cannot remove your own admin access" });
+    if (
+      editingSelf &&
+      (
+        updates.isVerified !== undefined ||
+        (updates.role && updates.role !== "admin") ||
+        updates.isActive === false
+      )
+    ) {
+      return res.status(400).json({
+        message: "You cannot change your own verification or admin access",
+      });
     }
 
     const user = await User.findByIdAndUpdate(id, updates, {

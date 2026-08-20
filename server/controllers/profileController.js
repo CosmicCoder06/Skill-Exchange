@@ -46,6 +46,13 @@ const getMyProfile = async (req, res) => {
             });
         }
 
+        // Admin identities are operational-only and are not public profiles.
+        if (user.role === "admin" && String(user._id) !== String(req.user.id)) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
         const profileComplete =
             user.profileCompleted ||
             calculateProfileComplete(user);
@@ -200,6 +207,15 @@ const updateProfile = async (req, res) => {
             }
         }
 
+        const existingUser =
+            await User.findById(req.user.id);
+
+        if (!existingUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
         const updates = {};
 
         if (bio !== undefined) {
@@ -249,19 +265,6 @@ const updateProfile = async (req, res) => {
                 typeof coverImageUrl === "string"
                     ? coverImageUrl.trim()
                     : "";
-        }
-
-        // -------------------------
-        // Get existing profile
-        // -------------------------
-
-        const existingUser =
-            await User.findById(req.user.id);
-
-        if (!existingUser) {
-            return res.status(404).json({
-                message: "User not found"
-            });
         }
 
         const profileForCompletion = {

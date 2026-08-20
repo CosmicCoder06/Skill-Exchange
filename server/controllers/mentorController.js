@@ -5,6 +5,7 @@ const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const listMentors = async (req, res) => {
   const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
   const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 12, 1), 50);
+  // An exact mentor role keeps operational admin accounts out of discovery.
   const query = { role: "mentor", isActive: true };
   const filters = [];
 

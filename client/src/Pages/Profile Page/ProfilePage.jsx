@@ -338,9 +338,11 @@ function ProfilePage({
                         }}
                     >
 
-                        <div className="profile-photo-fallback-letter">
-                            {initials}
-                        </div>
+                        {!profile.avatarUrl && (
+                            <div className="profile-photo-fallback-letter">
+                                {initials}
+                            </div>
+                        )}
 
                         {profile.avatarUrl ? (
                             <img

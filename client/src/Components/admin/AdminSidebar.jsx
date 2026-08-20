@@ -76,20 +76,6 @@ export default function AdminSidebar({
             </nav>
 
             <div className="admin-sidebar-bottom">
-                <div className="admin-protected">
-                    <span>✦</span>
-
-                    <div>
-                        <strong>
-                            Protected workspace
-                        </strong>
-
-                        <p>
-                            Admin access only
-                        </p>
-                    </div>
-                </div>
-
                 <button
                     type="button"
                     className="admin-logout"

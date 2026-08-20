@@ -391,7 +391,8 @@ export default function ChatPage({
                 result.filter(
                     (user) =>
                         String(user._id) !==
-                        String(currentUserId)
+                        String(currentUserId) &&
+                        user.role !== "admin"
                 )
             )
         } catch (requestError) {

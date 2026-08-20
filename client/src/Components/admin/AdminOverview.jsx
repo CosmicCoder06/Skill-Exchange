@@ -113,30 +113,9 @@ export default function AdminOverview({
         root.learnerCount
     );
 
-    const conversations = firstNumber(
-        root.conversations,
-        root.totalConversations,
-        root.conversationCount,
-        root.matches
-    );
-
-    const messages = firstNumber(
-        root.messages,
-        root.totalMessages,
-        root.messageCount
-    );
-
-    const completeProfiles = firstNumber(
-        root.completeProfiles,
-        root.completedProfiles,
-        root.profileCompleted,
-        root.completedProfileCount
-    );
-
     const deactivatedAccounts = firstNumber(root.deactivatedAccounts);
-    const deletedAccounts = firstNumber(root.deletedAccounts);
+    const verifiedUsers = firstNumber(root.verifiedUsers);
     const completedBookings = firstNumber(root.completedBookings);
-    const reviews = firstNumber(root.reviews);
 
     return (
         <section className="admin-overview">
@@ -151,10 +130,7 @@ export default function AdminOverview({
                     onClick={onOpenUsers}
                 />
 
-                <StatCard value={deactivatedAccounts} title="Deactivated accounts" description="Members who chose to pause access" tone="tone-lavender" onClick={onOpenUsers} />
-                <StatCard value={deletedAccounts} title="Deleted accounts" description="Permanent removals recorded by admins" tone="tone-sand" onClick={onOpenUsers} />
-                <StatCard value={completedBookings} title="Sessions completed" description="Successful learning exchanges delivered" tone="tone-mint" onClick={onOpenReports} />
-                <StatCard value={reviews} title="Reviews submitted" description="Trust signals from completed sessions" tone="tone-blue" onClick={onOpenReports} />
+                <StatCard value={verifiedUsers} title="Verified members" description="Trusted accounts ready for discovery" tone="tone-mint" onClick={onOpenUsers} />
 
                 <StatCard
                     value={mentors}
@@ -173,81 +149,20 @@ export default function AdminOverview({
                 />
 
                 <StatCard
-                    value={conversations}
-                    title="Conversations"
-                    description="Learning connections started"
-                    tone="tone-lavender"
-                    onClick={onOpenReports}
-                />
-
-                <StatCard
-                    value={messages}
-                    title="Messages"
-                    description="Knowledge exchanged"
+                    value={completedBookings}
+                    title="Sessions completed"
+                    description="Successful exchanges delivered"
                     tone="tone-blue"
                     onClick={onOpenReports}
                 />
 
                 <StatCard
-                    value={completeProfiles}
-                    title="Complete profiles"
-                    description="Members ready for discovery"
-                    tone="tone-soft"
+                    value={deactivatedAccounts}
+                    title="Deactivated accounts"
+                    description="Accounts currently paused"
+                    tone="tone-lavender"
                     onClick={onOpenUsers}
                 />
-
-            </div>
-
-            <div className="admin-overview-lower">
-
-                <div className="admin-overview-block">
-
-                    <p className="admin-eyebrow">
-                        COMMUNITY HEALTH
-                    </p>
-
-                    <h2>Operations snapshot</h2>
-
-                    <p className="admin-overview-copy">
-                        Monitor account health, session completion and trust signals from one protected workspace.
-                    </p>
-
-                    <button
-                        type="button"
-                        className="admin-text-button"
-                        onClick={onOpenReports}
-                    >
-                        View reports →
-                    </button>
-
-                </div>
-
-                <div className="admin-overview-block">
-
-                    <p className="admin-eyebrow">
-                        MEMBER MANAGEMENT
-                    </p>
-
-                    <h2>
-                        Recently joined
-                    </h2>
-
-                    <p className="admin-overview-copy">
-                        Review member accounts,
-                        profile photos and access
-                        permissions.
-                    </p>
-
-                    <button
-                        type="button"
-                        className="admin-text-button"
-                        onClick={onOpenUsers}
-                    >
-                        Manage all →
-                    </button>
-
-                </div>
-
             </div>
 
         </section>

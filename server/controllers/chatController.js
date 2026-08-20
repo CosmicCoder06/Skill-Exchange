@@ -108,9 +108,21 @@ async function listConversations(
                 unreadIds.map(String)
             )
 
+        // Admin accounts are intentionally not part of the member messaging
+        // experience. Hide legacy conversations too, not only new ones.
+        const memberConversations =
+            conversations.filter(
+                (conversation) =>
+                    conversation.participants.every(
+                        (participant) =>
+                            participant &&
+                            participant.role !== "admin"
+                    )
+            )
+
         return res.json({
             conversations:
-                conversations.map(
+                memberConversations.map(
                     (conversation) => ({
                         ...conversation,
                         __unread:
@@ -186,17 +198,35 @@ async function createConversation(
                 })
         }
 
-        const participantExists =
-            await User.exists({
-                _id: participantId,
-            })
+        const [senderIsMember, participantExists] =
+            await Promise.all([
+                User.exists({
+                    _id: req.user.id,
+                    role: { $ne: "admin" },
+                    isActive: true,
+                }),
+                User.exists({
+                    _id: participantId,
+                    role: { $ne: "admin" },
+                    isActive: true,
+                }),
+            ])
+
+        if (!senderIsMember) {
+            return res
+                .status(403)
+                .json({
+                    message:
+                        "Admin accounts are not available for member messaging",
+                })
+        }
 
         if (!participantExists) {
             return res
                 .status(404)
                 .json({
                     message:
-                        "Participant not found",
+                        "Participant is not available for messaging",
                 })
         }
 

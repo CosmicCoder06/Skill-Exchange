@@ -23,20 +23,186 @@ button:hover:not(:disabled) { transform: translateY(-2px); }
 button:active:not(:disabled) { transform: translateY(0); }
 
 html[data-theme="dark"] {
-  background: #0d1511;
+  color-scheme: dark;
+  background: #0b1310;
 }
 
 html[data-theme="dark"] body {
-  background: #0d1511;
+  background: #0b1310;
+  color: #e9f2ec;
 }
 
 html[data-theme="dark"] #root {
-  filter: invert(1) hue-rotate(180deg);
+  color: #e9f2ec;
 }
 
-html[data-theme="dark"] #root img,
-html[data-theme="dark"] #root video {
-  filter: invert(1) hue-rotate(180deg);
+html[data-theme="dark"] :is(
+  .home-page,
+  .discover-page,
+  .booking-page,
+  .bookings-page,
+  .learner-dashboard,
+  .profile-page,
+  .other-profile-page,
+  .completion-page,
+  .chat-page,
+  .account-management-page,
+  .admin-page
+) {
+  background: #121714 !important;
+  color: #e9f2ec;
+}
+
+html[data-theme="dark"] :is(
+  .home-cta,
+  .mentor-card,
+  .hero-card,
+  .account-management-card,
+  .profile-shell,
+  .profile-content,
+  .profile-details,
+  .profile-skills-section,
+  .other-profile-hero,
+  .other-profile-content,
+  .completion-form,
+  .chat-sidebar,
+  .chat-thread,
+  .new-chat-panel,
+  .booking-calendar,
+  .booking-item,
+  .admin-stat-card,
+  .admin-table-wrap,
+  .admin-report-block,
+  .admin-error,
+  .admin-loading
+) {
+  background: #16231d !important;
+  border-color: #2b4036 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] :is(
+  .app-nav,
+  .dashboard-topbar,
+  .chat-topbar,
+  .thread-header,
+  .admin-header,
+  .profile-sidebar,
+  .sidebar-navigation
+) {
+  border-color: #2b4036 !important;
+}
+
+html[data-theme="dark"] :is(
+  .profile-sidebar,
+  .chat-nav,
+  .admin-sidebar
+) {
+  background: #0a2118 !important;
+}
+
+html[data-theme="dark"] #root :is(h1, h2, h3, h4, strong, b) {
+  color: #edf7f0;
+}
+
+html[data-theme="dark"] #root :is(p, small, label, time, .admin-description) {
+  color: #aebeb5;
+}
+
+html[data-theme="dark"] #root :is(input, textarea, select) {
+  background: #0d1712 !important;
+  color: #edf7f0 !important;
+  border-color: #385246 !important;
+}
+
+html[data-theme="dark"] #root :is(input, textarea, select)::placeholder {
+  color: #7f9388;
+}
+
+html[data-theme="dark"] #root :is(
+  .dashboard-primary,
+  .home-primary,
+  .admin-action-verify,
+  .admin-modal-confirm,
+  .profile-primary-action,
+  .booking-primary-button
+) {
+  background: #26966c !important;
+  border-color: #26966c !important;
+  color: #06110c !important;
+}
+
+html[data-theme="dark"] #root :is(.dashboard-secondary, .nav-profile, .theme-toggle) {
+  background: #16231d !important;
+  border-color: #385246 !important;
+  color: #bcebd3 !important;
+}
+
+/* Landing and discovery use several intentionally low-emphasis labels in
+   light mode. Give those labels explicit accessible colours in dark mode. */
+html[data-theme="dark"] .home-page,
+html[data-theme="dark"] .discover-page {
+  background:
+    radial-gradient(circle at 78% 9%, rgba(43, 109, 79, 0.18), transparent 28%),
+    #121714 !important;
+}
+
+html[data-theme="dark"] .home-page .app-nav {
+  border-bottom: 1px solid #314238;
+}
+
+html[data-theme="dark"] .home-page :is(
+  .app-nav button,
+  .app-logo,
+  .nav-links button,
+  .home-text-button
+) {
+  color: #dce8e0 !important;
+}
+
+html[data-theme="dark"] .home-page .nav-links button:hover,
+html[data-theme="dark"] .home-page .nav-links button.active,
+html[data-theme="dark"] .home-page .home-text-button:hover {
+  color: #82d9ae !important;
+}
+
+html[data-theme="dark"] .home-page .home-kicker,
+html[data-theme="dark"] .home-page .hero-copy h1 em,
+html[data-theme="dark"] .home-page .hero-card-float > span {
+  color: #71d4a6 !important;
+}
+
+html[data-theme="dark"] .home-page :is(.home-lead, .hero-trust p) {
+  color: #bfcec5 !important;
+}
+
+html[data-theme="dark"] .home-page .hero-trust b {
+  color: #f0f7f2 !important;
+}
+
+html[data-theme="dark"] .home-page .home-primary,
+html[data-theme="dark"] .home-page .nav-join {
+  background: #2da676 !important;
+  color: #07140e !important;
+  box-shadow: 0 12px 30px rgba(45, 166, 118, 0.18) !important;
+}
+
+html[data-theme="dark"] .home-page .hero-art {
+  background: linear-gradient(145deg, #234b3b, #183326) !important;
+}
+
+html[data-theme="dark"] .home-page .hero-orbit {
+  border-color: rgba(208, 240, 221, 0.2);
+}
+
+html[data-theme="dark"] .home-page .hero-card {
+  background: #1a2821 !important;
+  border-color: #385647 !important;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.26) !important;
+}
+
+html[data-theme="dark"] .home-page :is(.hero-card p, .mini-avatars span) {
+  color: #b8ccc0 !important;
 }
 
 button,

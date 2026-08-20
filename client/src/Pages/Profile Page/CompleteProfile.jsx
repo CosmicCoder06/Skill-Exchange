@@ -306,21 +306,6 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                         <span />
                     </div>
 
-                    {role === "mentor" && asList(formData.skillsToTeach).length > 0 && (
-                        <section className="skill-level-picker">
-                            <p>TEACHING CONFIDENCE</p>
-                            <h3>Choose your level for each skill</h3>
-                            {asList(formData.skillsToTeach).map((skill) => (
-                                <label key={skill} className="skill-level-row">
-                                    <span>{skill}</span>
-                                    <select value={formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"} onChange={(event) => setSkillLevel(skill, event.target.value)}>
-                                        <option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Expert</option>
-                                    </select>
-                                </label>
-                            ))}
-                        </section>
-                    )}
-
                 </div>
 
 
@@ -411,6 +396,28 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                         </label>}
 
                     </div>
+
+                    {role === "mentor" && asList(formData.skillsToTeach).length > 0 && (
+                        <section className="skill-level-picker">
+                            <p>TEACHING CONFIDENCE</p>
+                            <h3>Choose your level for each teaching skill</h3>
+
+                            {asList(formData.skillsToTeach).map((skill) => (
+                                <label key={skill} className="skill-level-row">
+                                    <span>{skill}</span>
+                                    <select
+                                        value={formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"}
+                                        onChange={(event) => setSkillLevel(skill, event.target.value)}
+                                    >
+                                        <option>Beginner</option>
+                                        <option>Intermediate</option>
+                                        <option>Advanced</option>
+                                        <option>Expert</option>
+                                    </select>
+                                </label>
+                            ))}
+                        </section>
+                    )}
 
 
                     {/* AVAILABILITY + RATE */}

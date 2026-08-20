@@ -543,7 +543,7 @@ function AppContent() {
 
                         setProfileStatus(true);
 
-                        navigateTo(getDashboardPage(userRole));
+                        navigateTo("profile");
                     }}
                     onLater={() => {
                         localStorage.setItem(
@@ -555,7 +555,7 @@ function AppContent() {
                             "skipped"
                         );
 
-                        navigateTo(getDashboardPage(userRole));
+                        navigateTo("profile");
                     }}
                 />
             ) : page === "learner-dashboard" ? (

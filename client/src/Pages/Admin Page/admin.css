@@ -1749,3 +1749,77 @@
     }
 }
 /* @teamcosmiccoders */
+.admin-sidebar {
+    width: 230px;
+    min-width: 230px;
+    height: 100vh;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    overflow-y: auto;
+    padding: 26px 18px;
+    background: #123f31;
+}
+
+.admin-sidebar-label { margin: 28px 8px 10px; }
+.admin-nav-item { min-height: 46px; border-radius: 10px; }
+.admin-sidebar-bottom { padding-top: 18px; border-top: 1px solid rgba(255,255,255,.12); }
+.admin-action-verify { border-color: #176b4e !important; background: #e4f4ea !important; color: #176b4e !important; }
+.admin-action-verify:hover { background: #176b4e !important; color: #fff !important; }
+.admin-stats-grid { grid-template-columns: repeat(3, 1fr); }
+.admin-stat-card { min-height: 178px; padding: 24px; }
+.admin-stat-arrow { margin-bottom: 18px; }
+.admin-stat-card > strong { margin-bottom: 11px; font-size: 45px; }
+
+@media (min-width: 801px) {
+    .admin-page { display: block; }
+
+    .admin-sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+    }
+
+    .admin-workspace {
+        min-height: 100vh;
+        margin-left: 230px;
+    }
+}
+
+@media (max-width: 1150px) {
+    .admin-sidebar { width: 210px; min-width: 210px; }
+}
+
+@media (min-width: 801px) and (max-width: 1150px) {
+    .admin-workspace { margin-left: 210px; }
+}
+
+@media (max-width: 800px) {
+    .admin-sidebar {
+        position: relative;
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        min-height: 0;
+        padding: 18px;
+    }
+}
+
+@media (max-width: 760px) {
+    .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+html[data-theme="dark"] .admin-sidebar {
+    width: 230px;
+    min-width: 230px;
+    height: 100vh;
+    min-height: 100vh;
+    background: #0a2118 !important;
+}
+
+@media (min-width: 801px) and (max-width: 1150px) {
+    html[data-theme="dark"] .admin-sidebar {
+        width: 210px;
+        min-width: 210px;
+    }
+}

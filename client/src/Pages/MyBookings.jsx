@@ -560,7 +560,7 @@ function MyBookings({
             )
         );
 
-    function renderBookingRecord(
+    function renderBookingCard(
         booking
     ) {
         const {
@@ -601,8 +601,8 @@ function MyBookings({
             ] === true;
 
         return (
-            <article className="booking-record">
-                <div className="booking-record-top">
+            <article className="booking-card">
+                <div className="booking-card-top">
                     <div className="booking-person-avatar">
                         {initial}
                     </div>
@@ -925,7 +925,7 @@ function MyBookings({
                     </div>
 
                     <div className="booking-grid">
-                        {renderBookingRecord(
+                        {renderBookingCard(
                             selectedCalendarBooking
                         )}
                     </div>
@@ -969,12 +969,12 @@ function MyBookings({
                         {requests.map(
                             (booking) => (
                                 <article
-                                    className="booking-record"
+                                    className="booking-card"
                                     key={
                                         booking._id
                                     }
                                 >
-                                    <div className="booking-record-top">
+                                    <div className="booking-card-top">
                                         <div className="booking-person-avatar">
                                             {booking
                                                 .learner
@@ -1125,7 +1125,7 @@ function MyBookings({
                                         booking._id
                                     }
                                 >
-                                    {renderBookingRecord(
+                                    {renderBookingCard(
                                         booking
                                     )}
                                 </div>
