@@ -4,6 +4,7 @@ import "./CompleteProfile.css";
 const emptyProfile = {
     bio: "",
     skillsToTeach: "",
+    teachingSkillLevels: {},
     skillsToLearn: "",
     availability: "",
     hourlyRate: "",
@@ -46,6 +47,8 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                             ?.filter(Boolean)
                             .join(", ") || "",
 
+                    teachingSkillLevels: profile.teachingSkillLevels || {},
+
                     skillsToLearn:
                         profile.skillsToLearn
                             ?.filter(Boolean)
@@ -86,6 +89,13 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
         setFormData((current) => ({
             ...current,
             [name]: value
+        }));
+    }
+
+    function setSkillLevel(skill, level) {
+        setFormData((current) => ({
+            ...current,
+            teachingSkillLevels: { ...current.teachingSkillLevels, [skill]: level }
         }));
     }
 
@@ -222,6 +232,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                         bio: formData.bio,
 
                         skillsToTeach,
+                        teachingSkillLevels: Object.fromEntries(skillsToTeach.map((skill) => [skill, formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"])),
 
                         ...(role === "mentor" ? {} : { skillsToLearn }),
 
@@ -294,6 +305,21 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                         <span />
                         <span />
                     </div>
+
+                    {role === "mentor" && asList(formData.skillsToTeach).length > 0 && (
+                        <section className="skill-level-picker">
+                            <p>TEACHING CONFIDENCE</p>
+                            <h3>Choose your level for each skill</h3>
+                            {asList(formData.skillsToTeach).map((skill) => (
+                                <label key={skill} className="skill-level-row">
+                                    <span>{skill}</span>
+                                    <select value={formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"} onChange={(event) => setSkillLevel(skill, event.target.value)}>
+                                        <option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Expert</option>
+                                    </select>
+                                </label>
+                            ))}
+                        </section>
+                    )}
 
                 </div>
 

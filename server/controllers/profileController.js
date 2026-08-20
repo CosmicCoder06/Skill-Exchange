@@ -74,6 +74,7 @@ const updateProfile = async (req, res) => {
         const {
             bio,
             skillsToTeach,
+            teachingSkillLevels,
             skillsToLearn,
             availability,
             hourlyRate,
@@ -128,6 +129,12 @@ const updateProfile = async (req, res) => {
             skillsToTeach !== undefined
                 ? cleanStringList(skillsToTeach)
                 : undefined;
+
+        if (teachingSkillLevels !== undefined && (
+            !teachingSkillLevels || Array.isArray(teachingSkillLevels) || typeof teachingSkillLevels !== "object"
+        )) {
+            return res.status(400).json({ message: "Teaching skill levels must be an object." });
+        }
 
         const cleanedSkillsToLearn =
             skillsToLearn !== undefined
@@ -202,6 +209,15 @@ const updateProfile = async (req, res) => {
         if (cleanedSkillsToTeach !== undefined) {
             updates.skillsToTeach =
                 cleanedSkillsToTeach;
+        }
+
+        if (teachingSkillLevels !== undefined) {
+            const allowedLevels = new Set(["Beginner", "Intermediate", "Advanced", "Expert"]);
+            const validSkills = new Set((cleanedSkillsToTeach || existingUser.skillsToTeach || []).map((skill) => String(skill).toLowerCase()));
+            updates.teachingSkillLevels = Object.fromEntries(
+                Object.entries(teachingSkillLevels)
+                    .filter(([skill, level]) => validSkills.has(String(skill).toLowerCase()) && allowedLevels.has(level))
+            );
         }
 
         if (existingUser.role === "mentor") {

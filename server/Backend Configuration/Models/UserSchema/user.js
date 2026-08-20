@@ -84,6 +84,12 @@ const userSchema = new mongoose.Schema(
             default: [],
         },
 
+        teachingSkillLevels: {
+            type: Map,
+            of: String,
+            default: {},
+        },
+
         skillsToLearn: {
             type: [String],
             default: [],

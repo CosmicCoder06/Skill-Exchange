@@ -34,6 +34,7 @@ const getMentorDashboard = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 skillsToTeach: user.skillsToTeach,
+                teachingSkillLevels: user.teachingSkillLevels,
                 completedSessions,
                 upcomingBookings,
                 learnersTaught: learnersTaught.length,
