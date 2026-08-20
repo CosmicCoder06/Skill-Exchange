@@ -20,10 +20,7 @@
 }
 
 html[data-theme="dark"] .theme-toggle {
-    background: #193126;
-    border-color: #3b705a;
-    color: #c6f2d9;
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34);
+    filter: invert(1) hue-rotate(180deg);
 }
 
 @media (max-width: 700px) {
