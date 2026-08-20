@@ -226,7 +226,7 @@ function OtherProfilePage({
                             </div>
                         </div>
 
-                        <div>
+                        {profile.role !== "mentor" && <div>
                             <p className="profile-eyebrow">
                                 I WANT TO LEARN
                             </p>
@@ -247,7 +247,7 @@ function OtherProfilePage({
                                     </span>
                                 )}
                             </div>
-                        </div>
+                        </div>}
                     </div>
                 </div>
 

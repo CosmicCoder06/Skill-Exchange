@@ -4,6 +4,7 @@ import "./CompleteProfile.css";
 const emptyProfile = {
     bio: "",
     skillsToTeach: "",
+    teachingSkillLevels: {},
     skillsToLearn: "",
     availability: "",
     hourlyRate: "",
@@ -11,7 +12,7 @@ const emptyProfile = {
     coverImageUrl: ""
 };
 
-function CompleteProfile({ token, onComplete, onLater }) {
+function CompleteProfile({ token, role, onComplete, onLater }) {
     const [formData, setFormData] = useState(emptyProfile);
     const [error, setError] = useState("");
     const [saving, setSaving] = useState(false);
@@ -45,6 +46,8 @@ function CompleteProfile({ token, onComplete, onLater }) {
                         profile.skillsToTeach
                             ?.filter(Boolean)
                             .join(", ") || "",
+
+                    teachingSkillLevels: profile.teachingSkillLevels || {},
 
                     skillsToLearn:
                         profile.skillsToLearn
@@ -89,6 +92,13 @@ function CompleteProfile({ token, onComplete, onLater }) {
         }));
     }
 
+    function setSkillLevel(skill, level) {
+        setFormData((current) => ({
+            ...current,
+            teachingSkillLevels: { ...current.teachingSkillLevels, [skill]: level }
+        }));
+    }
+
     // =========================
     // CONVERT COMMA SEPARATED
     // VALUES INTO ARRAYS
@@ -127,7 +137,7 @@ function CompleteProfile({ token, onComplete, onLater }) {
         return "Add at least one skill you can teach.";
     }
 
-    if (skillsToLearn.length === 0) {
+    if (role !== "mentor" && skillsToLearn.length === 0) {
         return "Add at least one skill you want to learn.";
     }
 
@@ -222,8 +232,9 @@ function CompleteProfile({ token, onComplete, onLater }) {
                         bio: formData.bio,
 
                         skillsToTeach,
+                        teachingSkillLevels: Object.fromEntries(skillsToTeach.map((skill) => [skill, formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"])),
 
-                        skillsToLearn,
+                        ...(role === "mentor" ? {} : { skillsToLearn }),
 
                         availability:
                             asList(
@@ -371,7 +382,7 @@ function CompleteProfile({ token, onComplete, onLater }) {
                         </label>
 
 
-                        <label>
+                        {role !== "mentor" && <label>
                             Skills you want to learn <b>*</b>
 
                             <input
@@ -382,9 +393,31 @@ function CompleteProfile({ token, onComplete, onLater }) {
                                 placeholder="Design, Python"
                                 onChange={handleChange}
                             />
-                        </label>
+                        </label>}
 
                     </div>
+
+                    {role === "mentor" && asList(formData.skillsToTeach).length > 0 && (
+                        <section className="skill-level-picker">
+                            <p>TEACHING CONFIDENCE</p>
+                            <h3>Choose your level for each teaching skill</h3>
+
+                            {asList(formData.skillsToTeach).map((skill) => (
+                                <label key={skill} className="skill-level-row">
+                                    <span>{skill}</span>
+                                    <select
+                                        value={formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"}
+                                        onChange={(event) => setSkillLevel(skill, event.target.value)}
+                                    >
+                                        <option>Beginner</option>
+                                        <option>Intermediate</option>
+                                        <option>Advanced</option>
+                                        <option>Expert</option>
+                                    </select>
+                                </label>
+                            ))}
+                        </section>
+                    )}
 
 
                     {/* AVAILABILITY + RATE */}

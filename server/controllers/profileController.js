@@ -27,7 +27,7 @@ const calculateProfileComplete = (profile) =>
     Boolean(
         hasValue(profile.bio) &&
         hasSkill(profile.skillsToTeach) &&
-        hasSkill(profile.skillsToLearn)
+        (profile.role === "mentor" || hasSkill(profile.skillsToLearn))
     );
 
 
@@ -41,6 +41,13 @@ const getMyProfile = async (req, res) => {
             .select("-password -refreshToken");
 
         if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        // Admin identities are operational-only and are not public profiles.
+        if (user.role === "admin" && String(user._id) !== String(req.user.id)) {
             return res.status(404).json({
                 message: "User not found"
             });
@@ -74,6 +81,7 @@ const updateProfile = async (req, res) => {
         const {
             bio,
             skillsToTeach,
+            teachingSkillLevels,
             skillsToLearn,
             availability,
             hourlyRate,
@@ -115,6 +123,7 @@ const updateProfile = async (req, res) => {
         // -------------------------
 
         if (
+            req.user.role !== "mentor" &&
             skillsToLearn !== undefined &&
             !Array.isArray(skillsToLearn)
         ) {
@@ -127,6 +136,12 @@ const updateProfile = async (req, res) => {
             skillsToTeach !== undefined
                 ? cleanStringList(skillsToTeach)
                 : undefined;
+
+        if (teachingSkillLevels !== undefined && (
+            !teachingSkillLevels || Array.isArray(teachingSkillLevels) || typeof teachingSkillLevels !== "object"
+        )) {
+            return res.status(400).json({ message: "Teaching skill levels must be an object." });
+        }
 
         const cleanedSkillsToLearn =
             skillsToLearn !== undefined
@@ -147,6 +162,7 @@ const updateProfile = async (req, res) => {
         }
 
         if (
+            req.user.role !== "mentor" &&
             skillsToLearn !== undefined &&
             cleanedSkillsToLearn.length === 0
         ) {
@@ -191,6 +207,15 @@ const updateProfile = async (req, res) => {
             }
         }
 
+        const existingUser =
+            await User.findById(req.user.id);
+
+        if (!existingUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
         const updates = {};
 
         if (bio !== undefined) {
@@ -202,7 +227,18 @@ const updateProfile = async (req, res) => {
                 cleanedSkillsToTeach;
         }
 
-        if (cleanedSkillsToLearn !== undefined) {
+        if (teachingSkillLevels !== undefined) {
+            const allowedLevels = new Set(["Beginner", "Intermediate", "Advanced", "Expert"]);
+            const validSkills = new Set((cleanedSkillsToTeach || existingUser.skillsToTeach || []).map((skill) => String(skill).toLowerCase()));
+            updates.teachingSkillLevels = Object.fromEntries(
+                Object.entries(teachingSkillLevels)
+                    .filter(([skill, level]) => validSkills.has(String(skill).toLowerCase()) && allowedLevels.has(level))
+            );
+        }
+
+        if (existingUser.role === "mentor") {
+            updates.skillsToLearn = [];
+        } else if (cleanedSkillsToLearn !== undefined) {
             updates.skillsToLearn =
                 cleanedSkillsToLearn;
         }
@@ -229,19 +265,6 @@ const updateProfile = async (req, res) => {
                 typeof coverImageUrl === "string"
                     ? coverImageUrl.trim()
                     : "";
-        }
-
-        // -------------------------
-        // Get existing profile
-        // -------------------------
-
-        const existingUser =
-            await User.findById(req.user.id);
-
-        if (!existingUser) {
-            return res.status(404).json({
-                message: "User not found"
-            });
         }
 
         const profileForCompletion = {

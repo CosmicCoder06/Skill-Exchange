@@ -3,11 +3,13 @@
 ========================================= */
 
 .bookings-page {
-    width: min(1480px, calc(100% - 48px));
-    max-width: calc(100% - 48px);
+    width: calc(100% - 96px);
+    max-width: none;
     min-width: 0;
     margin: 0 auto;
     padding: 45px 0 80px;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .bookings-header {
@@ -15,6 +17,8 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 55px;
+    gap: 20px;
+    min-width: 0;
 }
 
 .bookings-header h1 {
@@ -110,22 +114,24 @@
         auto-fit,
         minmax(280px, 1fr)
     );
-    gap: 22px;
+    gap: 20px;
     grid-auto-rows: 1fr;
 }
 
 /* CARD */
 
 .booking-card {
-    padding: 25px;
-    border: 1px solid #e6e6e1;
-    border-radius: 20px;
-    background: #fff;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.035);
+    position: relative;
+    padding: 27px 24px 24px;
+    border: 1px solid #d7e6dc;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #ffffff 0%, #f5faf6 100%);
+    box-shadow: 0 16px 32px rgba(20, 73, 52, 0.08);
     box-sizing: border-box;
     transition:
         transform 0.2s ease,
-        box-shadow 0.2s ease;
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
     min-width: 0;
     height: 100%;
     display: flex;
@@ -134,9 +140,9 @@
 }
 
 .booking-card:hover {
-    transform: translateY(-3px);
-    box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.07);
+    transform: translateY(-5px);
+    border-color: #86b99c;
+    box-shadow: 0 22px 42px rgba(20, 73, 52, 0.13);
 }
 
 /* PERSON */
@@ -156,7 +162,7 @@
     height: 52px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: #111;
+    background: linear-gradient(145deg, #1b815d, #0d563d);
     color: #fff;
     font-size: 18px;
     font-weight: 800;
@@ -192,9 +198,10 @@
 }
 
 .booking-info > div {
-    padding: 14px;
-    border-radius: 13px;
-    background: #f7f7f3;
+    padding: 13px;
+    border: 1px solid #e1ece4;
+    border-radius: 11px;
+    background: #fff;
 }
 
 .booking-info span,
@@ -218,8 +225,9 @@
 .booking-message {
     margin-bottom: 16px;
     padding: 15px;
-    border-radius: 13px;
-    background: #f8f8f5;
+    border-radius: 10px;
+    border-left: 3px solid #8fcaa7;
+    background: #eef7f0;
 }
 
 .booking-message p {
@@ -426,7 +434,9 @@
     }
 }
 
-.booking-card::before{content:"SKILL EXCHANGE RECEIPT";margin:-25px -25px 20px;padding:10px 25px;background:#f3f8f4;color:#176b4e;font-size:10px;font-weight:900;letter-spacing:.12em}.booking-card .booking-actions,.booking-card .review-completed-box{margin-top:auto}.booking-status.missed{background:#fff1ce;color:#8a5b00}.missed-session{background:#fff8e7!important;border:1px solid #f4dfac}.booking-card .booking-message p{overflow-wrap:anywhere}
+.refresh-bookings:disabled { opacity: .62; cursor: wait; }
+
+.booking-card::before{content:"SESSION SUMMARY";display:block;margin:-27px -24px 20px;padding:10px 24px;border-bottom:1px solid #d7e6dc;background:linear-gradient(90deg,#e5f3e9,#f8fbf8);color:#176b4e;font-size:9px;font-weight:900;letter-spacing:.15em}.booking-card .booking-actions,.booking-card .review-completed-box{margin-top:auto}.booking-status.missed{background:#fff1ce;color:#8a5b00}.missed-session{background:#fff8e7!important;border:1px solid #f4dfac}.booking-card .booking-message p{overflow-wrap:anywhere}
 
 .booking-calendar-section,
 .booking-calendar {

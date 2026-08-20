@@ -163,6 +163,8 @@ function MyBookings({
     const [loading, setLoading] =
         useState(true);
 
+    const [refreshing, setRefreshing] = useState(false);
+
     const [error, setError] =
         useState("");
 
@@ -270,6 +272,12 @@ function MyBookings({
                 );
             }
         }, [API, token]);
+
+    const refreshSessions = async () => {
+        setRefreshing(true);
+        await Promise.all([fetchBookings(), fetchRequests()]);
+        setRefreshing(false);
+    };
 
     useEffect(() => {
         if (!token) return;
@@ -859,12 +867,10 @@ function MyBookings({
 
                 <button
                     className="refresh-bookings"
-                    onClick={() => {
-                        fetchBookings();
-                        fetchRequests();
-                    }}
+                    onClick={refreshSessions}
+                    disabled={refreshing}
                 >
-                    ↻ Refresh
+                    {refreshing ? "Refreshing…" : "↻ Refresh"}
                 </button>
             </header>
 

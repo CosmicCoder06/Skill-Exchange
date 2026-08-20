@@ -9,7 +9,8 @@ function AppSidebar({
     onDashboard,
     dashboardLabel,
     onAccount,
-    onLogout
+    onLogout,
+    showProfileControls = false
 }) {
     return (
         <aside className="profile-sidebar">
@@ -38,21 +39,21 @@ function AppSidebar({
                     <span className="sidebar-text">Profile</span>
                 </button>
 
-                <button className={`sidebar-item ${activePage.endsWith("dashboard") ? "active" : ""}`} onClick={onDashboard}>
+                {showProfileControls && <button className={`sidebar-item ${activePage.endsWith("dashboard") ? "active" : ""}`} onClick={onDashboard}>
                     <span className="sidebar-icon">◫</span>
                     <span className="sidebar-text">{dashboardLabel}</span>
-                </button>
+                </button>}
 
-                <button className={`sidebar-item ${activePage === "account" ? "active" : ""}`} onClick={onAccount}>
+                {showProfileControls && <button className={`sidebar-item ${activePage === "account" ? "active" : ""}`} onClick={onAccount}>
                     <span className="sidebar-icon">⚙</span>
                     <span className="sidebar-text">Account</span>
-                </button>
+                </button>}
             </div>
 
-            <button className="sidebar-item sidebar-logout" onClick={onLogout}>
+            {showProfileControls && <button className="sidebar-item sidebar-logout" onClick={onLogout}>
                 <span className="sidebar-icon">↪</span>
                 <span className="sidebar-text">Logout</span>
-            </button>
+            </button>}
         </aside>
     );
 }
