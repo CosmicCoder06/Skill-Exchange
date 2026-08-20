@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../../Models/UserSchema/user");
-const { generateAccessToken, generateRefreshToken } = require("../../../../Utils/generateToken");
+const { generateAccessToken, generateRefreshToken } = require("../../../Utils/generateToken");
 
 const refreshCookieOptions = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", maxAge: 7 * 24 * 60 * 60 * 1000 };
 const clearRefreshCookie = (res) => res.clearCookie("refreshToken", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict" });
