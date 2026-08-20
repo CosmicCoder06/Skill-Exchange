@@ -27,7 +27,7 @@ const calculateProfileComplete = (profile) =>
     Boolean(
         hasValue(profile.bio) &&
         hasSkill(profile.skillsToTeach) &&
-        hasSkill(profile.skillsToLearn)
+        (profile.role === "mentor" || hasSkill(profile.skillsToLearn))
     );
 
 
@@ -115,6 +115,7 @@ const updateProfile = async (req, res) => {
         // -------------------------
 
         if (
+            req.user.role !== "mentor" &&
             skillsToLearn !== undefined &&
             !Array.isArray(skillsToLearn)
         ) {
@@ -147,6 +148,7 @@ const updateProfile = async (req, res) => {
         }
 
         if (
+            req.user.role !== "mentor" &&
             skillsToLearn !== undefined &&
             cleanedSkillsToLearn.length === 0
         ) {
@@ -202,7 +204,9 @@ const updateProfile = async (req, res) => {
                 cleanedSkillsToTeach;
         }
 
-        if (cleanedSkillsToLearn !== undefined) {
+        if (existingUser.role === "mentor") {
+            updates.skillsToLearn = [];
+        } else if (cleanedSkillsToLearn !== undefined) {
             updates.skillsToLearn =
                 cleanedSkillsToLearn;
         }

@@ -45,7 +45,7 @@ const hasCompletedDetails = (profile) => {
     return (
         hasText(profile?.bio) &&
         hasSkill(profile?.skillsToTeach) &&
-        hasSkill(profile?.skillsToLearn)
+        (profile?.role === "mentor" || hasSkill(profile?.skillsToLearn))
     );
 };
 
@@ -525,6 +525,7 @@ function AppContent() {
                         dashboardLabel={userRole === "mentor" ? "Mentor Dashboard" : "Learner Dashboard"}
                         onAccount={() => navigateTo("account")}
                         onLogout={handleLogout}
+                        showProfileControls={page === "profile"}
                     />
                 )}
             {/* =================================================
@@ -534,6 +535,7 @@ function AppContent() {
             {profileStatus === false ? (
                 <CompleteProfile
                     token={token}
+                    role={userRole}
                     onComplete={() => {
                         localStorage.removeItem(
                             "ProfileSkipped"

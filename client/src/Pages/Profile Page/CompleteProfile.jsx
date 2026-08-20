@@ -11,7 +11,7 @@ const emptyProfile = {
     coverImageUrl: ""
 };
 
-function CompleteProfile({ token, onComplete, onLater }) {
+function CompleteProfile({ token, role, onComplete, onLater }) {
     const [formData, setFormData] = useState(emptyProfile);
     const [error, setError] = useState("");
     const [saving, setSaving] = useState(false);
@@ -127,7 +127,7 @@ function CompleteProfile({ token, onComplete, onLater }) {
         return "Add at least one skill you can teach.";
     }
 
-    if (skillsToLearn.length === 0) {
+    if (role !== "mentor" && skillsToLearn.length === 0) {
         return "Add at least one skill you want to learn.";
     }
 
@@ -223,7 +223,7 @@ function CompleteProfile({ token, onComplete, onLater }) {
 
                         skillsToTeach,
 
-                        skillsToLearn,
+                        ...(role === "mentor" ? {} : { skillsToLearn }),
 
                         availability:
                             asList(
@@ -371,7 +371,7 @@ function CompleteProfile({ token, onComplete, onLater }) {
                         </label>
 
 
-                        <label>
+                        {role !== "mentor" && <label>
                             Skills you want to learn <b>*</b>
 
                             <input
@@ -382,7 +382,7 @@ function CompleteProfile({ token, onComplete, onLater }) {
                                 placeholder="Design, Python"
                                 onChange={handleChange}
                             />
-                        </label>
+                        </label>}
 
                     </div>
 

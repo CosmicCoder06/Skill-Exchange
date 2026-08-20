@@ -133,6 +133,11 @@ export default function AdminOverview({
         root.completedProfileCount
     );
 
+    const deactivatedAccounts = firstNumber(root.deactivatedAccounts);
+    const deletedAccounts = firstNumber(root.deletedAccounts);
+    const completedBookings = firstNumber(root.completedBookings);
+    const reviews = firstNumber(root.reviews);
+
     return (
         <section className="admin-overview">
 
@@ -145,6 +150,11 @@ export default function AdminOverview({
                     featured
                     onClick={onOpenUsers}
                 />
+
+                <StatCard value={deactivatedAccounts} title="Deactivated accounts" description="Members who chose to pause access" tone="tone-lavender" onClick={onOpenUsers} />
+                <StatCard value={deletedAccounts} title="Deleted accounts" description="Permanent removals recorded by admins" tone="tone-sand" onClick={onOpenUsers} />
+                <StatCard value={completedBookings} title="Sessions completed" description="Successful learning exchanges delivered" tone="tone-mint" onClick={onOpenReports} />
+                <StatCard value={reviews} title="Reviews submitted" description="Trust signals from completed sessions" tone="tone-blue" onClick={onOpenReports} />
 
                 <StatCard
                     value={mentors}
@@ -196,15 +206,10 @@ export default function AdminOverview({
                         COMMUNITY HEALTH
                     </p>
 
-                    <h2>
-                        Platform at a glance
-                    </h2>
+                    <h2>Operations snapshot</h2>
 
                     <p className="admin-overview-copy">
-                        Keep member accounts,
-                        participation and profile
-                        readiness under control from
-                        one protected workspace.
+                        Monitor account health, session completion and trust signals from one protected workspace.
                     </p>
 
                     <button

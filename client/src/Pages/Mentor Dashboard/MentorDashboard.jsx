@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./MentorDashboard.css";
 
-function MentorDashboard({ token, onHome, onProfile, onBookings, onLogout }) {
+function MentorDashboard({ token, onHome, onBookings }) {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -66,11 +66,13 @@ function MentorDashboard({ token, onHome, onProfile, onBookings, onLogout }) {
     }
 
     const skillsToTeach = profile?.skillsToTeach || [];
-    const skillsToLearn = profile?.skillsToLearn || [];
-    const availability = profile?.availability || [];
-    const completedSessions = profile?.completedSessions || profile?.sessionsCompleted || 0;
-    const upcomingBookings = profile?.upcomingBookings || profile?.upcomingSessions || 0;
-    const averageRating = profile?.averageRating || profile?.rating || 0;
+    const completedSessions = profile?.completedSessions || 0;
+    const upcomingBookings = profile?.upcomingBookings || 0;
+    const learnersTaught = profile?.learnersTaught || 0;
+    const averageRating = profile?.averageRating || 0;
+    const monthlySessions = profile?.monthlySessions || [];
+    const statusBreakdown = profile?.statusBreakdown || {};
+    const maxSessions = Math.max(...monthlySessions.map((item) => item.sessions), 1);
 
     return (
         <main className="mentor-dashboard">
@@ -88,8 +90,7 @@ function MentorDashboard({ token, onHome, onProfile, onBookings, onLogout }) {
                         </h1>
 
                         <p className="dashboard-subtitle">
-                            Manage your profile, skills and availability
-                            from one place.
+                            Your teaching activity, learner impact and session momentum.
                         </p>
                     </div>
 
@@ -99,13 +100,6 @@ function MentorDashboard({ token, onHome, onProfile, onBookings, onLogout }) {
                             className="dashboard-secondary"
                         >
                             Home
-                        </button>
-
-                        <button
-                            onClick={onProfile}
-                            className="dashboard-primary"
-                        >
-                            My Profile
                         </button>
 
                         <button
@@ -136,10 +130,8 @@ function MentorDashboard({ token, onHome, onProfile, onBookings, onLogout }) {
                     </div>
 
                     <div className="mentor-stat-card">
-                        <span>Teaching skills</span>
-                        <strong>
-                            {skillsToTeach.length}
-                        </strong>
+                        <span>Learners taught</span>
+                        <strong>{learnersTaught}</strong>
                     </div>
 
                 </section>
@@ -147,30 +139,6 @@ function MentorDashboard({ token, onHome, onProfile, onBookings, onLogout }) {
                 {/* Dashboard Cards */}
                 <section className="mentor-dashboard-grid">
 
-                    {/* About */}
-                    <div className="dashboard-card">
-                        <p className="card-label">
-                            ABOUT ME
-                        </p>
-
-                        <h2>
-                            {profile?.name || "Your Profile"}
-                        </h2>
-
-                        <p className="about-text">
-                            {profile?.bio ||
-                                "Add a short bio to tell learners about yourself."}
-                        </p>
-
-                        <button
-                            onClick={onProfile}
-                            className="card-button"
-                        >
-                            View / Edit Profile →
-                        </button>
-                    </div>
-
-                    {/* Teaching Skills */}
                     <div className="dashboard-card">
                         <p className="card-label">
                             I CAN TEACH
@@ -194,96 +162,38 @@ function MentorDashboard({ token, onHome, onProfile, onBookings, onLogout }) {
                         </div>
                     </div>
 
-                    {/* Learning Skills */}
                     <div className="dashboard-card">
                         <p className="card-label">
-                            I WANT TO LEARN
+                            SESSION PIPELINE
                         </p>
-
-                        <div className="skill-list">
-                            {skillsToLearn.length > 0 ? (
-                                skillsToLearn.map((skill, index) => (
-                                    <span
-                                        className="skill-pill learn"
-                                        key={`${skill}-${index}`}
-                                    >
-                                        {skill}
-                                    </span>
-                                ))
-                            ) : (
-                                <p className="empty-text">
-                                    No learning skills added yet.
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Availability */}
-                    <div className="dashboard-card">
-                        <p className="card-label">
-                            AVAILABILITY
-                        </p>
-
-                        <div className="availability-list">
-                            {availability.length > 0 ? (
-                                availability.map((item, index) => (
-                                    <div
-                                        className="availability-item"
-                                        key={`${item}-${index}`}
-                                    >
-                                        <span>✓</span>
-                                        {item}
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="empty-text">
-                                    Availability not added yet.
-                                </p>
-                            )}
+                        <div className="mentor-pipeline">
+                            <span><b>{statusBreakdown.pending || 0}</b> pending</span>
+                            <span><b>{statusBreakdown.accepted || 0}</b> confirmed</span>
+                            <span><b>{statusBreakdown.completed || 0}</b> completed</span>
                         </div>
                     </div>
 
                 </section>
 
-                {/* Profile Status */}
-                <section className="mentor-profile-status">
-
-                    <div>
-                        <p className="card-label">
-                            PROFILE STATUS
-                        </p>
-
-                        <h2>
-                            {profile?.profileCompleted
-                                ? "Your profile is complete 🎉"
-                                : "Complete your profile"}
-                        </h2>
-
-                        <p>
-                            {profile?.profileCompleted
-                                ? "Your profile is ready for learners."
-                                : "Add your bio, skills and availability to improve your profile."}
-                        </p>
+                <section className="mentor-impact-card">
+                    <div className="mentor-impact-heading">
+                        <div>
+                            <p className="card-label">TEACHING MOMENTUM</p>
+                            <h2>Learners reached over time</h2>
+                        </div>
+                        <span>{profile?.ratingCount || 0} ratings received</span>
                     </div>
-
-                    <button
-                        onClick={onProfile}
-                        className="dashboard-primary"
-                    >
-                        {profile?.profileCompleted
-                            ? "Edit Profile"
-                            : "Complete Profile"}
-                    </button>
-
+                    <div className="mentor-bar-chart">
+                        {monthlySessions.length ? monthlySessions.map((item) => (
+                            <div key={item.month} className="mentor-bar-column">
+                                <strong>{item.sessions}</strong>
+                                <i style={{ height: `${Math.max((item.sessions / maxSessions) * 100, 8)}%` }} />
+                                <small>{item.month.slice(5)}</small>
+                                <em>{item.learners} learners</em>
+                            </div>
+                        )) : <p className="empty-text">Complete sessions to see your teaching impact chart.</p>}
+                    </div>
                 </section>
-
-                {/* Logout */}
-                <button
-                    onClick={onLogout}
-                    className="mentor-logout"
-                >
-                    Log out
-                </button>
 
             </div>
         </main>

@@ -8,6 +8,8 @@
     min-width: 0;
     margin: 0 auto;
     padding: 45px 0 80px;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .bookings-header {
@@ -15,6 +17,8 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 55px;
+    gap: 20px;
+    min-width: 0;
 }
 
 .bookings-header h1 {
@@ -425,6 +429,8 @@
         padding: 20px;
     }
 }
+
+.refresh-bookings:disabled { opacity: .62; cursor: wait; }
 
 .booking-card::before{content:"SKILL EXCHANGE RECEIPT";margin:-25px -25px 20px;padding:10px 25px;background:#f3f8f4;color:#176b4e;font-size:10px;font-weight:900;letter-spacing:.12em}.booking-card .booking-actions,.booking-card .review-completed-box{margin-top:auto}.booking-status.missed{background:#fff1ce;color:#8a5b00}.missed-session{background:#fff8e7!important;border:1px solid #f4dfac}.booking-card .booking-message p{overflow-wrap:anywhere}
 

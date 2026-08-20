@@ -461,7 +461,7 @@ function ProfilePage({
 
                         <strong>
                             {teachingSkills.length +
-                                learningSkills.length}
+                                (profile.role === "mentor" ? 0 : learningSkills.length)}
                         </strong>
 
                         <span>
@@ -527,9 +527,7 @@ function ProfilePage({
 
                             <div className="section-body">
 
-                                <h2>
-                                    Learning & sharing
-                                </h2>
+                                <h2>{profile.role === "mentor" ? "Teaching expertise" : "Learning & sharing"}</h2>
 
                                 <div className="skills-columns">
 
@@ -561,7 +559,7 @@ function ProfilePage({
                                     </div>
 
 
-                                    <div className="skill-column">
+                                    {profile.role !== "mentor" && <div className="skill-column">
 
                                         <p>
                                             I WANT TO LEARN
@@ -586,7 +584,7 @@ function ProfilePage({
                                             </span>
                                         )}
 
-                                    </div>
+                                    </div>}
 
                                 </div>
 

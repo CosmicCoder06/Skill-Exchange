@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const User = require("../Backend Configuration/Models/UserSchema/user");
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
+const Booking = require("../models/Booking");
+const Review = require("../models/Review");
+const ActivityLog = require("../models/ActivityLog");
 const { escapeRegex, fillDailySeries } = require("../Utils/adminAnalytics");
 
 const SAFE_USER_FIELDS = "name email role isVerified isActive profileCompleted skillsToTeach createdAt updatedAt";
@@ -22,6 +25,11 @@ async function getOverview(req, res) {
       messages,
       newUsers30d,
       activeConversations30d,
+      bookings,
+      completedBookings,
+      reviews,
+      deactivatedAccounts,
+      deletedAccounts,
       recentUsers,
     ] = await Promise.all([
       User.countDocuments(),
@@ -34,6 +42,11 @@ async function getOverview(req, res) {
       Message.countDocuments(),
       User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
       Conversation.countDocuments({ lastActivityAt: { $gte: thirtyDaysAgo } }),
+      Booking.countDocuments(),
+      Booking.countDocuments({ status: "completed" }),
+      Review.countDocuments(),
+      User.countDocuments({ isActive: false }),
+      ActivityLog.countDocuments({ action: "account.deleted" }),
       User.find().select(SAFE_USER_FIELDS).sort({ createdAt: -1 }).limit(6).lean(),
     ]);
 
@@ -49,6 +62,11 @@ async function getOverview(req, res) {
         messages,
         newUsers30d,
         activeConversations30d,
+        bookings,
+        completedBookings,
+        reviews,
+        deactivatedAccounts,
+        deletedAccounts,
       },
       recentUsers,
     });
@@ -144,6 +162,13 @@ async function deleteUser(req, res) {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const conversationIds = await Conversation.find({ participants: id }).distinct("_id");
+    await ActivityLog.create({
+      actor: req.user.id,
+      action: "account.deleted",
+      entityType: "User",
+      entityId: user._id,
+      metadata: { name: user.name, email: user.email, role: user.role },
+    });
     await Promise.all([
       Message.deleteMany({
         $or: [{ sender: id }, { conversation: { $in: conversationIds } }],

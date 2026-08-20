@@ -4,6 +4,7 @@
 
 .app-page-with-sidebar {
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .app-page-with-sidebar:has(.profile-sidebar):not(.app-page-profile) > :not(.profile-sidebar) {

@@ -273,4 +273,18 @@
         font-size: 26px;
     }
 }
+.mentor-pipeline { display: grid; gap: 10px; }
+.mentor-pipeline span { display: flex; justify-content: space-between; padding: 11px 13px; border-radius: 10px; background: #f3f8f4; color: #58746a; }
+.mentor-pipeline b { color: #176b4e; }
+.mentor-impact-card { margin-top: 20px; padding: 25px; border: 1px solid #dfe8e3; border-radius: 20px; background: #fff; }
+.mentor-impact-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; }
+.mentor-impact-heading h2 { margin: 4px 0 0; }
+.mentor-impact-heading > span { color: #6f7e78; font-size: 13px; }
+.mentor-bar-chart { min-height: 235px; display: flex; align-items: flex-end; gap: 16px; margin-top: 20px; padding: 16px 8px 0; border-bottom: 1px solid #dfe8e3; }
+.mentor-bar-column { flex: 1; min-width: 54px; height: 190px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; }
+.mentor-bar-column i { width: min(46px, 70%); border-radius: 10px 10px 0 0; background: linear-gradient(#42a77e, #176b4e); }
+.mentor-bar-column strong { color: #176b4e; font-size: 14px; }
+.mentor-bar-column small, .mentor-bar-column em { color: #718079; font-size: 11px; font-style: normal; }
+@media (max-width: 800px) { .mentor-impact-heading { flex-direction: column; } }
+
 /* @teamcosmiccoders */
