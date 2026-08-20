@@ -272,7 +272,7 @@ function LearnerDashboard({
 
                 <section className="overview-grid">
 
-                    <article className="overview-card">
+                    <article className="overview-rail">
                         <div className="overview-icon purple">
                             ↗
                         </div>
@@ -292,7 +292,7 @@ function LearnerDashboard({
                         </div>
                     </article>
 
-                    <article className="overview-card">
+                    <article className="overview-rail">
                         <div className="overview-icon green">
                             ✦
                         </div>
@@ -312,7 +312,7 @@ function LearnerDashboard({
                         </div>
                     </article>
 
-                    <article className="overview-card">
+                    <article className="overview-rail">
                         <div className="overview-icon orange">
                             ◷
                         </div>
@@ -332,7 +332,7 @@ function LearnerDashboard({
                         </div>
                     </article>
 
-                    <article className="overview-card">
+                    <article className="overview-rail">
                         <div className="overview-icon blue">
                             ✓
                         </div>
@@ -361,7 +361,7 @@ function LearnerDashboard({
                 <section className="dashboard-main-grid">
 
                     {/* SKILL BALANCE */}
-                    <article className="dashboard-panel skill-chart-panel">
+                    <article className="dashboard-section skill-chart-panel">
                         <div className="panel-heading">
                             <div>
                                 <p className="panel-kicker">
@@ -455,7 +455,7 @@ function LearnerDashboard({
                     </article>
 
                     {/* PROFILE HEALTH */}
-                    <article className="dashboard-panel health-panel">
+                    <article className="dashboard-section health-panel">
                         <div className="panel-heading">
                             <div>
                                 <p className="panel-kicker">
@@ -599,7 +599,7 @@ function LearnerDashboard({
                 <section className="dashboard-secondary-grid">
 
                     {/* LEARNING ROADMAP */}
-                    <article className="dashboard-panel roadmap-panel">
+                    <article className="dashboard-section roadmap-panel">
                         <div className="panel-heading">
                             <div>
                                 <p className="panel-kicker">
@@ -670,7 +670,7 @@ function LearnerDashboard({
                     </article>
 
                     {/* WEEKLY AVAILABILITY */}
-                    <article className="dashboard-panel availability-panel">
+                    <article className="dashboard-section availability-panel">
                         <div className="panel-heading">
                             <div>
                                 <p className="panel-kicker">
@@ -777,7 +777,7 @@ function LearnerDashboard({
                         <button
                             type="button"
                             onClick={onBookings}
-                            className="quick-action-card"
+                            className="quick-action-line"
                         >
                             <span className="quick-icon">
                                 ◷
@@ -800,7 +800,7 @@ function LearnerDashboard({
                         <button
                             type="button"
                             onClick={onProfile}
-                            className="quick-action-card"
+                            className="quick-action-line"
                         >
                             <span className="quick-icon">
                                 ✎
@@ -823,7 +823,7 @@ function LearnerDashboard({
                         <button
                             type="button"
                             onClick={onHome}
-                            className="quick-action-card"
+                            className="quick-action-line"
                         >
                             <span className="quick-icon">
                                 ⌂

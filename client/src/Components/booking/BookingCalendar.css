@@ -1,14 +1,14 @@
 .booking-calendar {
     width: 100%;
     margin: 0 0 35px;
-    padding: 30px;
-    background: #ffffff;
-    border: 1px solid #e8e8e4;
-    border-radius: 24px;
+    padding: 0 0 35px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
     box-sizing: border-box;
     min-width: 0;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: none;
 }
 
 .calendar-header {
@@ -89,9 +89,10 @@
 .calendar-day {
     min-height: 82px;
     padding: 10px;
-    border: 1px solid #e7e7e2;
-    border-radius: 11px;
-    background: #fafaf8;
+    border: 0;
+    border-top: 1px solid #dce5df;
+    border-radius: 0;
+    background: transparent;
     color: #111;
     text-align: left;
     cursor: pointer;
@@ -100,9 +101,9 @@
 }
 
 .calendar-day:hover:not(.empty) {
-    background: #fff;
-    border-color: #0b8062;
-    transform: translateY(-1px);
+    background: #edf6ef;
+    border-color: #176b4e;
+    transform: none;
 }
 
 .calendar-day.empty {
@@ -125,8 +126,8 @@
 }
 
 .calendar-day.today {
-    background: #f0faf6;
-    border-color: #0b8062;
+    background: #edf6ef;
+    border-color: #176b4e;
 }
 
 .calendar-day.today
@@ -236,9 +237,10 @@
     justify-content: space-between;
     width: 100%;
     padding: 13px 15px;
-    border: 1px solid #e5e5e0;
-    border-radius: 11px;
-    background: #fff;
+    border: 0;
+    border-bottom: 1px solid #dce5df;
+    border-radius: 0;
+    background: transparent;
     text-align: left;
     cursor: pointer;
 }
