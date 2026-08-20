@@ -69,21 +69,11 @@ const verifyToken = (req, res, next) => {
             decoded.user?.role ||
             decoded.userRole;
 
-        if (!role) {
-            console.error(
-                "Authentication failed: User role not found in token",
-                decoded
-            );
-
-            return res.status(403).json({
-                message:
-                    "User role not found in authentication token",
-            });
-        }
-
-        // Normalize role casing
+        // A role is needed only by routes which explicitly use `authorize`.
+        // Keeping it optional here allows legacy but otherwise valid access
+        // tokens to use role-neutral endpoints such as mentor discovery.
         const normalizedRole =
-            String(role).trim().toLowerCase();
+            role ? String(role).trim().toLowerCase() : null;
 
         // Attach authenticated user to request
         req.user = {
@@ -91,11 +81,6 @@ const verifyToken = (req, res, next) => {
             id: userId,
             role: normalizedRole,
         };
-
-        console.log("AUTH USER:", {
-            id: req.user.id,
-            role: req.user.role,
-        });
 
         next();
 

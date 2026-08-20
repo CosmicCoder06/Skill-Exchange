@@ -153,14 +153,17 @@ app.use("/api", reviewRoutes);
 // verifyToken + authorize("mentor"/"learner")
 app.use("/api", dashboardRoutes);
 
-// Admin
-// Protected internally by:
-// verifyToken + authorize("admin")
-app.use("/api", adminRoutes);
 app.use("/api", mentorRoutes);
 app.use("/api", skillCategoryRoutes);
 app.use("/api", settingRoutes);
 app.use("/api", activityLogRoutes);
+
+// Admin
+// Protected internally by:
+// verifyToken + authorize("admin")
+// Keep this router after non-admin routes because its router-level
+// authorization middleware applies to every request that reaches it.
+app.use("/api", adminRoutes);
 
 // =========================
 // Socket.io
