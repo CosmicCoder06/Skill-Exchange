@@ -333,7 +333,20 @@ function AppContent() {
     // LOGOUT
     // =====================================================
 
-    function handleLogout() {
+    async function handleLogout() {
+        if (token) {
+            try {
+                await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            } catch (error) {
+                // Local logout must still work when the server is unavailable.
+                console.error("Logout request failed:", error);
+            }
+        }
+
         localStorage.removeItem(
             "Token"
         );

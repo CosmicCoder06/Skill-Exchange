@@ -1,4 +1,5 @@
 const User = require("../Backend Configuration/Models/UserSchema/user");
+const { recordActivity } = require("../Utils/activityLogger");
 
 const hasValue = (value) =>
     typeof value === "string" && value.trim().length > 0;
@@ -271,6 +272,8 @@ const updateProfile = async (req, res) => {
                 }
             ).select("-password -refreshToken");
 
+        recordActivity({ actor: req.user.id, action: "profile.updated", entityType: "User", entityId: user._id });
+
         res.status(200).json({
             message: "Profile updated successfully",
             profile: user,
@@ -339,6 +342,8 @@ const deactivateMyAccount = async (req, res) => {
             deactivationReason: reason,
             refreshToken: null
         });
+
+        recordActivity({ actor: req.user.id, action: "account.deactivated", entityType: "User", entityId: req.user.id });
 
         return res.status(200).json({ message: "Account deactivated" });
     } catch (error) {

@@ -4,6 +4,7 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const server = http.createServer(app);
@@ -38,6 +39,9 @@ const updatedUser = require(
 
 const LoginRoute = require(
     "./Backend Configuration/Routes/Registration & Login Route/Login/loginRoute"
+);
+const sessionRoutes = require(
+    "./Backend Configuration/Routes/Token and Session Route/tokenRoute"
 );
 
 // =========================
@@ -80,12 +84,17 @@ const dashboardRoutes =
 
 const adminRoutes =
     require("./routes/adminRoutes");
+const mentorRoutes = require("./routes/mentorRoutes");
+const skillCategoryRoutes = require("./routes/skillCategoryRoutes");
+const settingRoutes = require("./routes/settingRoutes");
+const activityLogRoutes = require("./routes/activityLogRoutes");
 
 // =========================
 // Middleware
 // =========================
 
 app.use(express.json());
+app.use(cookieParser());
 
 const allowedOrigins = [
     "http://localhost:5173",
@@ -125,6 +134,7 @@ app.use("/api", getUsers);
 app.use("/api", deleteUsers);
 app.use("/api", updatedUser);
 app.use("/api", LoginRoute);
+app.use("/api", sessionRoutes);
 
 // Profile
 app.use("/api", profileRoutes);
@@ -147,6 +157,10 @@ app.use("/api", dashboardRoutes);
 // Protected internally by:
 // verifyToken + authorize("admin")
 app.use("/api", adminRoutes);
+app.use("/api", mentorRoutes);
+app.use("/api", skillCategoryRoutes);
+app.use("/api", settingRoutes);
+app.use("/api", activityLogRoutes);
 
 // =========================
 // Socket.io

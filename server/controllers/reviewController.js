@@ -282,6 +282,7 @@
 
 const Review = require("../models/Review");
 const Booking = require("../models/Booking");
+const { recordActivity } = require("../Utils/activityLogger");
 
 const getCurrentUserId = (req) => {
     return String(req.user._id || req.user.id);
@@ -426,6 +427,14 @@ const createReview = async (req, res) => {
                 comment:
                     comment?.trim() || ""
             });
+
+        recordActivity({
+            actor: currentUserId,
+            action: "review.created",
+            entityType: "Review",
+            entityId: review._id,
+            metadata: { bookingId, rating: numericRating }
+        });
 
         const populatedReview =
             await Review.findById(

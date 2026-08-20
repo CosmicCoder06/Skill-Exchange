@@ -15,6 +15,7 @@ The application supports learner, mentor, and administrator roles. Each role rec
 - Learner and mentor dashboard components
 - Admin portal for user moderation and platform reports
 - Responsive Skill Exchange interface
+- Backend mentor search, skill categories, activity logs, and platform settings
 
 ## Technology Stack
 
@@ -166,6 +167,12 @@ Authorization: Bearer <access-token>
 | Admin | `GET` | `/api/admin/users` | Search and filter members |
 | Admin | `PATCH`, `DELETE` | `/api/admin/users/:id` | Moderate a member account |
 | Admin | `GET` | `/api/admin/reports` | Read platform reports |
+| Session | `POST` | `/api/auth/refresh` | Rotate refresh token and return a new access token |
+| Session | `POST` | `/api/auth/logout` | Revoke current refresh session |
+| Discovery | `GET` | `/api/mentors` | Search mentors by `q`, `skill`, or `availability` |
+| Skill categories | `GET`, `POST`, `PATCH` | `/api/skill-categories` | Read categories; admin creates and updates them |
+| Settings | `GET`, `PUT` | `/api/settings` | Admin-managed platform settings |
+| Activity logs | `GET` | `/api/activity-logs` | Read recent auditable product activity |
 
 ## Real-Time Chat
 

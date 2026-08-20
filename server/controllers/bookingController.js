@@ -185,6 +185,7 @@
 
 
 const Booking = require("../models/Booking");
+const { recordActivity } = require("../Utils/activityLogger");
 const User = require(
     "../Backend Configuration/Models/UserSchema/user"
 );
@@ -281,6 +282,14 @@ const createBooking = async (req, res) => {
             time,
             message: message?.trim() || "",
             status: "pending"
+        });
+
+        recordActivity({
+            actor: learnerId,
+            action: "booking.created",
+            entityType: "Booking",
+            entityId: booking._id,
+            metadata: { mentor, date, time }
         });
 
         const populatedBooking =
@@ -482,6 +491,13 @@ const updateBookingStatus = async (req, res) => {
 
         await booking.save();
 
+        recordActivity({
+            actor: userId,
+            action: `booking.${requestedStatus}`,
+            entityType: "Booking",
+            entityId: booking._id
+        });
+
         const updatedBooking =
             await Booking.findById(
                 booking._id
@@ -553,6 +569,13 @@ const cancelBooking = async (req, res) => {
         booking.status = "cancelled";
 
         await booking.save();
+
+        recordActivity({
+            actor: userId,
+            action: "booking.cancelled",
+            entityType: "Booking",
+            entityId: booking._id
+        });
 
         return res.json({
             message: "Booking cancelled successfully",
