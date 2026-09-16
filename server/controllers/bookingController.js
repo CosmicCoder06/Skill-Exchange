@@ -185,6 +185,8 @@
 
 
 const Booking = require("../models/Booking");
+const { withMeeting, normalizeMeetUrl } = require('../Utils/bookingMeeting');
+const { paymentDetails } = require('../Utils/manualPayment');
 const { recordActivity } = require("../Utils/activityLogger");
 const User = require(
     "../Backend Configuration/Models/UserSchema/user"
@@ -224,7 +226,7 @@ const createBooking = async (req, res) => {
 
         // Verify mentor exists and is actually a mentor
         const mentorUser = await User.findById(mentor)
-            .select("_id name role isActive");
+            .select("_id name role isActive hourlyRate +paymentQr");
 
         if (!mentorUser) {
             return res.status(404).json({
@@ -274,8 +276,12 @@ const createBooking = async (req, res) => {
             });
         }
 
+        let payment;
+        try { payment = paymentDetails(mentorUser, req.body); }
+        catch (error) { return res.status(400).json({ message: error.message }); }
         // Create booking
         const booking = await Booking.create({
+            ...payment,
             mentor,
             learner: learnerId,
             date,
@@ -340,7 +346,7 @@ const getBookings = async (req, res) => {
                 createdAt: -1
             });
 
-        return res.json(bookings);
+        return res.json(bookings.map(booking => withMeeting(booking)));
 
     } catch (error) {
         console.error(
@@ -509,7 +515,7 @@ const updateBookingStatus = async (req, res) => {
         return res.json({
             message:
                 "Booking updated successfully",
-            booking: updatedBooking
+            booking: withMeeting(updatedBooking)
         });
 
     } catch (error) {
@@ -594,7 +600,24 @@ const cancelBooking = async (req, res) => {
     }
 };
 
+const updateMeeting = async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found' });
+        if (String(booking.mentor) !== getCurrentUserId(req)) return res.status(403).json({ message: 'Only the mentor can set the meeting link' });
+        if (booking.status !== 'accepted') return res.status(400).json({ message: 'Accept the session before adding a meeting link' });
+        const url = normalizeMeetUrl(req.body.meetingUrl);
+        if (!url) return res.status(400).json({ message: 'Enter a valid Google Meet link: https://meet.google.com/abc-defg-hij' });
+        booking.meetingUrl = url;
+        await booking.save();
+        return res.json({ meetingUrl: url });
+    } catch {
+        return res.status(500).json({ message: 'Unable to save meeting link' });
+    }
+};
+
 module.exports = {
+    updateMeeting,
     createBooking,
     getBookings,
     getMentorRequests,

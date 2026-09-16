@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./BookingPage.css";
 
 function BookingPage({
@@ -12,8 +12,22 @@ function BookingPage({
     const [message, setMessage] = useState("");
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [payment, setPayment] = useState(null);
+    const [paymentError, setPaymentError] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('pay_later');
+    const [paymentReference, setPaymentReference] = useState('');
+    useEffect(() => {
+        let active = true;
+        fetch(`${import.meta.env.VITE_API_URL}/mentors/${mentorId}/payment`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.message); return data; })
+            .then(data => { if (active) setPayment(data); })
+            .catch(err => { if (active) setPaymentError(err.message || 'Unable to load payment details. Refresh to retry.'); });
+        return () => { active = false; };
+    }, [mentorId, token]);
 
     async function createBooking() {
+        if (!payment) return;
+        if (payment.amount > 0 && paymentMethod === 'qr' && !/^[A-Za-z0-9-]{6,64}$/.test(paymentReference.trim())) { setPaymentError('Enter the transaction reference after paying.'); return; }
         if (!date || !time) {
             alert("Please select date and time.");
             return;
@@ -34,7 +48,10 @@ function BookingPage({
                         mentor: mentorId,
                         date,
                         time,
-                        message
+                        message,
+                        quotedAmount: payment.amount,
+                        paymentMethod,
+                        paymentReference
                     })
                 }
             );
@@ -76,7 +93,7 @@ function BookingPage({
                         SESSION REQUEST SENT
                     </p>
 
-                    <h1>Booking confirmed</h1>
+                    <h1>Request submitted</h1>
 
                     <p className="success-main-text">
                         Your session request with{" "}
@@ -115,7 +132,7 @@ function BookingPage({
                 <h1>Book Session</h1>
 
                 <p className="booking-with">
-                    With {mentorName}
+                    With {payment?.name || mentorName}
                 </p>
 
                 <label>Select Date</label>
@@ -146,10 +163,32 @@ function BookingPage({
                     disabled={loading}
                 />
 
+                <section className="manual-payment">
+                    <h2>Payment</h2>
+                    {!payment && !paymentError && <p>Loading mentor payment details…</p>}
+                    {payment && <>
+                        <p><strong>{payment.amount === 0 ? 'Free session' : `₹${payment.amount.toLocaleString('en-IN')} · 1-hour session`}</strong></p>
+                        {payment.amount > 0 && <>
+                            <label htmlFor="payment-method">Payment option</label>
+                            <select id="payment-method" value={paymentMethod} disabled={loading} onChange={e => { setPaymentMethod(e.target.value); setPaymentError(''); }}>
+                                <option value="pay_later">Pay later / arrange with mentor</option>
+                                {payment.qr && <option value="qr">Pay using mentor’s QR</option>}
+                            </select>
+                            {!payment.qr && <p>This mentor has not added a payment QR yet.</p>}
+                            {paymentMethod === 'qr' && <>
+                                <img className="payment-qr" src={payment.qr} alt={`Payment QR for ${payment.name}`} />
+                                <p>Check the recipient and amount in your payment app. After paying, enter the transaction reference. Your mentor will verify the transfer.</p>
+                                <label htmlFor="payment-reference">Transaction reference / UTR</label>
+                                <input id="payment-reference" value={paymentReference} maxLength={64} disabled={loading} onChange={e => setPaymentReference(e.target.value)} placeholder="Enter your payment reference" />
+                            </>}
+                        </>}
+                    </>}
+                    {paymentError && <p role="alert">{paymentError}</p>}
+                </section>
                 <button
                     className="confirm-booking"
                     onClick={createBooking}
-                    disabled={loading}
+                    disabled={loading || !payment}
                 >
                     {loading ? "Sending Request..." : "Confirm Booking"}
                 </button>

@@ -9,13 +9,14 @@ export function SocketProvider({ token, children }) {
     useEffect(() => {
         if (!token) return undefined;
 
+        const socketUrl = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
         const instance = io(
-            import.meta.env.VITE_SOCKET_URL ||
-            "io(import.meta.env.VITE_SOCKET_URL)",
+            socketUrl,
             {
                 auth: {
                     token: token
-                }
+                },
+                transports: ['websocket', 'polling']
             }
         );
 

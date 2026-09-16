@@ -5,6 +5,8 @@ import {
 } from "react";
 
 import BookingCalendar from "../Components/booking/BookingCalendar";
+import GoogleMeetLink from '../Components/booking/GoogleMeetLink';
+import PaymentReceipt from '../Components/booking/PaymentReceipt';
 
 import "./MyBookings.css";
 
@@ -601,7 +603,10 @@ function MyBookings({
             ] === true;
 
         return (
-            <article className="booking-card">
+            <article className="booking-card session-receipt">
+                <header className="receipt-heading"><span>SKILL EXCHANGE</span><span>SESSION RECEIPT</span></header>
+                <p className="receipt-number">NO. {booking._id.slice(-8).toUpperCase()}</p>
+                <PaymentReceipt key={`${booking._id}-${booking.paymentStatus}`} booking={booking} token={token} currentUserId={currentUserId} />
                 <div className="booking-card-top">
                     <div className="booking-person-avatar">
                         {initial}
@@ -744,6 +749,8 @@ function MyBookings({
                     </div>
                 )}
 
+                {isAccepted && <GoogleMeetLink key={`${booking._id}-${booking.meetingUrl || ''}`} booking={booking} token={token} currentUserId={currentUserId} />}
+
                 {isAccepted && !isMissed && (
                     <button
                         className="join-session-button"
@@ -757,7 +764,7 @@ function MyBookings({
                             }
                         }}
                     >
-                        Join Session →
+                        Open Session Chat →
                     </button>
                 )}
 

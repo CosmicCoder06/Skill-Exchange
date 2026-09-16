@@ -7,13 +7,16 @@ const {
     getBookings,
     getMentorRequests,
     updateBookingStatus,
-    cancelBooking
+    cancelBooking,
+    updateMeeting
 } = require("../controllers/bookingController");
 
 
 // Authentication middleware
 const authMiddleware =
     require("../Backend Configuration/Configuration Folders/Middleware Configuration/authMiddleware");
+
+router.put('/bookings/:id/meeting', authMiddleware, updateMeeting);
 
 
 // ========================================

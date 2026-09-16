@@ -4,6 +4,8 @@ import "./ProfilePage.css";
 function ProfilePage({
     token,
     profileStatus,
+    onHome,
+    onDashboard,
     onLogout,
     onMessagesClick,
     onBookings,
@@ -53,21 +55,15 @@ function ProfilePage({
                 }
 
                 setProfile(data.profile);
-
                 setProfileComplete(
                     data.profileComplete === true
                 );
             } catch (error) {
-                console.error(
-                    "Profile fetch error:",
-                    error
-                );
+                console.error("Profile fetch error:", error);
             }
         }
 
-        if (token) {
-            fetchProfile();
-        }
+        if (token) fetchProfile();
     }, [token]);
 
     useEffect(() => {
@@ -110,18 +106,13 @@ function ProfilePage({
                         : []
                 });
             } catch (error) {
-                console.error(
-                    "Reviews fetch error:",
-                    error
-                );
+                console.error("Reviews fetch error:", error);
             } finally {
                 setReviewsLoading(false);
             }
         }
 
-        if (token) {
-            fetchReviews();
-        }
+        if (token) fetchReviews();
     }, [token]);
 
     if (!profile) {
@@ -160,9 +151,7 @@ function ProfilePage({
         stats.totalReceived || 0;
 
     const ratingPercentage = (rating) => {
-        if (!totalReviews) {
-            return 0;
-        }
+        if (!totalReviews) return 0;
 
         return Math.round(
             (distribution[rating] / totalReviews) * 100
@@ -174,9 +163,7 @@ function ProfilePage({
             "Delete your account permanently? This cannot be undone."
         );
 
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         try {
             setDeleting(true);
@@ -215,31 +202,90 @@ function ProfilePage({
     return (
         <main className="profile-page">
 
-            {/* =========================================
-                MAIN WORKSPACE
-            ========================================= */}
+            <aside className="profile-sidebar">
+
+                <button
+                    className="sidebar-logo"
+                    onClick={onHome}
+                >
+                    ↗
+                </button>
+
+                <div className="sidebar-navigation">
+
+                    <button
+                        className="sidebar-item"
+                        onClick={onHome}
+                    >
+                        <span className="sidebar-icon">⌂</span>
+                        <span className="sidebar-text">Home</span>
+                    </button>
+
+                    <button
+                        className="sidebar-item"
+                        onClick={onDashboard}
+                    >
+                        <span className="sidebar-icon">◫</span>
+                        <span className="sidebar-text">Dashboard</span>
+                    </button>
+
+                    <button
+                        className="sidebar-item"
+                        onClick={onMessagesClick}
+                    >
+                        <span className="sidebar-icon">◇</span>
+                        <span className="sidebar-text">Messages</span>
+                    </button>
+
+                    <button
+                        className="sidebar-item"
+                        onClick={onBookings}
+                    >
+                        <span className="sidebar-icon">▣</span>
+                        <span className="sidebar-text">My Sessions</span>
+                    </button>
+
+                    <button
+                        className="sidebar-item active"
+                    >
+                        <span className="sidebar-icon">●</span>
+                        <span className="sidebar-text">Profile</span>
+                    </button>
+
+                </div>
+
+                <button
+                    className="sidebar-item sidebar-logout"
+                    onClick={onLogout}
+                >
+                    <span className="sidebar-icon">↪</span>
+                    <span className="sidebar-text">Logout</span>
+                </button>
+
+            </aside>
 
             <section className="profile-workspace">
-
-                {/* TOP HEADER */}
 
                 <header className="profile-header">
 
                     <div className="profile-brand">
-
-                        <strong>
-                            MY SPACE
-                        </strong>
+                        <strong>MY SPACE</strong>
 
                         <span>
                             {String(profile.role || "learner").toLowerCase() === "mentor"
                                 ? "Your mentor profile"
                                 : "Your learning profile"}
                         </span>
-
                     </div>
 
                     <div className="profile-header-actions">
+
+                        <button
+                            className="profile-header-link"
+                            onClick={onDashboard}
+                        >
+                            Dashboard <span>→</span>
+                        </button>
 
                         <button
                             className="profile-header-link"
@@ -258,11 +304,6 @@ function ProfilePage({
                     </div>
 
                 </header>
-
-
-                {/* =========================================
-                    COVER IMAGE
-                ========================================= */}
 
                 <section
                     className={
@@ -287,9 +328,7 @@ function ProfilePage({
                         onClick={onCompleteProfile}
                     >
                         ✎
-                        <span>
-                            Change cover
-                        </span>
+                        <span>Change cover</span>
                     </button>
 
                     {!profile.coverImageUrl && (
@@ -305,11 +344,6 @@ function ProfilePage({
                     )}
 
                 </section>
-
-
-                {/* =========================================
-                    PROFILE IDENTITY
-                ========================================= */}
 
                 <section className="profile-identity">
 
@@ -330,7 +364,8 @@ function ProfilePage({
                         onKeyDown={(event) => {
                             if (
                                 profile.avatarUrl &&
-                                (event.key === "Enter" || event.key === " ")
+                                (event.key === "Enter" ||
+                                    event.key === " ")
                             ) {
                                 event.preventDefault();
                                 setShowPhoto(true);
@@ -338,11 +373,9 @@ function ProfilePage({
                         }}
                     >
 
-                        {!profile.avatarUrl && (
-                            <div className="profile-photo-fallback-letter">
-                                {initials}
-                            </div>
-                        )}
+                        <div className="profile-photo-fallback-letter">
+                            {initials}
+                        </div>
 
                         {profile.avatarUrl ? (
                             <img
@@ -350,7 +383,9 @@ function ProfilePage({
                                 src={profile.avatarUrl}
                                 alt={`${profile.name}'s profile`}
                                 onError={(event) => {
-                                    event.currentTarget.style.display = "none";
+                                    event.currentTarget.style.display =
+                                        "none";
+
                                     event.currentTarget.parentElement.classList.add(
                                         "profile-photo-failed"
                                     );
@@ -363,7 +398,6 @@ function ProfilePage({
                         )}
 
                     </div>
-
 
                     <div className="profile-main-info">
 
@@ -382,22 +416,15 @@ function ProfilePage({
                             </span>
 
                             <span className="profile-role">
-                                {profile.role ||
-                                    "Learner"}
+                                {profile.role || "Learner"}
                             </span>
 
                         </div>
 
-                        <h1>
-                            {profile.name}
-                        </h1>
-
-                        <p>
-                            {profile.email}
-                        </p>
+                        <h1>{profile.name}</h1>
+                        <p>{profile.email}</p>
 
                     </div>
-
 
                     <div className="profile-actions">
 
@@ -414,76 +441,48 @@ function ProfilePage({
 
                 </section>
 
-
-                {/* =========================================
-                    PROFILE STATISTICS
-                ========================================= */}
-
                 <section className="profile-stats">
 
                     <div className="stat-item">
-
                         <strong>
                             {stats.average
                                 ? stats.average.toFixed(1)
                                 : "—"}
                         </strong>
 
-                        <span>
-                            Average Rating
-                        </span>
-
+                        <span>Average Rating</span>
                     </div>
 
                     <div className="stat-item">
-
                         <strong>
                             {stats.totalReceived || 0}
                         </strong>
 
-                        <span>
-                            Reviews Received
-                        </span>
-
+                        <span>Reviews Received</span>
                     </div>
 
                     <div className="stat-item">
-
                         <strong>
                             {stats.totalGiven || 0}
                         </strong>
 
-                        <span>
-                            Reviews Given
-                        </span>
-
+                        <span>Reviews Given</span>
                     </div>
 
                     <div className="stat-item">
-
                         <strong>
                             {teachingSkills.length +
-                                (profile.role === "mentor" ? 0 : learningSkills.length)}
+                                learningSkills.length}
                         </strong>
 
-                        <span>
-                            Skills Listed
-                        </span>
-
+                        <span>Skills Listed</span>
                     </div>
 
                 </section>
 
-
-                {/* =========================================
-                    PROFILE CONTENT
-                ========================================= */}
-
                 <section className="profile-content">
 
                     <div className="profile-content-main">
-
-                        {/* ABOUT */}
 
                         <section className="profile-section">
 
@@ -493,9 +492,7 @@ function ProfilePage({
 
                             <div className="section-body">
 
-                                <h2>
-                                    A little about me
-                                </h2>
+                                <h2>A little about me</h2>
 
                                 <p className="profile-bio">
                                     {profile.bio ||
@@ -518,9 +515,6 @@ function ProfilePage({
 
                         </section>
 
-
-                        {/* SKILLS */}
-
                         <section className="profile-section">
 
                             <div className="section-label">
@@ -529,15 +523,15 @@ function ProfilePage({
 
                             <div className="section-body">
 
-                                <h2>{profile.role === "mentor" ? "Teaching expertise" : "Learning & sharing"}</h2>
+                                <h2>
+                                    Learning & sharing
+                                </h2>
 
                                 <div className="skills-columns">
 
                                     <div className="skill-column">
 
-                                        <p>
-                                            I CAN HELP WITH
-                                        </p>
+                                        <p>I CAN HELP WITH</p>
 
                                         {teachingSkills.length ? (
                                             <div className="skill-list">
@@ -560,12 +554,9 @@ function ProfilePage({
 
                                     </div>
 
+                                    <div className="skill-column">
 
-                                    {profile.role !== "mentor" && <div className="skill-column">
-
-                                        <p>
-                                            I WANT TO LEARN
-                                        </p>
+                                        <p>I WANT TO LEARN</p>
 
                                         {learningSkills.length ? (
                                             <div className="skill-list">
@@ -586,16 +577,13 @@ function ProfilePage({
                                             </span>
                                         )}
 
-                                    </div>}
+                                    </div>
 
                                 </div>
 
                             </div>
 
                         </section>
-
-
-                        {/* COMMUNITY FEEDBACK */}
 
                         <section className="profile-reviews-section">
 
@@ -619,9 +607,7 @@ function ProfilePage({
                                             : "—"}
                                     </strong>
 
-                                    <span>
-                                        ★★★★★
-                                    </span>
+                                    <span>★★★★★</span>
 
                                     <small>
                                         {totalReviews
@@ -637,21 +623,21 @@ function ProfilePage({
 
                             </div>
 
-
                             {reviewsLoading ? (
                                 <div className="reviews-empty">
                                     Loading ratings...
                                 </div>
                             ) : (
                                 <>
-
                                     {totalReviews > 0 && (
                                         <div className="rating-breakdown">
 
                                             {[5, 4, 3, 2, 1].map(
                                                 (star) => {
                                                     const count =
-                                                        distribution[star] || 0;
+                                                        distribution[
+                                                            star
+                                                        ] || 0;
 
                                                     return (
                                                         <div
@@ -684,7 +670,6 @@ function ProfilePage({
                                         </div>
                                     )}
 
-
                                     {reviewsData.reviews.length > 0 ? (
                                         <div className="reviews-list">
 
@@ -701,7 +686,9 @@ function ProfilePage({
                                                                 {review
                                                                     .reviewer
                                                                     ?.name
-                                                                    ?.charAt(0)
+                                                                    ?.charAt(
+                                                                        0
+                                                                    )
                                                                     ?.toUpperCase() ||
                                                                     "U"}
                                                             </div>
@@ -739,7 +726,6 @@ function ProfilePage({
 
                                                         </div>
 
-
                                                         <div className="review-stars">
                                                             {"★".repeat(
                                                                 review.rating
@@ -756,7 +742,9 @@ function ProfilePage({
                                                         {review.comment && (
                                                             <p className="review-comment">
                                                                 “
-                                                                {review.comment}
+                                                                {
+                                                                    review.comment
+                                                                }
                                                                 ”
                                                             </p>
                                                         )}
@@ -768,6 +756,7 @@ function ProfilePage({
                                         </div>
                                     ) : (
                                         <div className="reviews-empty">
+
                                             <div>⭐</div>
 
                                             <h3>
@@ -779,20 +768,15 @@ function ProfilePage({
                                                 to start building your
                                                 reputation.
                                             </p>
+
                                         </div>
                                     )}
-
                                 </>
                             )}
 
                         </section>
 
                     </div>
-
-
-                    {/* =========================================
-                        RIGHT INFORMATION PANEL
-                    ========================================= */}
 
                     <aside className="profile-side-content">
 
@@ -804,9 +788,7 @@ function ProfilePage({
 
                             <div className="detail-row">
 
-                                <span>
-                                    Availability
-                                </span>
+                                <span>Availability</span>
 
                                 <strong>
                                     {profile.availability
@@ -819,9 +801,7 @@ function ProfilePage({
 
                             <div className="detail-row">
 
-                                <span>
-                                    Hourly rate
-                                </span>
+                                <span>Hourly rate</span>
 
                                 <strong>
                                     {profile.hourlyRate
@@ -833,9 +813,7 @@ function ProfilePage({
 
                             <div className="detail-row">
 
-                                <span>
-                                    Member since
-                                </span>
+                                <span>Member since</span>
 
                                 <strong>
                                     {profile.createdAt
@@ -855,12 +833,19 @@ function ProfilePage({
 
                         </section>
 
-
                         <section className="side-section">
 
                             <p className="side-label">
                                 QUICK ACTIONS
                             </p>
+
+                            <button
+                                className="side-action"
+                                onClick={onDashboard}
+                            >
+                                Dashboard
+                                <span>→</span>
+                            </button>
 
                             <button
                                 className="side-action"
@@ -887,7 +872,6 @@ function ProfilePage({
                             </button>
 
                         </section>
-
 
                         <section className="side-section">
 
@@ -953,10 +937,8 @@ function ProfilePage({
                 )}
 
             </section>
-
         </main>
     );
 }
 
 export default ProfilePage;
-// @teamcosmiccoders

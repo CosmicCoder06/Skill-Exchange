@@ -93,11 +93,13 @@ const activityLogRoutes = require("./routes/activityLogRoutes");
 // Middleware
 // =========================
 
-app.use(express.json());
+app.use(express.json({ limit: '400kb' }));
 app.use(cookieParser());
 
 const allowedOrigins = [
     "http://localhost:5173",
+    "http://localhost:5175",
+    "http://127.0.0.1:5175",
     process.env.CLIENT_URL,
 ].filter(Boolean);
 
@@ -163,6 +165,7 @@ app.use("/api", activityLogRoutes);
 // verifyToken + authorize("admin")
 // Keep this router after non-admin routes because its router-level
 // authorization middleware applies to every request that reaches it.
+app.use('/api', require('./routes/paymentRoutes'));
 app.use("/api", adminRoutes);
 
 // =========================

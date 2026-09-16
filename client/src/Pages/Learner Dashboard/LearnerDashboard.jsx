@@ -52,9 +52,7 @@ function LearnerDashboard({
             }
         }
 
-        if (token) {
-            fetchDashboard();
-        }
+        if (token) fetchDashboard();
     }, [token]);
 
     const skillsToLearn = useMemo(
@@ -125,9 +123,7 @@ function LearnerDashboard({
                 <div className="learner-dashboard-shell learner-loading">
                     <div className="loader-ring"></div>
                     <h2>Building your dashboard...</h2>
-                    <p>
-                        Fetching your learning space.
-                    </p>
+                    <p>Fetching your learning space.</p>
                 </div>
             </main>
         );
@@ -149,6 +145,13 @@ function LearnerDashboard({
 
                     <p>{error}</p>
 
+                    <button
+                        type="button"
+                        className="dashboard-primary"
+                        onClick={onHome}
+                    >
+                        Back Home
+                    </button>
                 </div>
             </main>
         );
@@ -158,24 +161,13 @@ function LearnerDashboard({
         <main className="learner-dashboard">
             <div className="learner-dashboard-shell">
 
-                {/* =========================================
-                    TOP BAR
-                ========================================= */}
-
                 <header className="dashboard-topbar">
                     <div className="dashboard-brand">
-                        <div className="brand-mark">
-                            S
-                        </div>
+                        <div className="brand-mark">S</div>
 
                         <div>
-                            <strong>
-                                Skill Exchange
-                            </strong>
-
-                            <span>
-                                Learner workspace
-                            </span>
+                            <strong>Skill Exchange</strong>
+                            <span>Learner workspace</span>
                         </div>
                     </div>
 
@@ -221,10 +213,6 @@ function LearnerDashboard({
                     </button>
                 </header>
 
-                {/* =========================================
-                    HERO
-                ========================================= */}
-
                 <section className="dashboard-hero">
                     <div>
                         <p className="dashboard-eyebrow">
@@ -234,8 +222,7 @@ function LearnerDashboard({
                         <h1>
                             Welcome back,{" "}
                             <span>
-                                {profile?.name ||
-                                    "Learner"}
+                                {profile?.name || "Learner"}
                             </span>{" "}
                             👋
                         </h1>
@@ -266,111 +253,53 @@ function LearnerDashboard({
                     </div>
                 </section>
 
-                {/* =========================================
-                    OVERVIEW STATS
-                ========================================= */}
-
                 <section className="overview-grid">
-
-                    <article className="overview-rail">
-                        <div className="overview-icon purple">
-                            ↗
-                        </div>
-
+                    <article className="overview-card">
+                        <div className="overview-icon purple">↗</div>
                         <div>
-                            <span>
-                                Learning Goals
-                            </span>
-
-                            <strong>
-                                {skillsToLearn.length}
-                            </strong>
-
-                            <small>
-                                skills you want to learn
-                            </small>
+                            <span>Learning Goals</span>
+                            <strong>{skillsToLearn.length}</strong>
+                            <small>skills you want to learn</small>
                         </div>
                     </article>
 
-                    <article className="overview-rail">
-                        <div className="overview-icon green">
-                            ✦
-                        </div>
-
+                    <article className="overview-card">
+                        <div className="overview-icon green">✦</div>
                         <div>
-                            <span>
-                                Skills You Share
-                            </span>
-
-                            <strong>
-                                {skillsToTeach.length}
-                            </strong>
-
-                            <small>
-                                skills you can teach
-                            </small>
+                            <span>Skills You Share</span>
+                            <strong>{skillsToTeach.length}</strong>
+                            <small>skills you can teach</small>
                         </div>
                     </article>
 
-                    <article className="overview-rail">
-                        <div className="overview-icon orange">
-                            ◷
-                        </div>
-
+                    <article className="overview-card">
+                        <div className="overview-icon orange">◷</div>
                         <div>
-                            <span>
-                                Availability
-                            </span>
-
-                            <strong>
-                                {availability.length}
-                            </strong>
-
-                            <small>
-                                availability slots
-                            </small>
+                            <span>Availability</span>
+                            <strong>{availability.length}</strong>
+                            <small>availability slots</small>
                         </div>
                     </article>
 
-                    <article className="overview-rail">
-                        <div className="overview-icon blue">
-                            ✓
-                        </div>
-
+                    <article className="overview-card">
+                        <div className="overview-icon blue">✓</div>
                         <div>
-                            <span>
-                                Profile Health
-                            </span>
-
-                            <strong>
-                                {profileScore}%
-                            </strong>
-
-                            <small>
-                                profile readiness
-                            </small>
+                            <span>Profile Health</span>
+                            <strong>{profileScore}%</strong>
+                            <small>profile readiness</small>
                         </div>
                     </article>
-
                 </section>
-
-                {/* =========================================
-                    MAIN GRID
-                ========================================= */}
 
                 <section className="dashboard-main-grid">
 
-                    {/* SKILL BALANCE */}
-                    <article className="dashboard-section skill-chart-panel">
+                    <article className="dashboard-panel skill-chart-panel">
                         <div className="panel-heading">
                             <div>
                                 <p className="panel-kicker">
                                     SKILL BALANCE
                                 </p>
-
-                                <h2>
-                                    Your learning direction
-                                </h2>
+                                <h2>Your learning direction</h2>
                             </div>
 
                             <span className="panel-badge">
@@ -379,7 +308,6 @@ function LearnerDashboard({
                         </div>
 
                         <div className="skill-chart">
-
                             <div className="donut-wrapper">
                                 <div
                                     className="skill-donut"
@@ -391,19 +319,13 @@ function LearnerDashboard({
                                     }}
                                 >
                                     <div className="donut-inner">
-                                        <strong>
-                                            {totalSkills}
-                                        </strong>
-
-                                        <span>
-                                            skills
-                                        </span>
+                                        <strong>{totalSkills}</strong>
+                                        <span>skills</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="chart-details">
-
                                 <div className="chart-legend">
                                     <span className="legend-dot learn-dot"></span>
 
@@ -411,15 +333,10 @@ function LearnerDashboard({
                                         <strong>
                                             {skillsToLearn.length}
                                         </strong>
-
-                                        <span>
-                                            Want to learn
-                                        </span>
+                                        <span>Want to learn</span>
                                     </div>
 
-                                    <b>
-                                        {learnPercentage}%
-                                    </b>
+                                    <b>{learnPercentage}%</b>
                                 </div>
 
                                 <div className="chart-legend">
@@ -429,15 +346,10 @@ function LearnerDashboard({
                                         <strong>
                                             {skillsToTeach.length}
                                         </strong>
-
-                                        <span>
-                                            Can teach
-                                        </span>
+                                        <span>Can teach</span>
                                     </div>
 
-                                    <b>
-                                        {teachPercentage}%
-                                    </b>
+                                    <b>{teachPercentage}%</b>
                                 </div>
 
                                 <div className="chart-message">
@@ -449,22 +361,17 @@ function LearnerDashboard({
                                         ? "You have a strong sharing profile. Help others while learning."
                                         : "Your learning and teaching goals are nicely balanced."}
                                 </div>
-
                             </div>
                         </div>
                     </article>
 
-                    {/* PROFILE HEALTH */}
-                    <article className="dashboard-section health-panel">
+                    <article className="dashboard-panel health-panel">
                         <div className="panel-heading">
                             <div>
                                 <p className="panel-kicker">
                                     PROFILE HEALTH
                                 </p>
-
-                                <h2>
-                                    Ready to connect?
-                                </h2>
+                                <h2>Ready to connect?</h2>
                             </div>
 
                             <span className="health-score">
@@ -482,7 +389,6 @@ function LearnerDashboard({
                         </div>
 
                         <div className="health-list">
-
                             <div
                                 className={
                                     profile?.bio
@@ -491,16 +397,10 @@ function LearnerDashboard({
                                 }
                             >
                                 <span>
-                                    {profile?.bio
-                                        ? "✓"
-                                        : "○"}
+                                    {profile?.bio ? "✓" : "○"}
                                 </span>
-
                                 <div>
-                                    <strong>
-                                        About you
-                                    </strong>
-
+                                    <strong>About you</strong>
                                     <small>
                                         Add a short introduction
                                     </small>
@@ -519,12 +419,8 @@ function LearnerDashboard({
                                         ? "✓"
                                         : "○"}
                                 </span>
-
                                 <div>
-                                    <strong>
-                                        Learning goals
-                                    </strong>
-
+                                    <strong>Learning goals</strong>
                                     <small>
                                         What do you want to learn?
                                     </small>
@@ -543,12 +439,8 @@ function LearnerDashboard({
                                         ? "✓"
                                         : "○"}
                                 </span>
-
                                 <div>
-                                    <strong>
-                                        Teaching skills
-                                    </strong>
-
+                                    <strong>Teaching skills</strong>
                                     <small>
                                         What can you share?
                                     </small>
@@ -567,18 +459,13 @@ function LearnerDashboard({
                                         ? "✓"
                                         : "○"}
                                 </span>
-
                                 <div>
-                                    <strong>
-                                        Availability
-                                    </strong>
-
+                                    <strong>Availability</strong>
                                     <small>
                                         When can you connect?
                                     </small>
                                 </div>
                             </div>
-
                         </div>
 
                         <button
@@ -589,26 +476,17 @@ function LearnerDashboard({
                             Improve my profile →
                         </button>
                     </article>
-
                 </section>
-
-                {/* =========================================
-                    SECOND ROW
-                ========================================= */}
 
                 <section className="dashboard-secondary-grid">
 
-                    {/* LEARNING ROADMAP */}
-                    <article className="dashboard-section roadmap-panel">
+                    <article className="dashboard-panel roadmap-panel">
                         <div className="panel-heading">
                             <div>
                                 <p className="panel-kicker">
                                     LEARNING ROADMAP
                                 </p>
-
-                                <h2>
-                                    What to focus on
-                                </h2>
+                                <h2>What to focus on</h2>
                             </div>
                         </div>
 
@@ -621,19 +499,14 @@ function LearnerDashboard({
                                             key={`${skill}-${index}`}
                                         >
                                             <div className="roadmap-number">
-                                                {String(
-                                                    index + 1
-                                                ).padStart(
+                                                {String(index + 1).padStart(
                                                     2,
                                                     "0"
                                                 )}
                                             </div>
 
                                             <div className="roadmap-content">
-                                                <strong>
-                                                    {skill}
-                                                </strong>
-
+                                                <strong>{skill}</strong>
                                                 <span>
                                                     Learning goal
                                                 </span>
@@ -645,8 +518,7 @@ function LearnerDashboard({
                                                         width: `${Math.max(
                                                             25,
                                                             90 -
-                                                                index *
-                                                                    15
+                                                                index * 15
                                                         )}%`,
                                                     }}
                                                 />
@@ -658,9 +530,7 @@ function LearnerDashboard({
                         ) : (
                             <div className="empty-dashboard">
                                 <span>◎</span>
-                                <strong>
-                                    No learning goals yet
-                                </strong>
+                                <strong>No learning goals yet</strong>
                                 <p>
                                     Add skills you want to learn
                                     from your profile.
@@ -669,22 +539,17 @@ function LearnerDashboard({
                         )}
                     </article>
 
-                    {/* WEEKLY AVAILABILITY */}
-                    <article className="dashboard-section availability-panel">
+                    <article className="dashboard-panel availability-panel">
                         <div className="panel-heading">
                             <div>
                                 <p className="panel-kicker">
                                     WEEKLY PLAN
                                 </p>
-
-                                <h2>
-                                    Your availability
-                                </h2>
+                                <h2>Your availability</h2>
                             </div>
                         </div>
 
                         <div className="week-bars">
-
                             {[
                                 "Mon",
                                 "Tue",
@@ -695,8 +560,7 @@ function LearnerDashboard({
                                 "Sun",
                             ].map((day, index) => {
                                 const active =
-                                    availability.length >
-                                    0 &&
+                                    availability.length > 0 &&
                                     index <
                                         Math.min(
                                             availability.length,
@@ -719,8 +583,7 @@ function LearnerDashboard({
                                                     height: active
                                                         ? `${
                                                               35 +
-                                                              ((index +
-                                                                  1) %
+                                                              ((index + 1) %
                                                                   4) *
                                                                   13
                                                           }%`
@@ -729,18 +592,14 @@ function LearnerDashboard({
                                             />
                                         </div>
 
-                                        <span>
-                                            {day}
-                                        </span>
+                                        <span>{day}</span>
                                     </div>
                                 );
                             })}
-
                         </div>
 
                         <div className="availability-summary">
                             <span className="summary-dot"></span>
-
                             <p>
                                 <strong>
                                     {availability.length}
@@ -753,107 +612,69 @@ function LearnerDashboard({
                             </p>
                         </div>
                     </article>
-
                 </section>
 
-                {/* =========================================
-                    QUICK ACTIONS
-                ========================================= */}
-
                 <section className="quick-actions">
-
                     <div className="quick-actions-heading">
                         <p className="panel-kicker">
                             QUICK ACTIONS
                         </p>
-
-                        <h2>
-                            Keep moving forward
-                        </h2>
+                        <h2>Keep moving forward</h2>
                     </div>
 
                     <div className="quick-action-grid">
-
                         <button
                             type="button"
                             onClick={onBookings}
-                            className="quick-action-line"
+                            className="quick-action-card"
                         >
-                            <span className="quick-icon">
-                                ◷
-                            </span>
-
+                            <span className="quick-icon">◷</span>
                             <div>
-                                <strong>
-                                    My Sessions
-                                </strong>
-
+                                <strong>My Sessions</strong>
                                 <span>
                                     View bookings and upcoming
                                     learning sessions
                                 </span>
                             </div>
-
                             <b>→</b>
                         </button>
 
                         <button
                             type="button"
                             onClick={onProfile}
-                            className="quick-action-line"
+                            className="quick-action-card"
                         >
-                            <span className="quick-icon">
-                                ✎
-                            </span>
-
+                            <span className="quick-icon">✎</span>
                             <div>
-                                <strong>
-                                    Update Profile
-                                </strong>
-
+                                <strong>Update Profile</strong>
                                 <span>
                                     Keep your skills and goals
                                     up to date
                                 </span>
                             </div>
-
                             <b>→</b>
                         </button>
 
                         <button
                             type="button"
                             onClick={onHome}
-                            className="quick-action-line"
+                            className="quick-action-card"
                         >
-                            <span className="quick-icon">
-                                ⌂
-                            </span>
-
+                            <span className="quick-icon">⌂</span>
                             <div>
-                                <strong>
-                                    Discover Skills
-                                </strong>
-
+                                <strong>Discover Skills</strong>
                                 <span>
                                     Find people to learn and
                                     exchange skills with
                                 </span>
                             </div>
-
                             <b>→</b>
                         </button>
-
                     </div>
                 </section>
 
-                {/* =========================================
-                    FOOTER
-                ========================================= */}
-
                 <footer className="dashboard-footer">
-                    <span>
-                        Skill Exchange
-                    </span>
+                    <span>Skill Exchange</span>
 
                     <div>
                         <button
@@ -871,11 +692,9 @@ function LearnerDashboard({
                         </button>
                     </div>
                 </footer>
-
             </div>
         </main>
     );
 }
 
 export default LearnerDashboard;
-// @teamcosmiccoders

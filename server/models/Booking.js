@@ -65,6 +65,11 @@ const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
     {
+        meetingUrl: { type: String, default: '', maxlength: 200 },
+        paymentAmount: { type: Number, min: 0 },
+        paymentMethod: { type: String, enum: ['free', 'pay_later', 'qr'] },
+        paymentStatus: { type: String, enum: ['not_required', 'unpaid', 'pending_verification', 'verified'] },
+        paymentReference: { type: String, maxlength: 64, default: '' },
         mentor: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

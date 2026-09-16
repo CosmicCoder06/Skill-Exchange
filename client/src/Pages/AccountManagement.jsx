@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./AccountManagement.css";
+import PaymentSettings from '../Components/booking/PaymentSettings';
 
 function AccountManagement({ token, onLogout }) {
     const [reason, setReason] = useState("");
@@ -65,6 +66,7 @@ function AccountManagement({ token, onLogout }) {
             <section className="account-management-card">
                 <p>ACCOUNT MANAGEMENT</p>
                 <h1>Manage your account</h1>
+                <PaymentSettings token={token} />
                 <span>Deactivate temporarily or permanently delete your Skill Exchange account.</span>
 
                 <label htmlFor="deactivation-reason">Reason for deactivation</label>

@@ -33,6 +33,7 @@ function UpdateRegisterCard({ onClose, id }) {
                 name: "",
                 email: ""
             });
+
         } catch (error) {
             console.log(error);
         }
@@ -102,4 +103,3 @@ function UpdateRegisterCard({ onClose, id }) {
 }
 
 export default UpdateRegisterCard;
-// @teamcosmiccoders
