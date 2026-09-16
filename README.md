@@ -6,7 +6,7 @@ The application supports learner, mentor, and administrator roles. Each role rec
 
 ## Features
 
-- JWT-based registration, email verification, and login
+- JWT-based registration and login
 - Learner and mentor profiles with skills and availability
 - Community discovery and member profile viewing
 - Session booking and booking-status management
@@ -15,6 +15,7 @@ The application supports learner, mentor, and administrator roles. Each role rec
 - Learner and mentor dashboard components
 - Admin portal for user moderation and platform reports
 - Responsive Skill Exchange interface
+- Backend mentor search, skill categories, activity logs, and platform settings
 
 ## Technology Stack
 
@@ -114,12 +115,6 @@ MONGO_URI=mongodb://127.0.0.1:27017/skill-exchange
 CLIENT_URL=http://localhost:5173
 JWT_ACCESS_SECRET=replace-with-a-long-random-secret
 JWT_REFRESH_SECRET=replace-with-another-long-random-secret
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=your-smtp-username
-SMTP_PASS=your-smtp-password
-EMAIL_FROM=Skill Exchange <no-reply@example.com>
 ADMIN_NAME=Skill Exchange Admin
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=replace-with-a-secure-password
@@ -133,8 +128,6 @@ VITE_SOCKET_URL=http://localhost:5000
 ```
 
 Do not commit either `.env` file. Vite exposes variables prefixed with `VITE_` to browser code, so never place secrets in the client environment file.
-
-For Gmail SMTP, use an app password instead of your normal account password. In production, add the same server variables to the backend hosting provider and set `CLIENT_URL` to the deployed frontend URL so verification links open the correct application.
 
 ## Create an Administrator
 
@@ -157,8 +150,6 @@ Authorization: Bearer <access-token>
 | Area | Method | Endpoint | Purpose |
 | --- | --- | --- | --- |
 | Authentication | `POST` | `/api/registration/api` | Register a learner or mentor |
-| Authentication | `POST` | `/api/auth/verify-email` | Verify a registration token |
-| Authentication | `POST` | `/api/auth/resend-verification` | Request another verification email |
 | Authentication | `POST` | `/api/loginRoute/api` | Log in and receive an access token |
 | Profile | `GET` | `/api/profile/me` | Read the current profile |
 | Profile | `PUT` | `/api/profile/update` | Update the current profile |
@@ -176,6 +167,12 @@ Authorization: Bearer <access-token>
 | Admin | `GET` | `/api/admin/users` | Search and filter members |
 | Admin | `PATCH`, `DELETE` | `/api/admin/users/:id` | Moderate a member account |
 | Admin | `GET` | `/api/admin/reports` | Read platform reports |
+| Session | `POST` | `/api/auth/refresh` | Rotate refresh token and return a new access token |
+| Session | `POST` | `/api/auth/logout` | Revoke current refresh session |
+| Discovery | `GET` | `/api/mentors` | Search mentors by `q`, `skill`, or `availability` |
+| Skill categories | `GET`, `POST`, `PATCH` | `/api/skill-categories` | Read categories; admin creates and updates them |
+| Settings | `GET`, `PUT` | `/api/settings` | Admin-managed platform settings |
+| Activity logs | `GET` | `/api/activity-logs` | Read recent auditable product activity |
 
 ## Real-Time Chat
 
@@ -223,13 +220,6 @@ Before opening a pull request, run the checks affected by your change and includ
 - Log in again to obtain a fresh access token.
 - Confirm that `JWT_ACCESS_SECRET` is configured and has not changed since the token was created.
 - Send the token using the `Authorization: Bearer <access-token>` header.
-
-### Verification emails are not delivered
-
-- Confirm that every `SMTP_*` variable and `EMAIL_FROM` exists in `server/.env`.
-- For providers such as Gmail, use an app password and ensure SMTP access is enabled.
-- Confirm that `CLIENT_URL` is the exact frontend origin; it is used to build the verification link.
-- Check the server log for a mail-provider authentication or connection error.
 
 ### Admin login is unavailable
 

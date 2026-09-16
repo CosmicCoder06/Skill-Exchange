@@ -53,28 +53,6 @@ const userSchema = new mongoose.Schema(
             default: false,
         },
 
-        // Existing accounts remain usable; public registration explicitly
-        // sets this to false until the emailed link is confirmed.
-        isEmailVerified: {
-            type: Boolean,
-            default: true,
-        },
-
-        emailVerificationTokenHash: {
-            type: String,
-            select: false,
-        },
-
-        emailVerificationExpiresAt: {
-            type: Date,
-            select: false,
-        },
-
-        emailVerificationSentAt: {
-            type: Date,
-            select: false,
-        },
-
         /*
          * Admin account status.
          *
@@ -84,6 +62,12 @@ const userSchema = new mongoose.Schema(
         isActive: {
             type: Boolean,
             default: true,
+        },
+
+        deactivationReason: {
+            type: String,
+            default: "",
+            trim: true,
         },
 
         // =========================
@@ -99,6 +83,12 @@ const userSchema = new mongoose.Schema(
         skillsToTeach: {
             type: [String],
             default: [],
+        },
+
+        teachingSkillLevels: {
+            type: Map,
+            of: String,
+            default: {},
         },
 
         skillsToLearn: {
@@ -188,3 +178,4 @@ module.exports =
         "User",
         userSchema
     );
+// @teamcosmiccoders

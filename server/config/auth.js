@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken")
 
-const JWT_SECRET = process.env.JWT_SECRET || "Dikshant16121999Chakrayat@123"
+const JWT_SECRET = process.env.JWT_SECRET || "Avhi@JWT#98990$Avhi"
 
 function verifyAuthToken(token) {
     return jwt.verify(token, JWT_SECRET)
@@ -8,3 +8,4 @@ function verifyAuthToken(token) {
 
 module.exports = { JWT_SECRET, verifyAuthToken }
 
+// @teamcosmiccoders

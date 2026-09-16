@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import styles from "./registrationComponent.module.css";
 
-function Register({ onBackHome, onBackToLogin, onRegistered }) {
+function Register({ onBackToLogin, onRegistered }) {
     const [user, setUser] = useState({
         name: "",
         email: "",
@@ -45,6 +45,8 @@ function Register({ onBackHome, onBackToLogin, onRegistered }) {
 
             console.log("Registration response:", response.data);
 
+            alert("Account created successfully! Please login.");
+
             setUser({
                 name: "",
                 email: "",
@@ -52,7 +54,7 @@ function Register({ onBackHome, onBackToLogin, onRegistered }) {
                 role: "learner"
             });
 
-            onRegistered(response.data.email || user.email);
+            onRegistered();
 
         } catch (error) {
             console.error("Registration Error:", error);
@@ -71,14 +73,6 @@ function Register({ onBackHome, onBackToLogin, onRegistered }) {
         <section className={styles.page}>
 
             <div className={styles.card}>
-
-                <button
-                    type="button"
-                    className={styles.backButton}
-                    onClick={onBackHome}
-                >
-                    ← Back to home
-                </button>
 
                 <div className={styles.logo}>
                     S
@@ -212,3 +206,4 @@ function Register({ onBackHome, onBackToLogin, onRegistered }) {
 }
 
 export default Register;
+// @teamcosmiccoders

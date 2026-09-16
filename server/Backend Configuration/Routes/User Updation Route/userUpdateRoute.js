@@ -8,3 +8,4 @@ const updateUser= require("../../Controllers/User Updation Controller/userContro
 router.put("/user/update/:id", updateUser)
 
 module.exports= router;
+// @teamcosmiccoders
