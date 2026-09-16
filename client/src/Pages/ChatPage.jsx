@@ -62,10 +62,6 @@ function addUnique(messages, incoming) {
 
 export default function ChatPage({
     token,
-    onLogout,
-    onHome,
-    onBack,
-    onProfile,
     onViewProfile,
     initialUserId,
 }) {
@@ -162,10 +158,14 @@ export default function ChatPage({
         )
 
         if (existing) {
-            initialHandled.current = true
-            setSelectedId(existing._id)
-            return
-        }
+    initialHandled.current = true
+
+    queueMicrotask(() => {
+        setSelectedId(existing._id)
+    })
+
+    return
+}
 
         async function createInitialChat() {
             try {
@@ -193,15 +193,14 @@ export default function ChatPage({
         createInitialChat()
     }, [initialUserId, loading, conversations])
 
-    useEffect(() => {
-        if (!selectedId) {
-            setMessages([])
-            return
-        }
+  useEffect(() => {
+    if (!selectedId) {
+        return
+    }
 
-        let active = true
+    let active = true
 
-        fetchMessages(selectedId)
+    fetchMessages(selectedId)
             .then((result) => {
                 if (active) setMessages(result)
             })
@@ -389,7 +388,8 @@ export default function ChatPage({
                 result.filter(
                     (user) =>
                         String(user._id) !==
-                        String(currentUserId)
+                        String(currentUserId) &&
+                        user.role !== "admin"
                 )
             )
         } catch (requestError) {
@@ -663,55 +663,7 @@ export default function ChatPage({
 
     return (
         <main className="chat-page">
-            <aside className="chat-nav" aria-label="Main navigation">
-                <button
-                    type="button"
-                    className="chat-brand-mark"
-                    onClick={onHome}
-                    aria-label="Skill Exchange home"
-                >
-                    SE
-                </button>
 
-                <nav className="chat-nav-links">
-                    <button
-                        type="button"
-                        onClick={onHome}
-                        title="Home"
-                    >
-                        <span>⌂</span>
-                        <small>Home</small>
-                    </button>
-
-                    <button
-                        type="button"
-                        className="is-active"
-                        title="Messages"
-                    >
-                        <span>◇</span>
-                        <small>Chats</small>
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={onProfile}
-                        title="Profile"
-                    >
-                        <span>◎</span>
-                        <small>Profile</small>
-                    </button>
-                </nav>
-
-                <button
-                    type="button"
-                    className="chat-nav-logout"
-                    onClick={onLogout}
-                    title="Log out"
-                >
-                    <span>↪</span>
-                    <small>Logout</small>
-                </button>
-            </aside>
 
             <section className="chat-main">
                 <header className="chat-topbar">
@@ -733,13 +685,6 @@ export default function ChatPage({
                                 : "Reconnecting"}
                         </span>
 
-                        <button
-                            type="button"
-                            className="back-link"
-                            onClick={onBack}
-                        >
-                            ← Back
-                        </button>
                     </div>
                 </header>
 
@@ -756,7 +701,7 @@ export default function ChatPage({
                 ) : null}
 
                 <section className="chat-workspace">
-                    <aside className="chat-sidebar">
+                    <section className="chat-sidebar" aria-label="Conversations">
                         <div className="sidebar-title-row">
                             <div>
                                 <h2>Chats</h2>
@@ -847,7 +792,7 @@ export default function ChatPage({
                                 }
                             />
                         )}
-                    </aside>
+                    </section>
 
                     <section className="chat-thread">
                         {showNewChat ? (
@@ -1219,3 +1164,4 @@ export default function ChatPage({
         </main>
     )
 }
+// @teamcosmiccoders

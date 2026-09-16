@@ -1,0 +1,430 @@
+[
+  {
+    "path": "client\\src\\AIExtension.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\App.css",
+    "before": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  },
+  {
+    "path": "client\\src\\App.jsx",
+    "before": "694446988FFE757CEBFEA25008BA5CA7F10A80C4F24B8B6FA6A0B5539E13A1D8"
+  },
+  {
+    "path": "client\\src\\chat-restored.css",
+    "before": null
+  },
+  {
+    "path": "client\\src\\editorial.css",
+    "before": null
+  },
+  {
+    "path": "client\\src\\index.css",
+    "before": "DCC8DC8AD6FA42076250758621494C63287296A91E36153909EA4A81FC0F4B26"
+  },
+  {
+    "path": "client\\src\\main.jsx",
+    "before": "5D6887AE46CD89095F1EE6D47CE963ACD5FFE21A0700F0015FF1AB6CFE15C2C4"
+  },
+  {
+    "path": "client\\src\\premium.css",
+    "before": null
+  },
+  {
+    "path": "client\\src\\session-receipts.css",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\AIMatchModal.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\AppFooter.css",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\AppFooter.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\AppSidebar.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\ThemeToggle.css",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\ThemeToggle.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\TopNavigation.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\admin\\AdminOverview.jsx",
+    "before": "F62D059EAB21F9DCED11342E48CABDD0BA9F7575F6AC92E0777B6FFB90706995"
+  },
+  {
+    "path": "client\\src\\Components\\admin\\AdminReports.jsx",
+    "before": "58E517E4E860A3BF331EE4904A79A0753F46D227E0EEB7211AC59C04C86548FC"
+  },
+  {
+    "path": "client\\src\\Components\\admin\\AdminSidebar.jsx",
+    "before": "1CC74DE85EDC9C8E0648D063CDC8DAD20AD48EC52C87348C8DF142575A634769"
+  },
+  {
+    "path": "client\\src\\Components\\admin\\AdminUserTable.jsx",
+    "before": "AC3A6CA15E9BBE2F039198E6CFC52CD7D32FA84D0B437D4FF36EB6FFC766F92E"
+  },
+  {
+    "path": "client\\src\\Components\\booking\\BookingCalendar.css",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\booking\\BookingCalendar.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\booking\\GoogleMeetLink.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\booking\\PaymentReceipt.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\booking\\PaymentSettings.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Components\\chat\\ChatList.jsx",
+    "before": "B529DE4E61C55DFE52B77B47A78ECBCC5E2D0E64529FB122605EDECC5117776C"
+  },
+  {
+    "path": "client\\src\\Components\\chat\\ChatPremium.css",
+    "before": "A5CC10CAC3C8DDDFC7D11D15C63D11E84BC0B400187A852D6B8EF7803F0923CD"
+  },
+  {
+    "path": "client\\src\\Components\\chat\\MessageBubble.jsx",
+    "before": "F5B1BFF4FD207CFAF44847413035985CC8C30B4BCC9388F28727C2779985B07B"
+  },
+  {
+    "path": "client\\src\\Components\\chat\\MessageInput.jsx",
+    "before": "55022B431A8BE404D47F207AA7528957C089AB7ABFE3A2259432295032034173"
+  },
+  {
+    "path": "client\\src\\Components\\Registration Component\\user Registered Card\\registerCard.jsx",
+    "before": "8BC6D9B441FB171405280F08AE6601B9F3C7A1CB92A78A43B7C13EB352B44F27"
+  },
+  {
+    "path": "client\\src\\Components\\Registration Component\\UseUpdationModal\\editModal.jsx",
+    "before": "23961F6A400CC3A868865452C3AB9EF05AF68021CE6F9EC67650765C4E4F7EA5"
+  },
+  {
+    "path": "client\\src\\context\\SocketContext.jsx",
+    "before": "319EC1B6FB4E004ADB39F56CDF0B3CA72DB05B781DEC04D16A9B14FE6F5F7219"
+  },
+  {
+    "path": "client\\src\\context\\socketContextValue.js",
+    "before": "B7602751E2A5DA0A87E5BA8C2E56727CB1A125A8F1D7D5BAA2CAD465F2F20951"
+  },
+  {
+    "path": "client\\src\\context\\ThemeContext.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\context\\useSocket.js",
+    "before": "84A9A963E5B6FB0141F56EC0796997E68C76EC57F3B055C47BD5CF9DA4ADBA86"
+  },
+  {
+    "path": "client\\src\\Pages\\AccountManagement.css",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Pages\\AccountManagement.jsx",
+    "before": null
+  },
+  {
+    "path": "client\\src\\Pages\\BookingPage.css",
+    "before": "53B83C7ED0BB313F12106772AF64C935649B240ADAAA13C4158738722B7C7AEC"
+  },
+  {
+    "path": "client\\src\\Pages\\BookingPage.jsx",
+    "before": "E2BBA3EAAB65646ABF1321B4625953C141F880BCF2631672F305453C7AE18F70"
+  },
+  {
+    "path": "client\\src\\Pages\\ChatPage.css",
+    "before": "9BEAEF0545E73C8A035EBA64450CDD6D872A8F329D4095FC368AE2D4F7978AC6"
+  },
+  {
+    "path": "client\\src\\Pages\\ChatPage.jsx",
+    "before": "9B372CED703EA6477BDF4FAB212801EA8C2C67DEB3D85A782CD608FEBD981247"
+  },
+  {
+    "path": "client\\src\\Pages\\Discover.css",
+    "before": "9D4751A8CCC15C8B172B11CA7F69DA5F329754FF8261F2ADA66D7A35C3C8BCDB"
+  },
+  {
+    "path": "client\\src\\Pages\\DiscoverPage.jsx",
+    "before": "86650495BC999055D07FAE7CE9C1730ACEB010C527D466665D32F8FBC89577A6"
+  },
+  {
+    "path": "client\\src\\Pages\\HomePage.css",
+    "before": "9A1AC2075118048FB5A04D86E0F73DF25B92353AA45AA1A2B13D8B0829CD7882"
+  },
+  {
+    "path": "client\\src\\Pages\\HomePage.jsx",
+    "before": "F5D491C8975B4B213D09565F3ED3968D36576E04A7AF7DA366375ADB91C9CB7B"
+  },
+  {
+    "path": "client\\src\\Pages\\Landing.css",
+    "before": "7F93D883E04F89753F8DC91233FA7A956F36241BE697C91E5FBC5828988610B4"
+  },
+  {
+    "path": "client\\src\\Pages\\MyBookings.css",
+    "before": "136E6A3EB71DB0B6F3F0F01FB06933EDC038908C2A6D66460D5DC40C6B350AC3"
+  },
+  {
+    "path": "client\\src\\Pages\\MyBookings.jsx",
+    "before": "9E6FD3F3F53AA5E35ECB2E22D825656B114408EB01CEE239CDC222E976009722"
+  },
+  {
+    "path": "client\\src\\Pages\\Admin Page\\admin.css",
+    "before": "DD96409AF9D1AD6FE8AA4059422D179B6B67F2E709A09FF5F5FE0300040BCFBF"
+  },
+  {
+    "path": "client\\src\\Pages\\Admin Page\\admin.jsx",
+    "before": "3A8A878DB8168C0BCF0AA3335E73A72EF9C88EEF01CA37E3AB71860DD2A3F51F"
+  },
+  {
+    "path": "client\\src\\Pages\\Mentor Dashboard\\MentorDashboard.css",
+    "before": "A67C449095FF1C51094EF023B8DDC3EAEE005E2B8FAC1A023AF4EB6277FF4312"
+  },
+  {
+    "path": "client\\src\\Pages\\Mentor Dashboard\\MentorDashboard.jsx",
+    "before": "66B7323A5D9393D89C2280B5B4DF8F6B15EF7E10B0AA78BA23B44BE602717629"
+  },
+  {
+    "path": "client\\src\\Pages\\Profile Page\\CompleteProfile.css",
+    "before": "97E8AB2D4DC96CC2BCB24078C2AC2FE737076F7B1DC3ADB1E0610739007A0161"
+  },
+  {
+    "path": "client\\src\\Pages\\Profile Page\\CompleteProfile.jsx",
+    "before": "79CE6E4C896F2DA70F90E0A569DDDFCC536B80383377F60AC318F94FF024F57F"
+  },
+  {
+    "path": "client\\src\\Pages\\Profile Page\\OtherProfilePage.css",
+    "before": "76851E9B8B74F4B3691751AEB12624C306B4025ABEC08AD8477456427050B2D9"
+  },
+  {
+    "path": "client\\src\\Pages\\Profile Page\\OtherProfilePage.jsx",
+    "before": "8CA09DA191A00C0C3924CA0AF7CAF8F593BAC96BDE654AF46D11C9F740C2EBD6"
+  },
+  {
+    "path": "client\\src\\Pages\\Profile Page\\ProfileActions.css",
+    "before": "4A1E761AA2AAB071AAA384A7E15490BC26981A2EDC468CD8A31703C618102FB9"
+  },
+  {
+    "path": "client\\src\\Pages\\Profile Page\\ProfilePage.css",
+    "before": "479EE639979CC13CB08D842DA9A9B90C9A4E88E5175CF1530D7E83803104E59B"
+  },
+  {
+    "path": "client\\src\\Pages\\Profile Page\\ProfilePremium.css",
+    "before": "12A62F229B446C6831A598A66C1C0C7B74CA7188F68DE478948652AF03B1D0CE"
+  },
+  {
+    "path": "client\\src\\services\\adminService.js",
+    "before": "30C15B70AADB9D4A688200E4B22ED0D7D1172F04B2A6E7905AC981A109714467"
+  },
+  {
+    "path": "client\\src\\services\\chatService.js",
+    "before": "85194895FADCED82B4848435EF859E9812BD70B3AA2289D73B374CF1DA62AC79"
+  },
+  {
+    "path": "client\\src\\services\\liveMentors.js",
+    "before": null
+  },
+  {
+    "path": "client\\src\\services\\liveMentors.test.js",
+    "before": null
+  },
+  {
+    "path": "client\\src\\services\\skillMatch.js",
+    "before": null
+  },
+  {
+    "path": "client\\src\\services\\skillMatch.test.js",
+    "before": null
+  },
+  {
+    "path": "server\\server.js",
+    "before": "89361B00528DA0A72835A285E8BC98D8FD9455F45FD0A62DD8CC55608B5026B8"
+  },
+  {
+    "path": "server\\Backend Configuration\\Models\\UserSchema\\user.js",
+    "before": "A0F7EB8FF3FF529FD93376674B0D638BBD1C1A969359BE638C410FFFF855DAE7"
+  },
+  {
+    "path": "server\\controllers\\activityLogController.js",
+    "before": null
+  },
+  {
+    "path": "server\\controllers\\adminController.js",
+    "before": "965807B7A5579D9E8ABF2FEB7420BAFF365AFB8B5F6C4F8261A29D99B3B6BFAC"
+  },
+  {
+    "path": "server\\controllers\\bookingController.js",
+    "before": "3088CFD94D5D7458E32EC7C0098683EE1CDBE0A382D085F17C7F9F543ABF30C0"
+  },
+  {
+    "path": "server\\controllers\\chatController.js",
+    "before": "02DF274C3982B5CFAEC58217F231BECF0AC51D7C0A9A4F68A24F2687CAE7AD8F"
+  },
+  {
+    "path": "server\\controllers\\dashboardController.js",
+    "before": "35E0FF06973BA503805B397B8BFF8D5484DFC45F316A04AE43D757E9A3EB31F4"
+  },
+  {
+    "path": "server\\controllers\\mentorController.js",
+    "before": null
+  },
+  {
+    "path": "server\\controllers\\profileController.js",
+    "before": "5886D24B56C7806A18D729F9F774D19AE91D1950CF92C3232E91E6BD8F638A1D"
+  },
+  {
+    "path": "server\\controllers\\reviewController.js",
+    "before": "DD9D792BB0CD6AE2D7D385198A11FD6B4D5500590BDE8F165A7315C2622ECC3A"
+  },
+  {
+    "path": "server\\controllers\\settingController.js",
+    "before": null
+  },
+  {
+    "path": "server\\controllers\\skillCategoryController.js",
+    "before": null
+  },
+  {
+    "path": "server\\models\\ActivityLog.js",
+    "before": null
+  },
+  {
+    "path": "server\\models\\Booking.js",
+    "before": "CA8890BFB777F913E7D279AE715C30A1B9044860E8F62E458DA8F7E330AC24ED"
+  },
+  {
+    "path": "server\\models\\Conversation.js",
+    "before": "168C0A45603B7C51D4B04E50AE0F6BA05DCBE1BE33424B8D8458980621850578"
+  },
+  {
+    "path": "server\\models\\Message.js",
+    "before": "0767A731A8CA53E59ED2626384BFD90E6D82AFAF8D0CE1EDFAE93625AB5B2A74"
+  },
+  {
+    "path": "server\\models\\Review.js",
+    "before": "78DC01740473DDAD01810B0F89363AF47F9A0A711D16499963676B4C0D255F80"
+  },
+  {
+    "path": "server\\models\\Setting.js",
+    "before": null
+  },
+  {
+    "path": "server\\models\\SkillCategory.js",
+    "before": null
+  },
+  {
+    "path": "server\\routes\\activityLogRoutes.js",
+    "before": null
+  },
+  {
+    "path": "server\\routes\\adminRoutes.js",
+    "before": "92BDF420D1DDE5999881C3CB30F0FDBB9878E55E9B122DA3C366DFCC9EC6EBF3"
+  },
+  {
+    "path": "server\\routes\\bookingRoutes.js",
+    "before": "49FE42AA52ABE7F62C10E39AFA9E7D75F17035F2761F765F98587EEFC5A78602"
+  },
+  {
+    "path": "server\\routes\\chatRoutes.js",
+    "before": "1584D4702B31074286A9FE6AD01D549E82C3999141957AE0B887839CFB1171D7"
+  },
+  {
+    "path": "server\\routes\\dashboardRoutes.js",
+    "before": "F38C2A5CD4F2A77E0413682670B2F12DEF5CBA70749D39AC299442E399DC3D4E"
+  },
+  {
+    "path": "server\\routes\\mentorRoutes.js",
+    "before": null
+  },
+  {
+    "path": "server\\routes\\paymentRoutes.js",
+    "before": null
+  },
+  {
+    "path": "server\\routes\\profileRoutes.js",
+    "before": "921F6D55A969A5309A4F81829D97C31AB44CEA08B9300EE974CE0D974D531C33"
+  },
+  {
+    "path": "server\\routes\\reviewRoutes.js",
+    "before": "55F96B210DC5D51618D424AF38900259A18E7545854661D6D2BFD7565E3BEC2C"
+  },
+  {
+    "path": "server\\routes\\settingRoutes.js",
+    "before": null
+  },
+  {
+    "path": "server\\routes\\skillCategoryRoutes.js",
+    "before": null
+  },
+  {
+    "path": "server\\scripts\\seedAdmin.js",
+    "before": "3DA4F821B1A1BF1E005E7B2DC96B7FB01A608EB8395D16AC778A96A079377134"
+  },
+  {
+    "path": "server\\sockets\\chatSocket.js",
+    "before": "6C94876106F3DAFE3C602ED892EFEE1ED6611BB7EB98AB06828F9841C3488464"
+  },
+  {
+    "path": "server\\tests\\adminAnalytics.test.js",
+    "before": "92DCA7D2405598EA3DCD232AD5F48ECD494FDA09FB703DFE8977D5D217E4CF18"
+  },
+  {
+    "path": "server\\tests\\bookingMeeting.test.js",
+    "before": null
+  },
+  {
+    "path": "server\\tests\\chatModels.test.js",
+    "before": "2AD8D4538D9084967A7F478778CDA7FD10E75F8CA54A98F63E6282F8A20B9CFA"
+  },
+  {
+    "path": "server\\tests\\manualPayment.test.js",
+    "before": null
+  },
+  {
+    "path": "server\\tests\\synopsisModels.test.js",
+    "before": null
+  },
+  {
+    "path": "server\\Utils\\activityLogger.js",
+    "before": null
+  },
+  {
+    "path": "server\\Utils\\bookingMeeting.js",
+    "before": null
+  },
+  {
+    "path": "server\\Utils\\manualPayment.js",
+    "before": null
+  },
+  {
+    "path": "client\\package.json",
+    "before": "4CA30DD9981ED0299DD78B09BD552D73775E3368637AA9E22647F5A65C8BDF02"
+  },
+  {
+    "path": "client\\package-lock.json",
+    "before": "02D422AC66A05B2C1CA929AA3EE6AFC6D11EA040EF0D1D89EDA800E15EF7D4D1"
+  }
+]

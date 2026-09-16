@@ -1,0 +1,331 @@
+.booking-page {
+    min-height: 100vh;
+    padding: 40px;
+    background: #f7f7f2;
+    color: #111;
+}
+
+.booking-back {
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    cursor: pointer;
+    color: #111;
+}
+
+.booking-back:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.booking-card {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 35px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1px solid #e7e7e2;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+}
+
+.booking-eyebrow,
+.success-eyebrow {
+    margin: 0 0 2px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: #777;
+}
+
+.booking-card h1 {
+    margin: 0;
+    font-size: 42px;
+    letter-spacing: -0.04em;
+}
+
+.booking-with {
+    margin: 0 0 18px;
+    color: #666;
+    font-size: 16px;
+}
+
+.booking-card label {
+    margin-top: 4px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.booking-card input,
+.booking-card textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #111;
+    font-size: 15px;
+    outline: none;
+}
+
+.booking-card input:focus,
+.booking-card textarea:focus {
+    border-color: #111;
+}
+
+.booking-card input:disabled,
+.booking-card textarea:disabled {
+    background: #f5f5f2;
+    cursor: not-allowed;
+}
+
+.booking-card textarea {
+    height: 110px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.confirm-booking {
+    margin-top: 4px;
+    padding: 15px;
+    border: none;
+    border-radius: 15px;
+    background: #111;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.confirm-booking:hover {
+    transform: translateY(-1px);
+}
+
+.confirm-booking:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.booking-success-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.booking-success-card {
+    width: min(520px, 100%);
+    background: #fff;
+    border: 1px solid #e5e5df;
+    border-radius: 28px;
+    padding: 48px 40px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
+    animation: successCardIn 0.5s ease;
+}
+
+.receipt-animation {
+    width: 92px;
+    height: 108px;
+    margin: 0 auto 28px;
+    border: 2px solid #111;
+    border-radius: 12px;
+    position: relative;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    animation: receiptIn 0.7s ease;
+}
+
+.receipt-animation::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(
+        135deg,
+        transparent 5px,
+        #fff 5px
+    );
+    border-bottom: 2px solid #111;
+}
+
+.receipt-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #dff5e9;
+    color: #087443;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    animation: checkPop 0.6s ease 0.3s both;
+}
+
+.receipt-line {
+    height: 4px;
+    border-radius: 5px;
+    background: #e8e8e2;
+}
+
+.line-one {
+    width: 50px;
+}
+
+.line-two {
+    width: 62px;
+}
+
+.line-three {
+    width: 40px;
+}
+
+.booking-success-card h1 {
+    margin: 8px 0 12px;
+    font-size: 42px;
+    letter-spacing: -0.04em;
+}
+
+.success-main-text {
+    max-width: 420px;
+    margin: 0 auto 25px;
+    color: #666;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.pending-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    text-align: left;
+    padding: 17px;
+    background: #fff7dc;
+    border: 1px solid #f1df9c;
+    border-radius: 16px;
+    margin-bottom: 22px;
+}
+
+.pending-dot {
+    width: 10px;
+    height: 10px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: #d79b00;
+    flex-shrink: 0;
+    animation: pendingPulse 1.4s infinite;
+}
+
+.pending-notice strong {
+    display: block;
+    color: #765700;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.pending-notice p {
+    margin: 0;
+    color: #856f36;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.redirect-message {
+    color: #999;
+    font-size: 13px;
+    animation: fadeMessage 1.5s infinite;
+}
+
+@keyframes successCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes receiptIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) rotate(-4deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) rotate(0);
+    }
+}
+
+@keyframes checkPop {
+    from {
+        opacity: 0;
+        transform: scale(0.4);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pendingPulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.45;
+        transform: scale(0.75);
+    }
+}
+
+@keyframes fadeMessage {
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 600px) {
+    .booking-page {
+        padding: 25px 18px;
+    }
+
+    .booking-card {
+        margin: 30px auto;
+        padding: 25px;
+        border-radius: 20px;
+    }
+
+    .booking-card h1,
+    .booking-success-card h1 {
+        font-size: 34px;
+    }
+
+    .booking-success-card {
+        padding: 38px 24px;
+        border-radius: 22px;
+    }
+}

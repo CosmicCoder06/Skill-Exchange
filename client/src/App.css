@@ -1,0 +1,101 @@
+#root {
+    min-height: 100vh;
+}
+
+.app-page-with-sidebar {
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.app-page-with-sidebar:has(.profile-sidebar):not(.app-page-profile) > :not(.profile-sidebar) {
+    margin-left: 98px;
+    transition: margin-left .22s ease;
+}
+
+@media (min-width: 701px) {
+    .app-page-with-sidebar .profile-sidebar {
+        width: 98px;
+        transition: width .22s ease, box-shadow .22s ease;
+    }
+
+    .app-page-with-sidebar .profile-sidebar:hover {
+        width: 236px;
+        align-items: flex-start;
+        box-shadow: 12px 0 30px rgba(23, 107, 78, .12);
+    }
+
+    .app-page-with-sidebar .profile-sidebar:hover .sidebar-logo {
+        margin-left: 8px;
+    }
+
+    .app-page-with-sidebar .profile-sidebar:hover .sidebar-navigation {
+        align-items: stretch;
+        padding: 0 4px;
+    }
+
+    .app-page-with-sidebar .profile-sidebar:hover .sidebar-item,
+    .app-page-with-sidebar .profile-sidebar:hover .sidebar-logout {
+        width: 208px;
+        min-width: 208px;
+        height: 52px;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 10px 14px;
+    }
+
+    .app-page-with-sidebar .profile-sidebar:hover .sidebar-text {
+        font-size: 12px;
+    }
+
+    .app-page-with-sidebar:has(.profile-sidebar:hover):not(.app-page-profile) > :not(.profile-sidebar) {
+        margin-left: 236px;
+    }
+
+    .app-page-profile:has(.profile-sidebar:hover) .profile-workspace {
+        margin-left: 236px;
+        transition: margin-left .22s ease;
+    }
+}
+
+@media (max-width: 700px) {
+    .app-page-with-sidebar {
+        padding-bottom: 78px;
+    }
+
+    .app-page-with-sidebar:has(.profile-sidebar):not(.app-page-profile) > :not(.profile-sidebar) {
+        margin-left: 0;
+    }
+
+    .app-page-with-sidebar .profile-sidebar {
+        inset: auto 0 0;
+        width: 100%;
+        height: 68px;
+        flex-direction: row;
+        justify-content: center;
+        padding: 6px 8px;
+        border-top: 1px solid #dce8e1;
+        border-right: 0;
+        overflow-x: auto;
+    }
+
+    .app-page-with-sidebar .sidebar-logo,
+    .app-page-with-sidebar .sidebar-logout {
+        display: none;
+    }
+
+    .app-page-with-sidebar .sidebar-navigation {
+        flex-direction: row;
+        justify-content: center;
+        gap: 4px;
+        margin: 0;
+    }
+
+    .app-page-with-sidebar .sidebar-item {
+        width: auto;
+        min-width: 58px;
+        height: 54px;
+        padding: 5px 7px;
+    }
+}
+/* @teamcosmiccoders */

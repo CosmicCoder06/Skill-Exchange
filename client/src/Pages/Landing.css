@@ -1,1 +1,2 @@
 .public-nav-actions{display:flex;align-items:center;gap:18px}.nav-join{padding:11px 16px!important;border-radius:999px!important;background:#176b4e!important;color:#fff!important;box-shadow:0 9px 22px rgba(23,107,78,.2)}.nav-join span{margin-left:7px}.home-page:has(.public-nav-actions) .home-hero{min-height:650px}.home-page:has(.public-nav-actions) .home-cta{margin-bottom:0}@media(max-width:560px){.public-nav-actions{gap:8px}.public-nav-actions .home-text-button{font-size:13px}.nav-join{padding:9px 12px!important;font-size:13px}}
+/* @teamcosmiccoders */

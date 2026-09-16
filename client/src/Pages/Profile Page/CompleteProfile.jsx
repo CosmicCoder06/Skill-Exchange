@@ -4,6 +4,7 @@ import "./CompleteProfile.css";
 const emptyProfile = {
     bio: "",
     skillsToTeach: "",
+    teachingSkillLevels: {},
     skillsToLearn: "",
     availability: "",
     hourlyRate: "",
@@ -11,7 +12,7 @@ const emptyProfile = {
     coverImageUrl: ""
 };
 
-function CompleteProfile({ token, onComplete, onLater }) {
+function CompleteProfile({ token, role, onComplete, onLater }) {
     const [formData, setFormData] = useState(emptyProfile);
     const [error, setError] = useState("");
     const [saving, setSaving] = useState(false);
@@ -45,6 +46,8 @@ function CompleteProfile({ token, onComplete, onLater }) {
                         profile.skillsToTeach
                             ?.filter(Boolean)
                             .join(", ") || "",
+
+                    teachingSkillLevels: profile.teachingSkillLevels || {},
 
                     skillsToLearn:
                         profile.skillsToLearn
@@ -89,6 +92,13 @@ function CompleteProfile({ token, onComplete, onLater }) {
         }));
     }
 
+    function setSkillLevel(skill, level) {
+        setFormData((current) => ({
+            ...current,
+            teachingSkillLevels: { ...current.teachingSkillLevels, [skill]: level }
+        }));
+    }
+
     // =========================
     // CONVERT COMMA SEPARATED
     // VALUES INTO ARRAYS
@@ -100,6 +110,88 @@ function CompleteProfile({ token, onComplete, onLater }) {
             .map((item) => item.trim())
             .filter(Boolean);
     }
+       function validateProfile() {
+    const bio = formData.bio.trim();
+
+    const skillsToTeach = [
+        ...new Set(
+            asList(formData.skillsToTeach).map((skill) =>
+                skill.toLowerCase()
+            )
+        )
+    ];
+
+    const skillsToLearn = [
+        ...new Set(
+            asList(formData.skillsToLearn).map((skill) =>
+                skill.toLowerCase()
+            )
+        )
+    ];
+
+    if (bio.length < 10) {
+        return "Bio must contain at least 10 characters.";
+    }
+
+    if (skillsToTeach.length === 0) {
+        return "Add at least one skill you can teach.";
+    }
+
+    if (role !== "mentor" && skillsToLearn.length === 0) {
+        return "Add at least one skill you want to learn.";
+    }
+
+    if (
+        formData.hourlyRate !== "" &&
+        (
+            !Number.isFinite(Number(formData.hourlyRate)) ||
+            Number(formData.hourlyRate) < 0
+        )
+    ) {
+        return "Hourly rate must be a valid non-negative number.";
+    }
+
+    const validateUrl = (value, fieldName) => {
+        if (!value.trim()) {
+            return null;
+        }
+
+        try {
+            const url = new URL(value.trim());
+
+            if (url.protocol !== "http:" && url.protocol !== "https:") {
+                return `${fieldName} must use http or https.`;
+            }
+
+            return null;
+        } catch {
+            return `${fieldName} must be a valid URL.`;
+        }
+    };
+
+    const avatarError = validateUrl(
+        formData.avatarUrl,
+        "Profile image URL"
+    );
+
+    if (avatarError) {
+        return avatarError;
+    }
+
+    const coverError = validateUrl(
+        formData.coverImageUrl,
+        "Cover image URL"
+    );
+
+    if (coverError) {
+        return coverError;
+    }
+
+    return "";
+}
+
+
+
 
     // =========================
     // SAVE PROFILE
@@ -115,15 +207,10 @@ function CompleteProfile({ token, onComplete, onLater }) {
             asList(formData.skillsToLearn);
 
         // Required fields
-        if (
-            !formData.bio.trim() ||
-            !skillsToTeach.length ||
-            !skillsToLearn.length
-        ) {
-            setError(
-                "Add your bio, teaching skills, and learning skills to finish your profile."
-            );
+        const validationError = validateProfile();
 
+        if (validationError) {
+            setError(validationError);
             return;
         }
 
@@ -145,8 +232,9 @@ function CompleteProfile({ token, onComplete, onLater }) {
                         bio: formData.bio,
 
                         skillsToTeach,
+                        teachingSkillLevels: Object.fromEntries(skillsToTeach.map((skill) => [skill, formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"])),
 
-                        skillsToLearn,
+                        ...(role === "mentor" ? {} : { skillsToLearn }),
 
                         availability:
                             asList(
@@ -294,7 +382,7 @@ function CompleteProfile({ token, onComplete, onLater }) {
                         </label>
 
 
-                        <label>
+                        {role !== "mentor" && <label>
                             Skills you want to learn <b>*</b>
 
                             <input
@@ -305,9 +393,31 @@ function CompleteProfile({ token, onComplete, onLater }) {
                                 placeholder="Design, Python"
                                 onChange={handleChange}
                             />
-                        </label>
+                        </label>}
 
                     </div>
+
+                    {role === "mentor" && asList(formData.skillsToTeach).length > 0 && (
+                        <section className="skill-level-picker">
+                            <p>TEACHING CONFIDENCE</p>
+                            <h3>Choose your level for each teaching skill</h3>
+
+                            {asList(formData.skillsToTeach).map((skill) => (
+                                <label key={skill} className="skill-level-row">
+                                    <span>{skill}</span>
+                                    <select
+                                        value={formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"}
+                                        onChange={(event) => setSkillLevel(skill, event.target.value)}
+                                    >
+                                        <option>Beginner</option>
+                                        <option>Intermediate</option>
+                                        <option>Advanced</option>
+                                        <option>Expert</option>
+                                    </select>
+                                </label>
+                            ))}
+                        </section>
+                    )}
 
 
                     {/* AVAILABILITY + RATE */}
@@ -389,3 +499,4 @@ function CompleteProfile({ token, onComplete, onLater }) {
 }
 
 export default CompleteProfile;
+// @teamcosmiccoders

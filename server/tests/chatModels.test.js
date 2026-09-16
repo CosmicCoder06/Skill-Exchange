@@ -37,3 +37,4 @@ test("message trims content and rejects empty text", () => {
     assert.equal(message.content, "")
     assert.ok(error.errors.content)
 })
+// @teamcosmiccoders

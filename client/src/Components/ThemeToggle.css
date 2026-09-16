@@ -1,0 +1,28 @@
+.theme-toggle {
+    position: relative;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(23, 107, 78, 0.25);
+    border-radius: 50%;
+    background: #ffffff;
+    color: #176b4e;
+    cursor: pointer;
+    font-size: 19px;
+    line-height: 1;
+    box-shadow: 0 10px 26px rgba(7, 34, 23, 0.2);
+}
+
+.theme-toggle:hover {
+    background: #ffffff;
+}
+
+
+
+@media (max-width: 700px) {
+    .theme-toggle {
+                width: 40px;
+        height: 40px;
+    }
+}
+/* @teamcosmiccoders */

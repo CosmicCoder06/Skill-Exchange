@@ -18,7 +18,7 @@ function DiscoverPage({
         async function loadUsers() {
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/getData`,
+                    `${import.meta.env.VITE_API_URL}/mentors?q=${encodeURIComponent(query)}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -51,8 +51,8 @@ function DiscoverPage({
                     );
                 }
 
-                const users = Array.isArray(data.data)
-                    ? data.data
+                const users = Array.isArray(data.mentors)
+                    ? data.mentors
                     : [];
 
                 const otherUsers = users.filter(
@@ -126,7 +126,7 @@ function DiscoverPage({
         }
 
         loadUsers();
-    }, [token]);
+    }, [token, query]);
 
     const matches = useMemo(() => {
         const search = query.toLowerCase().trim();
@@ -173,14 +173,6 @@ function DiscoverPage({
             </nav>
 
             <header className="discover-header">
-                <button
-                    className="page-back"
-                    onClick={onHome}
-                >
-                    <span>←</span>
-                    Back home
-                </button>
-
                 <div className="discover-kicker">
                     <span></span>
                     COMMUNITY DIRECTORY
@@ -390,3 +382,4 @@ function DiscoverPage({
 }
 
 export default DiscoverPage;
+// @teamcosmiccoders

@@ -1,0 +1,51 @@
+/* Sessions are the deliberate receipt-card exception. */
+body .bookings-page .booking-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr)); gap:28px; align-items:start; grid-auto-rows:auto; }
+body .bookings-page .booking-card.session-receipt {
+ padding:28px 26px 36px !important; background:#fffefa !important; border:1px solid #e4e0d6 !important; border-bottom:0 !important; border-radius:0 !important;
+ box-shadow:0 8px 24px #26352a0a !important; position:relative; overflow:visible; height:auto; gap:0; transform:none;
+}
+body .session-receipt::before { display:none; }
+body .session-receipt::after { content:''; position:absolute; left:-1px; right:-1px; bottom:-10px; height:12px; background:linear-gradient(135deg,#fffefa 25%,transparent 25%) -6px 0/12px 12px,linear-gradient(225deg,#fffefa 25%,transparent 25%) -6px 0/12px 12px; }
+.receipt-heading { display:flex; justify-content:space-between; gap:12px; font-family:'Courier New',monospace; font-size:11px; font-weight:700; letter-spacing:1px; color:#446354; }
+.receipt-number { font:12px 'Courier New',monospace; letter-spacing:1px; color:#849087; margin:12px 0 24px; padding-bottom:20px; border-bottom:1px dashed #cdd1c6; }
+body .session-receipt .booking-card-top { margin-bottom:22px; gap:14px; }
+body .session-receipt .booking-person-avatar { width:44px; height:44px; min-width:44px; font-size:18px; }
+body .session-receipt .booking-person-info h3 { font-size:22px; letter-spacing:-.5px; margin:0 0 4px; }
+body .session-receipt .booking-person-info p { font-size:13px; margin:4px 0 0; }
+body .session-receipt .booking-info { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:20px; padding:18px 0; border-block:1px dashed #cdd1c6; }
+body .session-receipt .booking-info > div { border:0; border-radius:0; background:none; padding:0; }
+body .session-receipt .booking-info span, .receipt-label { font:11px 'Courier New',monospace; letter-spacing:1px; color:#788477; }
+body .session-receipt .booking-info strong { font:600 15px 'Courier New',monospace; margin-top:8px; }
+body .session-receipt .booking-message { padding:12px 0 !important; margin:10px 0; border-bottom:0 !important; }
+body .session-receipt .booking-message p { font-size:14px; line-height:1.65; margin:6px 0; }
+body .session-receipt .booking-status-row { margin:0 0 10px; }
+body .session-receipt .booking-status { font-size:11px; padding:6px 10px; }
+.receipt-meeting { margin:18px 0 6px; padding-top:20px; border-top:1px dashed #cdd1c6; }
+.receipt-meeting p { font-size:13px; line-height:1.6; color:#68786d; }
+body .session-receipt .join-session-button { display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:14px; padding:13px 16px; margin:12px 0; border-radius:6px; }
+.receipt-meeting form { display:grid; gap:10px; margin-top:12px; }
+.receipt-meeting form a { font-size:14px; color:#196f54; font-weight:700; }
+.receipt-meeting label { font-size:12px; }
+.receipt-meeting input { width:100%; min-width:0; border:1px solid #d0d8ce; background:white; border-radius:4px; padding:10px; font-size:13px; }
+body .session-receipt button { min-height:38px; font-size:13px; border-radius:5px; }
+body .session-receipt .receipt-edit-link { background:transparent; color:#196f54; border:0; padding:4px 0; text-decoration:underline; }
+.receipt-meeting [role=alert] { color:#a73526; }
+/* Legible login typography on the light green showcase. */
+body .login-page { font-family:Inter,'Segoe UI',Arial,sans-serif; }
+body .login-page .showcase-description, body .login-page .feature-item span, body .login-page .showcase-footer { color:#3b584c; }
+body .login-page .brand > span > span, body .login-page .mobile-brand > span > span { color:#196f54; }
+body .login-page .feature-item strong { color:#183b2c; font-size:15px; }
+body .login-page .feature-item span { font-size:14px; line-height:1.6; }
+body .login-page .feature-icon { color:#196f54; background:#c5dfcf; border-color:#9fbead; }
+body .login-page .showcase-content h1 { letter-spacing:-.045em; line-height:1.08; }
+body .login-page .login-heading p, body .login-page .register-text { color:#54665d; }
+body .login-page input { font-family:inherit; font-size:16px; color:#19352a; }
+body .login-page input:-webkit-autofill { -webkit-text-fill-color:#19352a; }
+.manual-payment { border-block:1px solid #d2dbd2; padding:24px 0; margin:26px 0; display:flex; flex-direction:column; gap:12px; }
+.manual-payment h2 { margin:0; font-size:23px; letter-spacing:-.5px; }
+.manual-payment p { margin:0; font-size:14px; line-height:1.7; color:#486050; }
+.manual-payment label { font-size:14px; }
+.manual-payment select, .manual-payment input:not([type=file]) { width:100%; padding:12px; border:1px solid #bfcfc2; border-radius:5px; background:white; color:#19352a; font:inherit; }
+.manual-payment .payment-qr { width:230px; height:230px; max-width:100%; object-fit:contain; background:white; padding:12px; align-self:flex-start; }
+.manual-payment [role=alert] { color:#b02b21; }
+.manual-payment button { padding:12px 18px; border:1px solid #196f54; border-radius:5px; background:#196f54; color:white; cursor:pointer; }

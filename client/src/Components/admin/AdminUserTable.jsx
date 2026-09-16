@@ -372,6 +372,24 @@ export default function AdminUserTable({
 
                                             <button
                                                 type="button"
+                                                className="admin-action-verify"
+                                                disabled={
+                                                    busy ||
+                                                    isSelf
+                                                }
+                                                onClick={() =>
+                                                    onUpdate(user._id, {
+                                                        isVerified: !verified,
+                                                    })
+                                                }
+                                            >
+                                                {verified
+                                                    ? "Unverify"
+                                                    : "Verify"}
+                                            </button>
+
+                                            <button
+                                                type="button"
                                                 className="admin-action-secondary"
                                                 disabled={
                                                     busy ||
@@ -594,3 +612,4 @@ export default function AdminUserTable({
         </>
     );
 }
+// @teamcosmiccoders
