@@ -11,7 +11,7 @@ const {
 
 const router = express.Router();
 
-router.use(verifyToken, authorize("admin"));
+router.use("/admin", verifyToken, authorize("admin"));
 router.get("/admin/overview", getOverview);
 router.get("/admin/users", listUsers);
 router.patch("/admin/users/:id", updateUser);

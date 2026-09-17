@@ -10,13 +10,16 @@ function BookingPage({
 }) {
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
+    const [duration, setDuration] = useState(60);
     const [message, setMessage] = useState("");
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [payment, setPayment] = useState(null);
-    const [paymentError, setPaymentError] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState("pay_later");
-    const [paymentReference, setPaymentReference] = useState("");
+    const [availability, setAvailability] = useState({
+        checking: false,
+        available: null,
+        message: ""
+    });
 
     useEffect(() => {
         let active = true;
@@ -33,12 +36,10 @@ function BookingPage({
             .then((data) => {
                 if (active) {
                     setPayment(data);
-                    setPaymentError("");
                 }
             })
             .catch(() => {
                 if (active) {
-                    // Fallback to free session if payment info is unavailable
                     setPayment({
                         name: mentorName,
                         amount: 0,
@@ -53,25 +54,56 @@ function BookingPage({
         };
     }, [mentorId, mentorName, token]);
 
-    async function createBooking() {
-        const paymentData = payment || {
-            name: mentorName,
-            amount: 0,
-            qr: "",
-            currency: "INR"
-        };
-
-        if (
-            paymentData.amount > 0 &&
-            paymentMethod === "qr" &&
-            !/^[A-Za-z0-9-]{6,64}$/.test(paymentReference.trim())
-        ) {
-            setPaymentError("Enter the transaction reference after paying.");
+    // Live slot availability check
+    useEffect(() => {
+        let active = true;
+        if (!mentorId || !date || !time) {
+            setAvailability({ checking: false, available: null, message: "" });
             return;
         }
 
+        const timer = setTimeout(() => {
+            setAvailability({ checking: true, available: null, message: "" });
+            fetch(
+                `${import.meta.env.VITE_API_URL}/bookings/check-availability?mentor=${mentorId}&date=${date}&time=${time}&duration=${duration}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            )
+                .then(async (res) => {
+                    const data = await res.json();
+                    if (!active) return;
+                    setAvailability({
+                        checking: false,
+                        available: data.available === true,
+                        message: data.message || ""
+                    });
+                })
+                .catch(() => {
+                    if (!active) return;
+                    setAvailability({
+                        checking: false,
+                        available: true,
+                        message: "Slot ready"
+                    });
+                });
+        }, 350);
+
+        return () => {
+            active = false;
+            clearTimeout(timer);
+        };
+    }, [mentorId, date, time, duration, token]);
+
+    const baseHourlyRate = payment?.amount || 0;
+    const calculatedAmount = Math.round((baseHourlyRate * duration) / 60);
+
+    async function createBooking() {
         if (!date || !time) {
             alert("Please select date and time.");
+            return;
+        }
+
+        if (availability.available === false) {
+            alert(availability.message || "This time slot is unavailable. Please choose another slot.");
             return;
         }
 
@@ -90,10 +122,8 @@ function BookingPage({
                         mentor: mentorId,
                         date,
                         time,
-                        message,
-                        quotedAmount: paymentData.amount,
-                        paymentMethod: paymentData.amount === 0 ? "free" : paymentMethod,
-                        paymentReference: paymentData.amount === 0 ? "" : paymentReference
+                        duration,
+                        message
                     })
                 }
             );
@@ -101,7 +131,7 @@ function BookingPage({
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data.message || "Booking failed");
+                alert(data.message || "Booking request failed");
                 setLoading(false);
                 return;
             }
@@ -115,7 +145,7 @@ function BookingPage({
             }, 2500);
         } catch (error) {
             console.error("Booking error:", error);
-            alert("Booking failed. Please try again.");
+            alert("Booking request failed. Please try again.");
             setLoading(false);
         }
     }
@@ -132,26 +162,23 @@ function BookingPage({
                     </div>
 
                     <p className="success-eyebrow">
-                        SESSION REQUEST SENT
+                        TIME SLOT REQUESTED
                     </p>
 
                     <h1>Request submitted</h1>
 
                     <p className="success-main-text">
                         Your session request with{" "}
-                        <strong>{mentorName}</strong> has been sent
-                        successfully.
+                        <strong>{mentorName}</strong> for <strong>{duration} minutes</strong> has been sent.
                     </p>
 
                     <div className="pending-notice">
                         <span className="pending-dot"></span>
 
                         <div>
-                            <strong>Waiting for mentor approval</strong>
-
+                            <strong>Step 1 Complete: Waiting for mentor approval</strong>
                             <p>
-                                Your request is pending. You'll be able
-                                to track its status from My Sessions.
+                                Once your mentor approves the time slot, payment options will become available in My Sessions to confirm your booking.
                             </p>
                         </div>
                     </div>
@@ -179,7 +206,7 @@ function BookingPage({
 
             <section className="booking-card">
                 <p className="booking-eyebrow">
-                    SESSION REQUEST
+                    SESSION BOOKING
                 </p>
 
                 <h1>Book Session</h1>
@@ -188,8 +215,46 @@ function BookingPage({
                     With {payment?.name || mentorName}
                 </p>
 
-                <label>Select Date</label>
+                <div className="booking-approval-steps-card">
+                    <div className="approval-step-item">
+                        <span className="step-num active">1</span>
+                        <div>
+                            <strong>Pick Time & Duration</strong>
+                            <small>Check slot availability</small>
+                        </div>
+                    </div>
+                    <div className="approval-step-item">
+                        <span className="step-num">2</span>
+                        <div>
+                            <strong>Mentor Approval</strong>
+                            <small>Mentor approves slot</small>
+                        </div>
+                    </div>
+                    <div className="approval-step-item">
+                        <span className="step-num">3</span>
+                        <div>
+                            <strong>Pay & Confirm</strong>
+                            <small>Confirm with payment</small>
+                        </div>
+                    </div>
+                </div>
 
+                <label>Session Duration</label>
+                <div className="duration-pill-group">
+                    {[30, 45, 60, 90, 120].map((mins) => (
+                        <button
+                            key={mins}
+                            type="button"
+                            className={`duration-pill ${duration === mins ? "active" : ""}`}
+                            onClick={() => setDuration(mins)}
+                            disabled={loading}
+                        >
+                            {mins >= 60 ? (mins === 60 ? "1 hr" : `${mins / 60} hrs`) : `${mins} mins`}
+                        </button>
+                    ))}
+                </div>
+
+                <label>Select Date</label>
                 <input
                     type="date"
                     value={date}
@@ -199,7 +264,6 @@ function BookingPage({
                 />
 
                 <label>Select Time</label>
-
                 <input
                     type="time"
                     value={time}
@@ -207,43 +271,53 @@ function BookingPage({
                     disabled={loading}
                 />
 
-                <label>Message</label>
+                {date && time && (
+                    <div className={`slot-availability-badge ${availability.checking ? "checking" : availability.available ? "available" : "unavailable"}`}>
+                        {availability.checking ? (
+                            <span>⏳ Checking slot availability…</span>
+                        ) : availability.available ? (
+                            <span>✓ Time slot is available for {duration} mins</span>
+                        ) : (
+                            <span>⚠️ {availability.message || "Time slot is unavailable. Please choose another time."}</span>
+                        )}
+                    </div>
+                )}
 
+                <label>Message (Optional)</label>
                 <textarea
-                    placeholder="Tell mentor about your requirement"
+                    placeholder="Tell mentor about your goals or topics you want to cover"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     disabled={loading}
                 />
 
-                <section className="manual-payment">
-                    <h2>Payment</h2>
-                    {!payment && !paymentError && <p>Loading mentor payment details…</p>}
-                    {payment && <>
-                        <p><strong>{payment.amount === 0 ? 'Free session' : `₹${payment.amount.toLocaleString('en-IN')} · 1-hour session`}</strong></p>
-                        {payment.amount > 0 && <>
-                            <label htmlFor="payment-method">Payment option</label>
-                            <select id="payment-method" value={paymentMethod} disabled={loading} onChange={e => { setPaymentMethod(e.target.value); setPaymentError(''); }}>
-                                <option value="pay_later">Pay later / arrange with mentor</option>
-                                {payment.qr && <option value="qr">Pay using mentor’s QR</option>}
-                            </select>
-                            {!payment.qr && <p>This mentor has not added a payment QR yet.</p>}
-                            {paymentMethod === 'qr' && <>
-                                <img className="payment-qr" src={payment.qr} alt={`Payment QR for ${payment.name}`} />
-                                <p>Check the recipient and amount in your payment app. After paying, enter the transaction reference. Your mentor will verify the transfer.</p>
-                                <label htmlFor="payment-reference">Transaction reference / UTR</label>
-                                <input id="payment-reference" value={paymentReference} maxLength={64} disabled={loading} onChange={e => setPaymentReference(e.target.value)} placeholder="Enter your payment reference" />
-                            </>}
-                        </>}
-                    </>}
-                    {paymentError && <p role="alert">{paymentError}</p>}
-                </section>
+                <div className="pricing-calculation-card">
+                    <div className="pricing-calc-row">
+                        <span>Mentor Rate:</span>
+                        <strong>{baseHourlyRate === 0 ? "Free" : `₹${baseHourlyRate.toLocaleString("en-IN")}/hr`}</strong>
+                    </div>
+                    <div className="pricing-calc-row">
+                        <span>Selected Duration:</span>
+                        <strong>{duration} minutes</strong>
+                    </div>
+                    <div className="pricing-calc-divider" />
+                    <div className="pricing-calc-total">
+                        <span>Calculated Fee:</span>
+                        <strong className="calc-amount">
+                            {calculatedAmount === 0 ? "Free Session" : `₹${calculatedAmount.toLocaleString("en-IN")}`}
+                        </strong>
+                    </div>
+                    <p className="pricing-payment-note">
+                        💡 <em>Payment is unlocked after the mentor approves this time slot.</em>
+                    </p>
+                </div>
+
                 <button
                     className="confirm-booking"
                     onClick={createBooking}
-                    disabled={loading || !date || !time}
+                    disabled={loading || !date || !time || availability.checking || availability.available === false}
                 >
-                    {loading ? "Sending Request..." : "Confirm Booking"}
+                    {loading ? "Sending Request..." : "Request Time Slot for Approval"}
                 </button>
             </section>
         </main>

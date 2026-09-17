@@ -539,6 +539,9 @@ function App() {
                     onHome={() =>
                         resetNavigation("home")
                     }
+                    onBookings={() =>
+                        navigateTo("bookings")
+                    }
                     onProfile={() => {
                         setViewingUserId(null);
                         navigateTo("profile");

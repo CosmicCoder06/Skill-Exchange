@@ -3,6 +3,10 @@ const express = require("express");
 const router = express.Router();
 
 const {
+    checkAvailability,
+    completeBookingPayment,
+    suggestSlots,
+    chooseSlot,
     createBooking,
     getBookings,
     getMentorRequests,
@@ -16,6 +20,10 @@ const {
 const authMiddleware =
     require("../Backend Configuration/Configuration Folders/Middleware Configuration/authMiddleware");
 
+router.get('/bookings/check-availability', authMiddleware, checkAvailability);
+router.put('/bookings/:id/pay', authMiddleware, completeBookingPayment);
+router.put('/bookings/:id/suggest-slots', authMiddleware, suggestSlots);
+router.put('/bookings/:id/choose-slot', authMiddleware, chooseSlot);
 router.put('/bookings/:id/meeting', authMiddleware, updateMeeting);
 
 

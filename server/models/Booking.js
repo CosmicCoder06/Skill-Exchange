@@ -67,9 +67,23 @@ const bookingSchema = new mongoose.Schema(
     {
         meetingUrl: { type: String, default: '', maxlength: 200 },
         paymentAmount: { type: Number, min: 0 },
-        paymentMethod: { type: String, enum: ['free', 'pay_later', 'qr'] },
-        paymentStatus: { type: String, enum: ['not_required', 'unpaid', 'pending_verification', 'verified'] },
+        baseSessionAmount: { type: Number, default: 0, min: 0 },
+        gstAmount: { type: Number, default: 0, min: 0 },
+        grossAmountWithGst: { type: Number, default: 0, min: 0 },
+        paymentMethod: { type: String, enum: ['free', 'pay_later', 'qr', 'wallet', 'upi', 'card', 'upi_card'] },
+        paymentStatus: { type: String, enum: ['not_required', 'awaiting_approval', 'unpaid', 'pending_verification', 'verified', 'declined', 'cancelled'] },
         paymentReference: { type: String, maxlength: 64, default: '' },
+        learnerConvenienceFee: { type: Number, default: 0, min: 0 },
+        mentorPlatformFee: { type: Number, default: 0, min: 0 },
+        mentorEarnings: { type: Number, default: 0, min: 0 },
+        totalAmountPaid: { type: Number, default: 0, min: 0 },
+        duration: {
+            type: Number,
+            required: true,
+            default: 60,
+            min: 15,
+            max: 480
+        },
         mentor: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
@@ -103,10 +117,37 @@ const bookingSchema = new mongoose.Schema(
             maxlength: 1000
         },
 
+        suggestedSlots: [
+            {
+                date: { type: String, required: true, trim: true },
+                time: { type: String, required: true, trim: true },
+                isPreferred: { type: Boolean, default: false }
+            }
+        ],
+        actionExpiresAt: {
+            type: Date,
+            index: true
+        },
+        lastActionAt: {
+            type: Date,
+            default: Date.now
+        },
+        cancellationReason: {
+            type: String,
+            default: "",
+            trim: true,
+            maxlength: 500
+        },
+        cancelledBy: {
+            type: String,
+            enum: ["mentor", "learner", "system"]
+        },
         status: {
             type: String,
             enum: [
                 "pending",
+                "approved",
+                "slots_offered",
                 "accepted",
                 "rejected",
                 "completed",

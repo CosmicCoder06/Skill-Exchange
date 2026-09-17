@@ -60,6 +60,11 @@ const messageSchema =
                     ref: "User",
                 },
             ],
+
+            inActiveSession: {
+                type: Boolean,
+                default: false,
+            },
         },
         { timestamps: true }
     )
