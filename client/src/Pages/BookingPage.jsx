@@ -5,6 +5,7 @@ function BookingPage({
     token,
     mentorId,
     mentorName,
+    onBack,
     onBookingCreated
 }) {
     const [date, setDate] = useState("");
@@ -13,21 +14,62 @@ function BookingPage({
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const [payment, setPayment] = useState(null);
-    const [paymentError, setPaymentError] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState('pay_later');
-    const [paymentReference, setPaymentReference] = useState('');
+    const [paymentError, setPaymentError] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState("pay_later");
+    const [paymentReference, setPaymentReference] = useState("");
+
     useEffect(() => {
         let active = true;
-        fetch(`${import.meta.env.VITE_API_URL}/mentors/${mentorId}/payment`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.message); return data; })
-            .then(data => { if (active) setPayment(data); })
-            .catch(err => { if (active) setPaymentError(err.message || 'Unable to load payment details. Refresh to retry.'); });
-        return () => { active = false; };
-    }, [mentorId, token]);
+        if (!mentorId) return;
+
+        fetch(`${import.meta.env.VITE_API_URL}/mentors/${mentorId}/payment`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+            .then(async (r) => {
+                const data = await r.json();
+                if (!r.ok) throw new Error(data.message);
+                return data;
+            })
+            .then((data) => {
+                if (active) {
+                    setPayment(data);
+                    setPaymentError("");
+                }
+            })
+            .catch(() => {
+                if (active) {
+                    // Fallback to free session if payment info is unavailable
+                    setPayment({
+                        name: mentorName,
+                        amount: 0,
+                        qr: "",
+                        currency: "INR"
+                    });
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [mentorId, mentorName, token]);
 
     async function createBooking() {
-        if (!payment) return;
-        if (payment.amount > 0 && paymentMethod === 'qr' && !/^[A-Za-z0-9-]{6,64}$/.test(paymentReference.trim())) { setPaymentError('Enter the transaction reference after paying.'); return; }
+        const paymentData = payment || {
+            name: mentorName,
+            amount: 0,
+            qr: "",
+            currency: "INR"
+        };
+
+        if (
+            paymentData.amount > 0 &&
+            paymentMethod === "qr" &&
+            !/^[A-Za-z0-9-]{6,64}$/.test(paymentReference.trim())
+        ) {
+            setPaymentError("Enter the transaction reference after paying.");
+            return;
+        }
+
         if (!date || !time) {
             alert("Please select date and time.");
             return;
@@ -49,9 +91,9 @@ function BookingPage({
                         date,
                         time,
                         message,
-                        quotedAmount: payment.amount,
-                        paymentMethod,
-                        paymentReference
+                        quotedAmount: paymentData.amount,
+                        paymentMethod: paymentData.amount === 0 ? "free" : paymentMethod,
+                        paymentReference: paymentData.amount === 0 ? "" : paymentReference
                     })
                 }
             );
@@ -124,6 +166,17 @@ function BookingPage({
 
     return (
         <main className="booking-page">
+            {onBack && (
+                <button
+                    type="button"
+                    className="booking-back"
+                    onClick={onBack}
+                    disabled={loading}
+                >
+                    ← Back
+                </button>
+            )}
+
             <section className="booking-card">
                 <p className="booking-eyebrow">
                     SESSION REQUEST
@@ -188,7 +241,7 @@ function BookingPage({
                 <button
                     className="confirm-booking"
                     onClick={createBooking}
-                    disabled={loading || !payment}
+                    disabled={loading || !date || !time}
                 >
                     {loading ? "Sending Request..." : "Confirm Booking"}
                 </button>

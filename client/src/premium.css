@@ -130,12 +130,12 @@ button { transition:background .18s ease, box-shadow .18s ease, color .18s ease;
  .home-page .hero-actions .home-primary { justify-content:center; }
 }
 /* User preference: flat, open layouts; no cards or boxed content panels. */
-body :is(.booking-card,.booking-success-card,.review-card,.person-row,.profile-section,.side-section,.profile-stats,.dashboard-section,.overview-card,.overview-rail,.mentor-panel,.mentor-section,.mentor-stat,.account-management-card,.admin-users-panel,.admin-stat-card,.admin-report-card,.completion-panel,.login-card,.new-chat-panel,.booking-calendar-section,.booking-section,.booking-message,.chat-list-item) {
+body :is(.review-card,.person-row,.profile-section,.side-section,.profile-stats,.dashboard-section,.overview-card,.overview-rail,.mentor-panel,.mentor-section,.mentor-stat,.account-management-card,.admin-users-panel,.admin-stat-card,.admin-report-card,.completion-panel,.login-card,.new-chat-panel,.booking-calendar-section,.booking-section,.chat-list-item) {
  border:0 !important; border-bottom:1px solid var(--premium-line) !important;
  border-radius:0 !important; box-shadow:none !important; background:transparent !important;
 }
-body :is(.booking-card,.review-card,.person-row,.profile-section,.dashboard-section,.account-management-card) { padding:26px 0 !important; }
-body :is(.booking-card,.person-row,.review-card):hover { box-shadow:none !important; background:transparent !important; }
+body :is(.review-card,.person-row,.profile-section,.dashboard-section,.account-management-card) { padding:26px 0 !important; }
+body :is(.person-row,.review-card):hover { box-shadow:none !important; background:transparent !important; }
 body .home-page .path-grid { display:block; }
 body .home-page .path-grid article { display:grid; grid-template-columns:60px 1fr 1.3fr; align-items:baseline; gap:24px; padding:28px 0; border:0; border-top:1px solid var(--premium-line); border-radius:0; box-shadow:none; background:transparent; }
 body .home-page .path-grid article b { padding:0; background:none; border-radius:0; }

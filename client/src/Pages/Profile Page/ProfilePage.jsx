@@ -202,73 +202,17 @@ function ProfilePage({
     return (
         <main className="profile-page">
 
-            <aside className="profile-sidebar">
-
-                <button
-                    className="sidebar-logo"
-                    onClick={onHome}
-                >
-                    ↗
-                </button>
-
-                <div className="sidebar-navigation">
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onHome}
-                    >
-                        <span className="sidebar-icon">⌂</span>
-                        <span className="sidebar-text">Home</span>
-                    </button>
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onDashboard}
-                    >
-                        <span className="sidebar-icon">◫</span>
-                        <span className="sidebar-text">Dashboard</span>
-                    </button>
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onMessagesClick}
-                    >
-                        <span className="sidebar-icon">◇</span>
-                        <span className="sidebar-text">Messages</span>
-                    </button>
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onBookings}
-                    >
-                        <span className="sidebar-icon">▣</span>
-                        <span className="sidebar-text">My Sessions</span>
-                    </button>
-
-                    <button
-                        className="sidebar-item active"
-                    >
-                        <span className="sidebar-icon">●</span>
-                        <span className="sidebar-text">Profile</span>
-                    </button>
-
-                </div>
-
-                <button
-                    className="sidebar-item sidebar-logout"
-                    onClick={onLogout}
-                >
-                    <span className="sidebar-icon">↪</span>
-                    <span className="sidebar-text">Logout</span>
-                </button>
-
-            </aside>
-
             <section className="profile-workspace">
 
                 <header className="profile-header">
 
-                    <div className="profile-brand">
+                    <div
+                        className="profile-brand"
+                        onClick={onHome}
+                        role="button"
+                        tabIndex={0}
+                        title="Go to Home"
+                    >
                         <strong>MY SPACE</strong>
 
                         <span>
@@ -279,6 +223,13 @@ function ProfilePage({
                     </div>
 
                     <div className="profile-header-actions">
+
+                        <button
+                            className="profile-header-link"
+                            onClick={onHome}
+                        >
+                            Home <span>→</span>
+                        </button>
 
                         <button
                             className="profile-header-link"
@@ -299,6 +250,15 @@ function ProfilePage({
                             onClick={onBookings}
                         >
                             My Sessions <span>→</span>
+                        </button>
+
+                        <button
+                            className="profile-header-logout"
+                            onClick={onLogout}
+                            title="Log out"
+                        >
+                            <span className="profile-logout-icon">↪</span>
+                            Logout
                         </button>
 
                     </div>
@@ -372,11 +332,6 @@ function ProfilePage({
                             }
                         }}
                     >
-
-                        <div className="profile-photo-fallback-letter">
-                            {initials}
-                        </div>
-
                         {profile.avatarUrl ? (
                             <img
                                 className="profile-photo"

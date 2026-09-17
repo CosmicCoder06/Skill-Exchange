@@ -21,10 +21,11 @@ router.put('/payment-settings', async (req, res) => {
 });
 router.get('/mentors/:id/payment', async (req, res) => {
   try {
-    const mentor = await User.findOne({ _id: req.params.id, role: 'mentor', isActive: true }).select('name hourlyRate +paymentQr');
-    if (!mentor) return res.status(404).json({ message: 'Mentor unavailable' });
-    res.json({ name: mentor.name, amount: mentor.hourlyRate || 0, qr: mentor.paymentQr || '', currency: 'INR' });
-  } catch { res.status(400).json({ message: 'Unable to load mentor payment details' }); }
+    const user = await User.findOne({ _id: req.params.id, isActive: true }).select('name role hourlyRate +paymentQr');
+    if (!user) return res.status(404).json({ message: 'User unavailable' });
+    const isMentor = user.role === 'mentor';
+    res.json({ name: user.name, amount: isMentor ? (user.hourlyRate || 0) : 0, qr: isMentor ? (user.paymentQr || '') : '', currency: 'INR' });
+  } catch { res.status(400).json({ message: 'Unable to load payment details' }); }
 });
 router.put('/bookings/:id/payment/verify', async (req, res) => {
   try {

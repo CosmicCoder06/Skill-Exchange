@@ -436,7 +436,133 @@
 
 .refresh-bookings:disabled { opacity: .62; cursor: wait; }
 
-.booking-card::before{content:"SESSION SUMMARY";display:block;margin:-27px -24px 20px;padding:10px 24px;border-bottom:1px solid #d7e6dc;background:linear-gradient(90deg,#e5f3e9,#f8fbf8);color:#176b4e;font-size:9px;font-weight:900;letter-spacing:.15em}.booking-card .booking-actions,.booking-card .review-completed-box{margin-top:auto}.booking-status.missed{background:#fff1ce;color:#8a5b00}.missed-session{background:#fff8e7!important;border:1px solid #f4dfac}.booking-card .booking-message p{overflow-wrap:anywhere}
+/* Solid, beautiful boxed booking cards */
+body .bookings-page .booking-card {
+    position: relative !important;
+    padding: 24px !important;
+    border: 1px solid #dce8e1 !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 24px rgba(23, 107, 78, 0.08) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+body .bookings-page .booking-card:hover {
+    transform: translateY(-3px) !important;
+    border-color: #a3cbb5 !important;
+    box-shadow: 0 14px 32px rgba(23, 107, 78, 0.12) !important;
+}
+
+.booking-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eef3f0;
+}
+
+.booking-card-kicker {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #176b4e;
+    text-transform: uppercase;
+}
+
+.booking-card .booking-card-top {
+    margin-bottom: 0;
+}
+
+.booking-card .booking-info {
+    margin-bottom: 0;
+}
+
+.booking-card .booking-info > div {
+    padding: 12px 14px;
+    border: 1px solid #e1ece4;
+    border-radius: 12px;
+    background: #fbfdfc;
+}
+
+.booking-card .booking-message {
+    margin: 0;
+    padding: 12px;
+    background: #f8faf9;
+    border: 1px solid #e8f0ec;
+    border-radius: 10px;
+}
+
+.booking-card .booking-message span {
+    font-size: 10px;
+    font-weight: 800;
+    color: #87938c;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.booking-card .booking-message p {
+    margin: 0;
+    font-size: 13px;
+    color: #2c3e35;
+    overflow-wrap: anywhere;
+}
+
+.booking-card .booking-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    margin-top: auto !important;
+    padding-top: 6px !important;
+}
+
+.booking-card .booking-actions button {
+    flex: 1 !important;
+    width: auto !important;
+    height: 44px !important;
+    margin-top: 0 !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.18s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.booking-card .booking-accept {
+    background: #176b4e !important;
+    border: 1px solid #176b4e !important;
+    color: #ffffff !important;
+}
+
+.booking-card .booking-accept:hover {
+    background: #0d5940 !important;
+    border-color: #0d5940 !important;
+    transform: translateY(-1px) !important;
+}
+
+.booking-card .booking-reject {
+    background: #ffffff !important;
+    border: 1px solid #cbd9d0 !important;
+    color: #3e5046 !important;
+}
+
+.booking-card .booking-reject:hover {
+    background: #fdf2f2 !important;
+    border-color: #f5c2be !important;
+    color: #9c271d !important;
+    transform: translateY(-1px) !important;
+}
+
+.booking-status.missed { background: #fff1ce; color: #8a5b00; }
+.missed-session { background: #fff8e7 !important; border: 1px solid #f4dfac; }
 
 .booking-calendar-section,
 .booking-calendar {

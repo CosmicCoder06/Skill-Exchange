@@ -981,6 +981,11 @@ function MyBookings({
                                         booking._id
                                     }
                                 >
+                                    <div className="booking-card-header">
+                                        <span className="booking-card-kicker">SESSION REQUEST</span>
+                                        <span className="booking-status pending">Pending</span>
+                                    </div>
+
                                     <div className="booking-card-top">
                                         <div className="booking-person-avatar">
                                             {booking
@@ -1006,11 +1011,7 @@ function MyBookings({
                                             </span>
 
                                             <p>
-                                                wants
-                                                to
-                                                learn
-                                                from
-                                                you
+                                                wants to learn from you
                                             </p>
                                         </div>
                                     </div>
@@ -1039,12 +1040,6 @@ function MyBookings({
                                                 }
                                             </strong>
                                         </div>
-                                    </div>
-
-                                    <div className="booking-status-row">
-                                        <span className="booking-status pending">
-                                            Pending
-                                        </span>
                                     </div>
 
                                     <div className="booking-message">

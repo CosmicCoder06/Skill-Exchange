@@ -224,26 +224,31 @@ const createBooking = async (req, res) => {
             });
         }
 
-        // Verify mentor exists and is actually a mentor
+        // Verify mentor/peer exists
         const mentorUser = await User.findById(mentor)
             .select("_id name role isActive hourlyRate +paymentQr");
 
         if (!mentorUser) {
             return res.status(404).json({
-                message: "Mentor not found"
+                message: "User not found"
             });
         }
 
-        if (mentorUser.role !== "mentor") {
+        if (mentorUser.role === "admin") {
             return res.status(400).json({
-                message: "Selected user is not a mentor"
+                message: "Cannot book a session with an administrator"
             });
         }
 
         if (mentorUser.isActive === false) {
             return res.status(400).json({
-                message: "This mentor is currently unavailable"
+                message: "This user is currently unavailable"
             });
+        }
+
+        if (mentorUser.role !== "mentor") {
+            mentorUser.hourlyRate = 0;
+            mentorUser.paymentQr = "";
         }
 
         // Prevent booking a past date
