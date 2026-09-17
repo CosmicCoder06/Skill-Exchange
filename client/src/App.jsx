@@ -71,24 +71,136 @@ function getCurrentUserRole(token) {
     }
 }
 
-function App() {
-    const [token, setToken] = useState(
-        localStorage.getItem("Token")
-    );
+function getPathFromState({ page, viewingUserId, bookingMentorId, chatTargetUserId, showLogin, showRegister, token }) {
+    if (!token) {
+        if (showRegister) return "/register";
+        if (showLogin) return "/login";
+        return "/";
+    }
+    switch (page) {
+        case "discover":
+            return "/discover";
+        case "mentor-dashboard":
+            return "/mentor-dashboard";
+        case "learner-dashboard":
+            return "/learner-dashboard";
+        case "profile":
+            return "/profile";
+        case "account":
+            return "/account";
+        case "user-profile":
+            return viewingUserId ? `/profile/${viewingUserId}` : "/discover";
+        case "booking":
+            return bookingMentorId ? `/booking/${bookingMentorId}` : "/discover";
+        case "bookings":
+            return "/bookings";
+        case "chat":
+            return chatTargetUserId ? `/chat/${chatTargetUserId}` : "/chat";
+        case "home":
+        default:
+            return "/";
+    }
+}
 
-    const [showRegister, setShowRegister] = useState(false);
-    const [showLogin, setShowLogin] = useState(false);
-    const [page, setPage] = useState("home");
+function parseLocation(pathname, role) {
+    const clean = pathname.replace(/\/+$/, "") || "/";
+    if (clean === "/login") return { page: "home", showLogin: true, showRegister: false };
+    if (clean === "/register") return { page: "home", showLogin: false, showRegister: true };
+    if (clean === "/" || clean === "/home") return { page: "home", showLogin: false, showRegister: false };
+    if (clean === "/discover") return { page: "discover" };
+    if (clean === "/dashboard") {
+        return { page: String(role).toLowerCase() === "mentor" ? "mentor-dashboard" : "learner-dashboard" };
+    }
+    if (clean === "/mentor-dashboard") return { page: "mentor-dashboard" };
+    if (clean === "/learner-dashboard") return { page: "learner-dashboard" };
+    if (clean === "/profile") return { page: "profile", viewingUserId: null };
+    if (clean.startsWith("/profile/") || clean.startsWith("/user/")) {
+        const id = clean.split("/")[2];
+        return { page: "user-profile", viewingUserId: id || null };
+    }
+    if (clean.startsWith("/booking/")) {
+        const id = clean.split("/")[2];
+        return { page: "booking", bookingMentorId: id || null };
+    }
+    if (clean === "/booking") return { page: "booking" };
+    if (clean === "/bookings" || clean === "/my-bookings") return { page: "bookings" };
+    if (clean.startsWith("/chat/") || clean.startsWith("/messages/")) {
+        const id = clean.split("/")[2];
+        return { page: "chat", chatTargetUserId: id || null };
+    }
+    if (clean === "/chat" || clean === "/messages") return { page: "chat" };
+    if (clean === "/account") return { page: "account" };
+    return { page: "home" };
+}
+
+function App() {
+    const initialToken = localStorage.getItem("Token");
+    const initialRole = getCurrentUserRole(initialToken);
+    const initialRoute = parseLocation(window.location.pathname, initialRole);
+
+    const [token, setToken] = useState(initialToken);
+    const [showRegister, setShowRegister] = useState(initialRoute.showRegister || false);
+    const [showLogin, setShowLogin] = useState(initialRoute.showLogin || false);
+    const [page, setPage] = useState(initialRoute.page || "home");
     const [pageHistory, setPageHistory] = useState([]);
 
     const [profileStatus, setProfileStatus] = useState(null);
-    const [viewingUserId, setViewingUserId] = useState(null);
-    const [bookingMentorId, setBookingMentorId] = useState(null);
+    const [viewingUserId, setViewingUserId] = useState(initialRoute.viewingUserId || null);
+    const [bookingMentorId, setBookingMentorId] = useState(initialRoute.bookingMentorId || null);
     const [bookingMentorName, setBookingMentorName] = useState("");
-    const [chatTargetUserId, setChatTargetUserId] = useState(null);
+    const [chatTargetUserId, setChatTargetUserId] = useState(initialRoute.chatTargetUserId || null);
     const [chatReturnPage, setChatReturnPage] = useState("home");
+    const [globalModal, setGlobalModal] = useState(null);
+
+    useEffect(() => {
+        const originalAlert = window.alert;
+        window.alert = (msg) => {
+            const text = typeof msg === "string" ? msg : JSON.stringify(msg);
+            setGlobalModal({ message: text });
+        };
+        return () => {
+            window.alert = originalAlert;
+        };
+    }, []);
 
     const userRole = getCurrentUserRole(token);
+
+    // Sync URL when app navigation state changes
+    useEffect(() => {
+        const targetPath = getPathFromState({
+            page,
+            viewingUserId,
+            bookingMentorId,
+            chatTargetUserId,
+            showLogin,
+            showRegister,
+            token
+        });
+
+        if (window.location.pathname !== targetPath) {
+            window.history.pushState(
+                { page, viewingUserId, bookingMentorId, chatTargetUserId },
+                "",
+                targetPath
+            );
+        }
+    }, [page, viewingUserId, bookingMentorId, chatTargetUserId, showLogin, showRegister, token]);
+
+    // Handle browser address bar Back/Forward or manual location changes
+    useEffect(() => {
+        function handlePopState() {
+            const route = parseLocation(window.location.pathname, getCurrentUserRole(token));
+            setPage(route.page);
+            if (route.viewingUserId !== undefined) setViewingUserId(route.viewingUserId);
+            if (route.bookingMentorId !== undefined) setBookingMentorId(route.bookingMentorId);
+            if (route.chatTargetUserId !== undefined) setChatTargetUserId(route.chatTargetUserId);
+            if (route.showLogin !== undefined) setShowLogin(route.showLogin);
+            if (route.showRegister !== undefined) setShowRegister(route.showRegister);
+        }
+
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+    }, [token]);
 
     function navigateTo(nextPage) {
         if (!nextPage || nextPage === page) return;
@@ -195,6 +307,8 @@ function App() {
         localStorage.setItem("Token", newToken);
         localStorage.removeItem("ProfileSkipped");
 
+        setShowLogin(false);
+        setShowRegister(false);
         setToken(newToken);
 
         // Profile completion check decides whether the user
@@ -210,6 +324,8 @@ function App() {
         localStorage.removeItem("Token");
         localStorage.removeItem("ProfileSkipped");
 
+        setShowLogin(false);
+        setShowRegister(false);
         setToken(null);
         resetNavigation("home");
 
@@ -533,6 +649,45 @@ function App() {
                 />
             )}
             </div>
+
+            {globalModal && (
+                <div
+                    className="se-modal-backdrop"
+                    onClick={() => setGlobalModal(null)}
+                >
+                    <div
+                        className="se-modal-card"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="se-modal-header">
+                            <div className="se-modal-title">
+                                <span className="se-modal-icon">✦</span>
+                                <h3>Notice</h3>
+                            </div>
+                            <button
+                                type="button"
+                                className="se-modal-close"
+                                onClick={() => setGlobalModal(null)}
+                                aria-label="Close modal"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <div className="se-modal-body">
+                            <p>{globalModal.message}</p>
+                        </div>
+                        <div className="se-modal-footer">
+                            <button
+                                type="button"
+                                className="se-modal-btn"
+                                onClick={() => setGlobalModal(null)}
+                            >
+                                Okay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </SocketProvider>
     );
 }

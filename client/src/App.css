@@ -98,4 +98,140 @@
         padding: 5px 7px;
     }
 }
+
+/* =========================================================
+   SKILL EXCHANGE CUSTOM UI MODAL / POPUP
+========================================================= */
+
+.se-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(15, 30, 24, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: seFadeIn 0.18s ease-out;
+}
+
+@keyframes seFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.se-modal-card {
+    background: #ffffff;
+    border: 1px solid #cbd9d0;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(13, 89, 64, 0.14), 0 4px 16px rgba(0, 0, 0, 0.06);
+    max-width: 440px;
+    width: 100%;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: sePopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes sePopIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.se-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.se-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.se-modal-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e4efe7;
+    color: #176b4e;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.se-modal-title h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    color: #15231f;
+    letter-spacing: -0.02em;
+}
+
+.se-modal-close {
+    border: 0;
+    background: transparent;
+    color: #87938c;
+    font-size: 16px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.se-modal-close:hover {
+    background: #f0f4f1;
+    color: #15231f;
+}
+
+.se-modal-body {
+    color: #485950;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.se-modal-body p {
+    margin: 0;
+    word-break: break-word;
+}
+
+.se-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.se-modal-btn {
+    background: #176b4e;
+    color: #ffffff;
+    border: 0;
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s ease, transform 0.15s ease;
+}
+
+.se-modal-btn:hover {
+    background: #0d5940;
+    transform: translateY(-1px);
+}
+
 /* @teamcosmiccoders */
