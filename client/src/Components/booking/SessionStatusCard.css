@@ -1,0 +1,343 @@
+/* =========================================================
+   UNIFIED SESSION STATUS CARD COMPONENT STYLING
+========================================================= */
+
+.session-status-card {
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border: 1.5px solid transparent;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* TOP BAR (STATUS PILL + TIMER CHIP) */
+.status-card-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.status-card-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+.status-card-timer-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* TEXT BLOCK */
+.status-card-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.status-card-heading {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+}
+
+.status-card-desc {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    opacity: 0.92;
+}
+
+/* =========================================================
+   INLINE ALERT CALLOUT BOXES (POLICY & REASON)
+========================================================= */
+.status-inline-callout {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 13px;
+    border-radius: 10px;
+    margin-top: 2px;
+    border: 1px solid transparent;
+}
+
+.status-inline-callout.callout-policy {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.status-inline-callout.callout-policy .callout-icon-box {
+    color: #b45309;
+}
+
+.status-inline-callout.callout-policy .callout-title {
+    color: #92400e;
+}
+
+.status-inline-callout.callout-reason {
+    background: #fdf2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.status-inline-callout.callout-reason .callout-icon-box {
+    color: #b91c1c;
+}
+
+.status-inline-callout.callout-reason .callout-title {
+    color: #991b1b;
+}
+
+.callout-icon-box {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+}
+
+.callout-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.callout-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.callout-message {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* REVIEW ACTIONS INSIDE CARD */
+.status-card-review-section {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.status-card-review-btn {
+    background: #15803d;
+    color: #ffffff;
+    border: 0;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.18s ease;
+}
+
+.status-card-review-btn:hover {
+    background: #166534;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(22, 101, 52, 0.2);
+}
+
+.status-card-reviewed-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #15803d;
+    background: #eaf8ee;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #bbf7d0;
+}
+
+.status-card-reviewed-indicator .star-filled-icon {
+    fill: #eab308;
+    color: #eab308;
+}
+
+/* =========================================================
+   THEME ACCENTS PER STATUS
+========================================================= */
+
+/* ACCEPTED / CONFIRMED */
+.session-status-card.theme-accepted {
+    background: #f4faf6;
+    border-color: #b7dfc8;
+}
+.session-status-card.theme-accepted .status-card-pill {
+    background: #e1f3e9;
+    color: #125b41;
+    border-color: #a8d9bc;
+}
+.session-status-card.theme-accepted .status-card-heading {
+    color: #125b41;
+}
+.session-status-card.theme-accepted .status-card-desc {
+    color: #275643;
+}
+.session-status-card.theme-accepted .status-card-timer-chip {
+    background: #e1f3e9;
+    color: #125b41;
+}
+
+/* APPROVED (SLOT APPROVED, WAITING PAYMENT) */
+.session-status-card.theme-approved {
+    background: #f0fdfa;
+    border-color: #99f6e4;
+}
+.session-status-card.theme-approved .status-card-pill {
+    background: #ccfbf1;
+    color: #0f766e;
+    border-color: #5eead4;
+}
+.session-status-card.theme-approved .status-card-heading {
+    color: #0f766e;
+}
+.session-status-card.theme-approved .status-card-desc {
+    color: #134e4a;
+}
+.session-status-card.theme-approved .status-card-timer-chip {
+    background: #ccfbf1;
+    color: #0f766e;
+}
+
+/* PENDING */
+.session-status-card.theme-pending {
+    background: #fffdf5;
+    border-color: #fde68a;
+}
+.session-status-card.theme-pending .status-card-pill {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+.session-status-card.theme-pending .status-card-heading {
+    color: #92400e;
+}
+.session-status-card.theme-pending .status-card-desc {
+    color: #78350f;
+}
+.session-status-card.theme-pending .status-card-timer-chip {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* SLOTS OFFERED */
+.session-status-card.theme-slots-offered {
+    background: #f0f9ff;
+    border-color: #bae6fd;
+}
+.session-status-card.theme-slots-offered .status-card-pill {
+    background: #e0f2fe;
+    color: #0284c7;
+    border-color: #7dd3fc;
+}
+.session-status-card.theme-slots-offered .status-card-heading {
+    color: #0369a1;
+}
+.session-status-card.theme-slots-offered .status-card-desc {
+    color: #075985;
+}
+.session-status-card.theme-slots-offered .status-card-timer-chip {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+/* REJECTED / DECLINED */
+.session-status-card.theme-rejected {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+.session-status-card.theme-rejected .status-card-pill {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+}
+.session-status-card.theme-rejected .status-card-heading {
+    color: #991b1b;
+}
+.session-status-card.theme-rejected .status-card-desc {
+    color: #7f1d1d;
+}
+
+/* CANCELLED */
+.session-status-card.theme-cancelled {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.session-status-card.theme-cancelled .status-card-pill {
+    background: #ffedd5;
+    color: #c2410c;
+    border-color: #fdba74;
+}
+.session-status-card.theme-cancelled .status-card-heading {
+    color: #9a3412;
+}
+.session-status-card.theme-cancelled .status-card-desc {
+    color: #7c2d12;
+}
+
+/* COMPLETED */
+.session-status-card.theme-completed {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+.session-status-card.theme-completed .status-card-pill {
+    background: #dcfce7;
+    color: #15803d;
+    border-color: #86efac;
+}
+.session-status-card.theme-completed .status-card-heading {
+    color: #166534;
+}
+.session-status-card.theme-completed .status-card-desc {
+    color: #14532d;
+}
+
+/* MISSED / EXPIRED SESSION */
+.session-status-card.theme-missed {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+.session-status-card.theme-missed .status-card-pill {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+.session-status-card.theme-missed .status-card-heading {
+    color: #92400e;
+}
+.session-status-card.theme-missed .status-card-desc {
+    color: #b45309;
+}
+

@@ -88,6 +88,11 @@ export default function ChatPage({
     const [typingUserId, setTypingUserId] = useState(null)
     const [menuOpen, setMenuOpen] = useState(false)
     const [creatingChat, setCreatingChat] = useState(false)
+    const [sessionInfo, setSessionInfo] = useState({
+        isActive: false,
+        activeSession: null,
+        freeCount: 0
+    })
 
     const typingTimer = useRef(null)
     const messagesEnd = useRef(null)
@@ -104,10 +109,8 @@ export default function ChatPage({
     )
 
     const isBookedChat = Boolean(selectedConversation?.bookingId)
-
-    const directMessageCount = messages.length
-    const directLimitReached =
-        !isBookedChat && directMessageCount >= 5
+    const isSessionActive = Boolean(sessionInfo.isActive)
+    const directLimitReached = !isSessionActive && sessionInfo.freeCount >= 5
 
     const refreshConversations = useCallback(async () => {
         const result = await fetchConversations()
@@ -200,9 +203,18 @@ export default function ChatPage({
 
     let active = true
 
-    fetchMessages(selectedId)
+        fetchMessages(selectedId)
             .then((result) => {
-                if (active) setMessages(result)
+                if (!active) return
+                const list = Array.isArray(result) ? result : (result?.messages || [])
+                setMessages(list)
+                if (result && !Array.isArray(result)) {
+                    setSessionInfo({
+                        isActive: Boolean(result.isSessionActive),
+                        activeSession: result.activeSession || null,
+                        freeCount: typeof result.freeMessageCount === "number" ? result.freeMessageCount : list.length,
+                    })
+                }
             })
             .catch((requestError) => {
                 if (active) {
@@ -475,13 +487,27 @@ export default function ChatPage({
                     return false
                 }
 
+                if (!isSessionActive) {
+                    setSessionInfo((prev) => ({
+                        ...prev,
+                        freeCount: prev.freeCount + 1,
+                    }))
+                }
+
                 return true
             }
 
             await sendMessage(selectedId, content)
-            const refreshed =
-                await fetchMessages(selectedId)
-            setMessages(refreshed)
+            const refreshed = await fetchMessages(selectedId)
+            const list = Array.isArray(refreshed) ? refreshed : (refreshed?.messages || [])
+            setMessages(list)
+            if (refreshed && !Array.isArray(refreshed)) {
+                setSessionInfo({
+                    isActive: Boolean(refreshed.isSessionActive),
+                    activeSession: refreshed.activeSession || null,
+                    freeCount: typeof refreshed.freeMessageCount === "number" ? refreshed.freeMessageCount : list.length,
+                })
+            }
             await refreshConversations()
             return true
         } catch (requestError) {
@@ -1038,19 +1064,23 @@ export default function ChatPage({
                                     </div>
                                 </header>
 
-                                {!isBookedChat ? (
+                                {isSessionActive ? (
+                                    <div className="active-session-unlimited-banner">
+                                        <span className="live-session-dot" />
+                                        <div className="active-session-text">
+                                            <strong>Active Session ({sessionInfo.activeSession?.duration || 60} mins) · Unlimited Messaging Unlocked</strong>
+                                            <span>Message limit is disabled during your live session.</span>
+                                        </div>
+                                    </div>
+                                ) : !isBookedChat ? (
                                     <div className="direct-limit-banner">
-                                        <strong>
-                                            Direct chat limit
-                                        </strong>
-
+                                        <strong>Direct chat limit</strong>
                                         <span>
-                                            You can send and receive up to{" "}
-                                            <b>5 messages</b> with{" "}
-                                            <b>{contact?.name}</b>. Book a
-                                            session with{" "}
-                                            <b>{contact?.name}</b> to
-                                            continue the conversation.
+                                            {sessionInfo.freeCount < 5 ? (
+                                                <>You have <b>{5 - sessionInfo.freeCount} free messages</b> remaining with <b>{contact?.name}</b>. Book a session with <b>{contact?.name}</b> for unlimited messaging.</>
+                                            ) : (
+                                                <>You've reached the 5-message limit with <b>{contact?.name}</b>. Book a session to unlock unlimited messaging during your session.</>
+                                            )}
                                         </span>
                                     </div>
                                 ) : null}
