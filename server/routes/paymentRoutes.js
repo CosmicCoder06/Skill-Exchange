@@ -38,14 +38,9 @@ router.put('/bookings/:id/payment/verify', async (req, res) => {
 
     // Credit mentor's wallet with session earnings (session rate minus 3% mentor fee)
     if (booking.paymentAmount > 0) {
-      const Wallet = require('../models/Wallet');
       const WalletTransaction = require('../models/WalletTransaction');
-      let mentorWallet = await Wallet.findOne({ user: booking.mentor });
-      if (!mentorWallet) {
-        mentorWallet = await Wallet.create({ user: booking.mentor, balance: 0, earnedBalance: 0, topupBalance: 0, currency: 'INR' });
-      }
-      if (mentorWallet.earnedBalance === undefined) mentorWallet.earnedBalance = 0;
-      if (mentorWallet.topupBalance === undefined) mentorWallet.topupBalance = 0;
+      const { getOrCreateReconciledWallet } = require('../Utils/walletHelper');
+      const mentorWallet = await getOrCreateReconciledWallet(booking.mentor);
 
       const earnings = booking.mentorEarnings || (booking.paymentAmount - (booking.mentorPlatformFee || Math.round((booking.paymentAmount * 0.03 + Number.EPSILON) * 100) / 100));
       mentorWallet.earnedBalance = Math.round((mentorWallet.earnedBalance + earnings + Number.EPSILON) * 100) / 100;

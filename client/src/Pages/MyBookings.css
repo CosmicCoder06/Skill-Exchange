@@ -108,15 +108,50 @@
 
 /* GRID */
 
-.booking-grid {
-    display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(320px, 1fr)
-    );
-    gap: 24px;
-    grid-auto-rows: auto;
-    align-items: start;
+.booking-grid,
+body .bookings-page .booking-grid {
+    display: grid !important;
+    gap: 24px !important;
+    align-items: stretch !important;
+    grid-auto-rows: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+@media (min-width: 1400px) {
+    .booking-grid,
+    body .bookings-page .booking-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1399px) {
+    .booking-grid,
+    body .bookings-page .booking-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 680px) and (max-width: 1023px) {
+    .booking-grid,
+    body .bookings-page .booking-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 679px) {
+    .booking-grid,
+    body .bookings-page .booking-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+.booking-grid > div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
 }
 
 /* CARD */
@@ -131,10 +166,11 @@
     box-sizing: border-box;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     min-width: 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .booking-card:hover {
@@ -445,7 +481,12 @@ body .bookings-page .booking-card {
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 16px;
+    gap: 16px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    align-self: stretch !important;
+    overflow: visible !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
 }
 
@@ -682,6 +723,33 @@ body .bookings-page .booking-card:hover {
     font-family: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+.receipt-breakdown-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+    padding-top: 4px;
+}
+
+.receipt-breakdown-toggle-btn {
+    background: transparent;
+    border: none;
+    color: #166534;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.receipt-breakdown-toggle-btn:hover {
+    background: #f0fdf4;
+    text-decoration: underline;
+}
+
 /* PAYMENT STATUS PILLS */
 .payment-pill {
     display: inline-flex;
@@ -831,6 +899,9 @@ body .bookings-page .booking-card:hover {
     flex-direction: column;
     gap: 12px;
     margin: 4px 0;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .payment-mode-choice-card {
@@ -843,6 +914,9 @@ body .bookings-page .booking-card:hover {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .payment-mode-choice-card:hover {
@@ -862,6 +936,8 @@ body .bookings-page .booking-card:hover {
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
+    min-width: 0;
+    width: 100%;
 }
 
 .mode-radio-group {
@@ -871,6 +947,7 @@ body .bookings-page .booking-card:hover {
     font-size: 14px;
     font-weight: 700;
     color: #0f172a;
+    min-width: 0;
 }
 
 .mode-radio-group input[type="radio"] {
@@ -879,6 +956,7 @@ body .bookings-page .booking-card:hover {
     height: 18px;
     cursor: pointer;
     margin: 0;
+    flex-shrink: 0;
 }
 
 .save-fee-badge {
@@ -890,6 +968,7 @@ body .bookings-page .booking-card:hover {
     padding: 3px 9px;
     border-radius: 999px;
     letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
 .convenience-badge {
@@ -901,6 +980,7 @@ body .bookings-page .booking-card:hover {
     padding: 3px 9px;
     border-radius: 999px;
     letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
 .mode-pricing-line {
@@ -909,12 +989,14 @@ body .bookings-page .booking-card:hover {
     gap: 10px;
     margin: 2px 0 0 28px;
     flex-wrap: wrap;
+    min-width: 0;
 }
 
 .mode-amount {
     font-size: 17px;
     font-weight: 800;
     color: #0f172a;
+    flex-shrink: 0;
 }
 
 .no-extra-tag {
@@ -927,6 +1009,9 @@ body .bookings-page .booking-card:hover {
     font-size: 12px;
     color: #64748b;
     font-weight: 500;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
 }
 
 .wallet-balance-indicator {
@@ -942,6 +1027,8 @@ body .bookings-page .booking-card:hover {
     padding: 8px 12px;
     border-radius: 8px;
     flex-wrap: wrap;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .wallet-bal-text {
@@ -1032,6 +1119,35 @@ body .bookings-page .booking-card:hover {
     opacity: 0.65;
     cursor: not-allowed;
     transform: none !important;
+}
+
+.btn-cancel-unpaid-booking {
+    width: 100% !important;
+    margin-top: 8px !important;
+    padding: 9px 14px !important;
+    background: transparent !important;
+    border: 1px dashed #cbd5e1 !important;
+    color: #64748b !important;
+    border-radius: 8px !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.18s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+}
+
+.btn-cancel-unpaid-booking:hover:not(:disabled) {
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+    color: #dc2626 !important;
+}
+
+.btn-cancel-unpaid-booking:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
 }
 
 .receipt-verify-action-box {
@@ -1812,6 +1928,160 @@ body .bookings-page .booking-card:hover {
 }
 
 /* =========================================================
+   SESSION REVIEWS IN DETAILS MODAL
+========================================================= */
+.details-reviews-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.details-reviews-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.details-no-reviews-box {
+    background: #fbfdfc;
+    border: 1px dashed #c8d8ce;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.details-no-reviews-box .no-review-icon {
+    font-size: 18px;
+    color: #f59e0b;
+}
+
+.details-no-reviews-box p {
+    margin: 0;
+    font-size: 13.5px;
+    color: #62756a;
+    font-style: italic;
+}
+
+.details-reviews-loading {
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.details-review-card {
+    background: #ffffff;
+    border: 1.5px solid #dbe6df;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(18, 54, 44, 0.03);
+    transition: border-color 0.15s ease;
+}
+
+.details-review-card.learner-review-card {
+    border-left: 4px solid #166534;
+}
+
+.details-review-card.mentor-review-card {
+    border-left: 4px solid #0284c7;
+}
+
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.reviewer-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.review-role-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.review-role-badge.learner {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.review-role-badge.mentor {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.reviewer-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.review-rating-score {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fefce8;
+    border: 1px solid #fef08a;
+    padding: 3px 8px;
+    border-radius: 999px;
+}
+
+.review-stars-visual {
+    color: #eab308;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.review-numeric-score {
+    font-size: 12px;
+    font-weight: 800;
+    color: #854d0e;
+}
+
+.review-card-body {
+    margin: 2px 0;
+}
+
+.review-comment-text {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #1f2937;
+}
+
+.review-empty-note {
+    color: #6b7280;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.review-card-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.review-timestamp {
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+/* =========================================================
    VIDEO SESSION CARD & GOOGLE MEET STYLING (FIXES OVERLAP)
 ========================================================= */
 .video-session-card {
@@ -2216,6 +2486,224 @@ body .bookings-page .booking-card:hover {
     color: #0f172a !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* =========================================================
+   GROUPED SESSIONS & STATUS TABS NAVIGATION
+========================================================= */
+
+.section-subtext {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13.5px;
+}
+
+.sessions-tab-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0 32px;
+    padding-bottom: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.sessions-tab-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.session-tab-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    background: #ffffff;
+    border: 1.5px solid #dce8e1;
+    border-radius: 999px;
+    color: #334e43;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.18s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.session-tab-pill:hover {
+    background: #f0f7f3;
+    border-color: #b5d3c4;
+    color: #123d31;
+}
+
+.session-tab-pill.active {
+    background: #123d31;
+    border-color: #123d31;
+    color: #ffffff;
+    box-shadow: 0 3px 12px rgba(18, 61, 49, 0.22);
+}
+
+.tab-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #eef4f0;
+    color: #2a5240;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    transition: all 0.18s ease;
+}
+
+.session-tab-pill.active .tab-count-badge {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+}
+
+.tab-count-badge.urgent-badge {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.session-tab-pill.active .tab-count-badge.urgent-badge {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.session-tab-pill.has-urgent:not(.active) {
+    border-color: #fca5a5;
+    background: #fffcfc;
+}
+
+/* SUB-SECTIONS INSIDE TABS */
+.session-group-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 42px;
+}
+
+.session-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 12px;
+    border-bottom: 1.5px solid #edf2ef;
+}
+
+.session-group-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.session-group-icon-bubble {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 10px;
+    background: #eaf4ef;
+    color: #123d31;
+    box-shadow: 0 2px 6px rgba(18, 61, 49, 0.08);
+}
+
+.session-group-icon-bubble.urgent-bubble {
+    background: #fef3c7;
+    color: #b45309;
+    box-shadow: 0 2px 6px rgba(180, 83, 9, 0.1);
+}
+
+.session-group-heading-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.session-group-heading-line h3 {
+    margin: 0;
+    font-size: 17.5px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: -0.02em;
+}
+
+.session-group-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 11.5px;
+    font-weight: 800;
+}
+
+.session-group-badge.urgent {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.session-group-subtext {
+    margin: 3px 0 0;
+    font-size: 12.5px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+/* CONTEXTUAL EMPTY STATES */
+.tab-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 48px 24px;
+    background: #ffffff;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 16px;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 8px 0 24px;
+}
+
+.tab-empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #f8fafc;
+    color: #94a3b8;
+    font-size: 26px;
+    margin-bottom: 2px;
+}
+
+.tab-empty-state h4 {
+    margin: 0;
+    font-size: 16.5px;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+}
+
+.tab-empty-state p {
+    margin: 0;
+    font-size: 13.5px;
+    color: #64748b;
+    max-width: 420px;
+    line-height: 1.5;
 }
 
 /* @teamcosmiccoders */

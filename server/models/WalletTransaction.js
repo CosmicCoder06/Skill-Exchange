@@ -21,7 +21,8 @@ const walletTransactionSchema = new mongoose.Schema(
                 "session_payment",
                 "session_earning",
                 "refund",
-                "settlement"
+                "settlement",
+                "withdrawal"
             ],
             required: true
         },

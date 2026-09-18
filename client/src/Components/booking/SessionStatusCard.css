@@ -12,6 +12,7 @@
     transition: all 0.2s ease;
     box-sizing: border-box;
     width: 100%;
+    min-height: 124px;
 }
 
 /* TOP BAR (STATUS PILL + TIMER CHIP) */

@@ -6,16 +6,16 @@
 ========================================================= */
 
 :root {
-    --profile-bg: #f7f8f4;
+    --profile-bg: #f4f1e9;
     --profile-surface: #ffffff;
-    --profile-green: #176b4e;
-    --profile-green-dark: #0d5940;
-    --profile-green-soft: #e4efe7;
-    --profile-text: #15231f;
-    --profile-muted: #687870;
-    --profile-muted-soft: #87938c;
-    --profile-line: #cbd9d0;
-    --profile-line-soft: #dce5df;
+    --profile-green: #123d31;
+    --profile-green-dark: #0a251e;
+    --profile-green-soft: #e3ede5;
+    --profile-text: #12362c;
+    --profile-muted: #587067;
+    --profile-muted-soft: #7a8e84;
+    --profile-line: #b9c9bd;
+    --profile-line-soft: #c8d5cb;
     --profile-gold: #d99b00;
     --profile-yellow: #f8eec9;
     --profile-danger: #b34336;
@@ -28,12 +28,9 @@
 
 .profile-page {
     min-height: 100vh;
-    background:
-        radial-gradient(circle at 92% 6%, #d8f0df 0, transparent 24%),
-        var(--profile-bg);
+    background: var(--profile-bg);
     color: var(--profile-text);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system,
-        BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
 }
 
 .profile-page button {
@@ -594,14 +591,21 @@
 
 .stat-item strong {
     display: block;
-    font-size: 28px;
-    letter-spacing: -.05em;
+    font-family: Georgia, serif;
+    font-size: clamp(30px, 3.5vw, 44px);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -.04em;
     color: var(--profile-text);
 }
 
 .stat-item span {
     display: block;
+    margin-top: 4px;
     font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
     color: var(--profile-muted);
 }
 

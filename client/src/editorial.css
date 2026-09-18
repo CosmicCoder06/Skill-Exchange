@@ -23,10 +23,10 @@ body .home-page .hero-copy h1 em { color:#2c8363; }
 body .home-page .home-lead { font-size:19px; line-height:1.85; margin-top:32px; max-width:660px; }
 body .home-page .home-kicker { letter-spacing:2.2px; font-size:12px; }
 body .home-page .hero-actions { margin-top:34px; }
-body :is(.home-primary,.nav-join,.dashboard-primary,.mentor-action-primary,.primary-action,.login-button,.join-session-button) {
+body :is(.home-primary,.nav-join,.dashboard-primary,.mentor-action-primary,.learner-action-primary,.primary-action,.login-button,.join-session-button) {
  border-radius:999px; background:#196f54; color:#fff; padding:15px 24px; font-weight:700; box-shadow:none; border:1px solid transparent;
 }
-body :is(.home-primary,.nav-join,.dashboard-primary,.mentor-action-primary,.primary-action,.login-button,.join-session-button):hover { background:#115b43; box-shadow:0 8px 20px #196f5414; }
+body :is(.home-primary,.nav-join,.dashboard-primary,.mentor-action-primary,.learner-action-primary,.primary-action,.login-button,.join-session-button):hover { background:#115b43; box-shadow:0 8px 20px #196f5414; }
 body .home-page .hero-trust { margin-top:62px; }
 .hero-editorial { position:relative; isolation:isolate; padding:64px 48px; border:0; min-height:440px; display:flex; flex-direction:column; justify-content:center; }
 .hero-editorial::before { content:''; position:absolute; z-index:-1; inset:5% -2%; border-radius:46% 54% 49% 51% / 44% 44% 56% 56%; background:#d2e7db; transform:rotate(-6deg); }
@@ -43,15 +43,15 @@ body .home-page .path-grid article { padding-block:32px; }
 body .home-page .path-grid article h3 { font-size:22px; font-weight:600; letter-spacing:-.5px; }
 body .home-page .path-grid article b { font-family:Georgia,serif; font-size:22px; font-weight:400; color:#348065; }
 body .home-page .home-cta { max-width:1344px; margin-bottom:72px; padding-block:48px; }
-.app-premium-shell :is(.discover-header,.bookings-header,.chat-topbar,.dashboard-hero,.mentor-hero) h1 { font-size:clamp(36px,4.6vw,64px); font-weight:650; letter-spacing:-.055em; line-height:1.1; }
-.app-premium-shell :is(.discover-description,.mentor-lede,.dashboard-hero-text) { font-size:17px; line-height:1.85; color:var(--premium-muted); }
-.app-premium-shell :is(.discover-header,.bookings-header,.chat-topbar,.mentor-hero) { padding-top:24px; padding-bottom:28px; }
+.app-premium-shell :is(.discover-header,.bookings-header,.chat-topbar,.dashboard-hero,.mentor-hero,.learner-hero) h1 { font-size:clamp(36px,4.6vw,64px); font-weight:650; letter-spacing:-.055em; line-height:1.1; }
+.app-premium-shell :is(.discover-description,.mentor-lede,.learner-lede,.dashboard-hero-text) { font-size:17px; line-height:1.85; color:var(--premium-muted); }
+.app-premium-shell :is(.discover-header,.bookings-header,.chat-topbar,.mentor-hero,.learner-hero) { padding-top:24px; padding-bottom:28px; }
 body .app-premium-shell :is(.profile-workspace,.learner-dashboard-shell,.chat-main) { max-width:1344px; padding:48px 32px; }
 .app-premium-shell .dashboard-hero { padding-block:28px 40px; border-bottom:1px solid var(--premium-line); }
-.app-premium-shell :is(.overview-grid,.mentor-scoreline) { padding-block:30px; border-block:1px solid var(--premium-line); gap:28px; }
-.app-premium-shell :is(.overview-grid,.mentor-scoreline) strong { font-weight:500; letter-spacing:-1.5px; }
+.app-premium-shell :is(.overview-grid,.mentor-scoreline,.learner-scoreline) { padding-block:30px; border-block:1px solid var(--premium-line); gap:28px; }
+.app-premium-shell :is(.overview-grid,.mentor-scoreline,.learner-scoreline) strong { font-weight:500; letter-spacing:-1.5px; }
 body .app-premium-shell :is(.dashboard-section,.profile-section,.review-card,.person-row,.booking-card) { padding-block:32px !important; }
-.app-premium-shell :is(.panel-heading,.mentor-section-heading,.section-heading) h2 { font-size:24px; font-weight:600; letter-spacing:-.7px; }
+.app-premium-shell :is(.panel-heading,.mentor-section-heading,.learner-section-heading,.section-heading) h2 { font-size:24px; font-weight:600; letter-spacing:-.7px; }
 body .profile-content { display:block; }
 body .profile-side-content { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:32px; margin-top:40px; }
 body .profile-side-content .side-section { padding-block:24px; }

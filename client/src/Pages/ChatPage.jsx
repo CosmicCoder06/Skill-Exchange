@@ -984,6 +984,7 @@ export default function ChatPage({
                                                 </strong>
 
                                                 <span>
+                                                    <span className="thread-status-dot" aria-hidden="true" />
                                                     {isBookedChat
                                                         ? "Booked session chat"
                                                         : "Direct skill chat"}
@@ -1065,23 +1066,32 @@ export default function ChatPage({
                                 </header>
 
                                 {isSessionActive ? (
-                                    <div className="active-session-unlimited-banner">
-                                        <span className="live-session-dot" />
+                                    <div className="active-session-unlimited-banner" role="status">
+                                        <div className="chat-notice-icon-box">
+                                            <span className="live-session-dot" />
+                                        </div>
                                         <div className="active-session-text">
                                             <strong>Active Session ({sessionInfo.activeSession?.duration || 60} mins) · Unlimited Messaging Unlocked</strong>
                                             <span>Message limit is disabled during your live session.</span>
                                         </div>
                                     </div>
                                 ) : !isBookedChat ? (
-                                    <div className="direct-limit-banner">
-                                        <strong>Direct chat limit</strong>
-                                        <span>
-                                            {sessionInfo.freeCount < 5 ? (
-                                                <>You have <b>{5 - sessionInfo.freeCount} free messages</b> remaining with <b>{contact?.name}</b>. Book a session with <b>{contact?.name}</b> for unlimited messaging.</>
-                                            ) : (
-                                                <>You've reached the 5-message limit with <b>{contact?.name}</b>. Book a session to unlock unlimited messaging during your session.</>
-                                            )}
-                                        </span>
+                                    <div className={`direct-limit-banner ${sessionInfo.freeCount >= 5 ? "is-reached" : "is-active"}`} role="note">
+                                        <div className="chat-notice-icon-box">
+                                            <span className="chat-notice-glyph" aria-hidden="true">
+                                                {sessionInfo.freeCount >= 5 ? "🔒" : "✦"}
+                                            </span>
+                                        </div>
+                                        <div className="direct-limit-body">
+                                            <strong>Direct chat limit</strong>
+                                            <p>
+                                                {sessionInfo.freeCount < 5 ? (
+                                                    <>You have <b>{5 - sessionInfo.freeCount} free messages</b> remaining with <b>{contact?.name}</b>. Book a session with <b>{contact?.name}</b> for unlimited messaging.</>
+                                                ) : (
+                                                    <>You've reached the 5-message limit with <b>{contact?.name}</b>. Book a session to unlock unlimited messaging during your session.</>
+                                                )}
+                                            </p>
+                                        </div>
                                     </div>
                                 ) : null}
 
@@ -1089,16 +1099,14 @@ export default function ChatPage({
                                     {visibleMessages.length ===
                                     0 ? (
                                         <div className="empty-thread">
-                                            <span>✦</span>
+                                            <div className="empty-thread-badge" aria-hidden="true">
+                                                <span className="empty-thread-icon">✦</span>
+                                            </div>
                                             <h3>
-                                                Start the
-                                                conversation
+                                                Start the conversation
                                             </h3>
                                             <p>
-                                                Ask a question,
-                                                share a resource,
-                                                or plan your next
-                                                session.
+                                                Ask a question, share a resource, or plan your next session.
                                             </p>
                                         </div>
                                     ) : (
@@ -1177,7 +1185,9 @@ export default function ChatPage({
                             </>
                         ) : (
                             <div className="empty-thread no-selection">
-                                <span>✦</span>
+                                <div className="empty-thread-badge" aria-hidden="true">
+                                    <span className="empty-thread-icon">💬</span>
+                                </div>
                                 <h2>
                                     Select a conversation
                                 </h2>

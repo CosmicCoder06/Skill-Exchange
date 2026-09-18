@@ -1,56 +1,17 @@
 const Wallet = require("../models/Wallet");
 const WalletTransaction = require("../models/WalletTransaction");
 const { recordActivity } = require("../Utils/activityLogger");
+const { roundToTwo, getOrCreateReconciledWallet, computeBalancesFromLedger } = require("../Utils/walletHelper");
 
 const getCurrentUserId = (req) => String(req.user._id || req.user.id);
-
-function roundToTwo(num) {
-    return Math.round((Number(num) + Number.EPSILON) * 100) / 100;
-}
-
-const ensureWalletBalances = async (wallet) => {
-    let dirty = false;
-    if (wallet.earnedBalance === undefined || wallet.earnedBalance === null) {
-        wallet.earnedBalance = 0;
-        dirty = true;
-    }
-    if (wallet.topupBalance === undefined || wallet.topupBalance === null) {
-        wallet.topupBalance = 0;
-        dirty = true;
-    }
-    // Legacy wallet migration: if wallet had balance > 0 but earned/topup both 0, attribute to earnedBalance
-    if (wallet.balance > 0 && wallet.earnedBalance === 0 && wallet.topupBalance === 0) {
-        wallet.earnedBalance = wallet.balance;
-        dirty = true;
-    }
-    const combined = roundToTwo(wallet.earnedBalance + wallet.topupBalance);
-    if (wallet.balance !== combined) {
-        wallet.balance = combined;
-        dirty = true;
-    }
-    if (dirty) {
-        await wallet.save();
-    }
-    return wallet;
-};
 
 // GET WALLET BALANCE & TRANSACTIONS
 const getWallet = async (req, res) => {
     try {
         const userId = getCurrentUserId(req);
 
-        let wallet = await Wallet.findOne({ user: userId });
-        if (!wallet) {
-            wallet = await Wallet.create({
-                user: userId,
-                balance: 0,
-                earnedBalance: 0,
-                topupBalance: 0,
-                currency: "INR"
-            });
-        } else {
-            await ensureWalletBalances(wallet);
-        }
+        // Always fetch or create a wallet that is fully reconciled with the transaction ledger
+        const wallet = await getOrCreateReconciledWallet(userId);
 
         const transactions = await WalletTransaction.find({ user: userId })
             .sort({ createdAt: -1 })
@@ -77,18 +38,7 @@ const topupWallet = async (req, res) => {
             return res.status(400).json({ message: "Top-up amount must be at least ₹50" });
         }
 
-        let wallet = await Wallet.findOne({ user: userId });
-        if (!wallet) {
-            wallet = await Wallet.create({
-                user: userId,
-                balance: 0,
-                earnedBalance: 0,
-                topupBalance: 0,
-                currency: "INR"
-            });
-        } else {
-            await ensureWalletBalances(wallet);
-        }
+        const wallet = await getOrCreateReconciledWallet(userId);
 
         // Top-up adds directly to topupBalance (for session payments)
         wallet.topupBalance = roundToTwo(wallet.topupBalance + amount);
@@ -145,18 +95,7 @@ const requestWithdrawal = async (req, res) => {
             return res.status(400).json({ message: "Please enter a valid UPI ID (e.g. name@upi)" });
         }
 
-        let wallet = await Wallet.findOne({ user: userId });
-        if (!wallet) {
-            wallet = await Wallet.create({
-                user: userId,
-                balance: 0,
-                earnedBalance: 0,
-                topupBalance: 0,
-                currency: "INR"
-            });
-        } else {
-            await ensureWalletBalances(wallet);
-        }
+        const wallet = await getOrCreateReconciledWallet(userId);
 
         // Strict enforcement: Withdrawal allowed only from earnedBalance
         if (wallet.earnedBalance < amount) {

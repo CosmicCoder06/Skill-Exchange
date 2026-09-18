@@ -179,8 +179,10 @@
 
 .balance-dual-breakdown {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
     margin-bottom: 12px;
 }
 
@@ -188,10 +190,15 @@
     background: rgba(0, 0, 0, 0.22);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 10px;
-    padding: 9px 12px;
+    padding: 10px 13px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
 }
 
 .dual-balance-item.earned {
@@ -206,6 +213,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
     margin-bottom: 2px;
 }
@@ -216,6 +224,7 @@
     color: #d1fae5;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    min-width: 0;
 }
 
 .dual-status-badge {
@@ -243,6 +252,7 @@
     font-weight: 800;
     color: #ffffff;
     line-height: 1.2;
+    word-break: break-word;
 }
 
 .dual-desc {
@@ -251,9 +261,10 @@
     line-height: 1.2;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 540px) {
     .balance-dual-breakdown {
         grid-template-columns: 1fr;
+        gap: 10px;
     }
 }
 
