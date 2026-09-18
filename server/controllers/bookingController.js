@@ -187,6 +187,7 @@
 const Booking = require("../models/Booking");
 const Wallet = require("../models/Wallet");
 const WalletTransaction = require("../models/WalletTransaction");
+const { getOrCreateReconciledWallet } = require("../Utils/walletHelper");
 const { withMeeting, normalizeMeetUrl } = require('../Utils/bookingMeeting');
 const { paymentDetails } = require('../Utils/manualPayment');
 const { recordActivity } = require("../Utils/activityLogger");
@@ -482,8 +483,8 @@ const getBookings = async (req, res) => {
                 "name email role avatarUrl"
             )
             .sort({
-                date: 1,
-                time: 1,
+                date: -1,
+                time: -1,
                 createdAt: -1
             });
 
@@ -519,6 +520,8 @@ const getMentorRequests = async (req, res) => {
                 "name email role avatarUrl"
             )
             .sort({
+                date: -1,
+                time: -1,
                 createdAt: -1
             });
 
@@ -750,23 +753,7 @@ const completeBookingPayment = async (req, res) => {
         // Wallet Settlement
         const deductionAmount = payment.totalAmountPaid || payment.paymentAmount;
         if (payment.paymentMethod === "wallet" && deductionAmount > 0) {
-            let learnerWallet = await Wallet.findOne({ user: userId });
-            if (!learnerWallet) {
-                learnerWallet = await Wallet.create({
-                    user: userId,
-                    balance: 0,
-                    earnedBalance: 0,
-                    topupBalance: 0,
-                    currency: "INR"
-                });
-            }
-
-            if (learnerWallet.earnedBalance === undefined) learnerWallet.earnedBalance = 0;
-            if (learnerWallet.topupBalance === undefined) learnerWallet.topupBalance = 0;
-            if (learnerWallet.balance > 0 && learnerWallet.earnedBalance === 0 && learnerWallet.topupBalance === 0) {
-                learnerWallet.earnedBalance = learnerWallet.balance;
-            }
-            learnerWallet.balance = Math.round((learnerWallet.earnedBalance + learnerWallet.topupBalance + Number.EPSILON) * 100) / 100;
+            const learnerWallet = await getOrCreateReconciledWallet(userId);
 
             if (learnerWallet.balance < deductionAmount) {
                 return res.status(400).json({
@@ -801,18 +788,7 @@ const completeBookingPayment = async (req, res) => {
             });
 
             // Credit to mentor wallet earnedBalance (net of 3% platform fee)
-            let mentorWallet = await Wallet.findOne({ user: booking.mentor });
-            if (!mentorWallet) {
-                mentorWallet = await Wallet.create({
-                    user: booking.mentor,
-                    balance: 0,
-                    earnedBalance: 0,
-                    topupBalance: 0,
-                    currency: "INR"
-                });
-            }
-            if (mentorWallet.earnedBalance === undefined) mentorWallet.earnedBalance = 0;
-            if (mentorWallet.topupBalance === undefined) mentorWallet.topupBalance = 0;
+            const mentorWallet = await getOrCreateReconciledWallet(booking.mentor);
 
             mentorWallet.earnedBalance = Math.round((mentorWallet.earnedBalance + payment.mentorEarnings + Number.EPSILON) * 100) / 100;
             mentorWallet.balance = Math.round((mentorWallet.earnedBalance + mentorWallet.topupBalance + Number.EPSILON) * 100) / 100;
@@ -833,18 +809,7 @@ const completeBookingPayment = async (req, res) => {
             });
         } else if (['upi', 'upi_card', 'card'].includes(payment.paymentMethod) && payment.paymentStatus === 'verified' && payment.mentorEarnings > 0) {
             // Direct UPI/Card: Credit to mentor wallet earnedBalance (net of 3% platform fee)
-            let mentorWallet = await Wallet.findOne({ user: booking.mentor });
-            if (!mentorWallet) {
-                mentorWallet = await Wallet.create({
-                    user: booking.mentor,
-                    balance: 0,
-                    earnedBalance: 0,
-                    topupBalance: 0,
-                    currency: "INR"
-                });
-            }
-            if (mentorWallet.earnedBalance === undefined) mentorWallet.earnedBalance = 0;
-            if (mentorWallet.topupBalance === undefined) mentorWallet.topupBalance = 0;
+            const mentorWallet = await getOrCreateReconciledWallet(booking.mentor);
 
             mentorWallet.earnedBalance = Math.round((mentorWallet.earnedBalance + payment.mentorEarnings + Number.EPSILON) * 100) / 100;
             mentorWallet.balance = Math.round((mentorWallet.earnedBalance + mentorWallet.topupBalance + Number.EPSILON) * 100) / 100;
@@ -1139,8 +1104,10 @@ const cancelBooking = async (req, res) => {
 
         if (learnerRefundDue) {
             booking.cancellationReason = "Cancelled by mentor: Learner payment refund required under platform cancellation policy";
-        } else if (req.body.reason) {
+        } else if (req.body?.reason) {
             booking.cancellationReason = req.body.reason.trim();
+        } else if (isLearner) {
+            booking.cancellationReason = "Cancelled by learner before payment.";
         }
 
         await booking.save();

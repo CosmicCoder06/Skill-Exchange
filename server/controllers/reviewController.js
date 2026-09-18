@@ -383,13 +383,14 @@ const createReview = async (req, res) => {
         const mentorId =
             booking.mentor.toString();
 
-        // Only learner can review mentor
+        // Both learner and mentor can review each other
         if (
-            currentUserId !== learnerId
+            currentUserId !== learnerId &&
+            currentUserId !== mentorId
         ) {
             return res.status(403).json({
                 message:
-                    "Only the learner can review the mentor"
+                    "You are not part of this booking"
             });
         }
 
@@ -404,7 +405,7 @@ const createReview = async (req, res) => {
             });
         }
 
-        // One review per booking
+        // One review per booking per reviewer
         const existingReview =
             await Review.findOne({
                 booking: bookingId,
@@ -418,11 +419,16 @@ const createReview = async (req, res) => {
             });
         }
 
+        const reviewee =
+            currentUserId === learnerId
+                ? booking.mentor
+                : booking.learner;
+
         const review =
             await Review.create({
                 booking: bookingId,
                 reviewer: currentUserId,
-                reviewee: booking.mentor,
+                reviewee,
                 rating: numericRating,
                 comment:
                     comment?.trim() || ""
@@ -630,20 +636,35 @@ const getBookingReview = async (
             });
         }
 
-        const review =
-            await Review.findOne({
+        const reviews =
+            await Review.find({
                 booking:
-                    req.params.bookingId,
-                reviewer:
-                    currentUserId
+                    req.params.bookingId
             }).populate(
                 "reviewer reviewee",
                 "name email role avatarUrl"
             );
 
+        const learnerId = (booking.learner?._id || booking.learner).toString();
+        const mentorId = (booking.mentor?._id || booking.mentor).toString();
+
+        const learnerReview = reviews.find(
+            (r) => (r.reviewer?._id || r.reviewer)?.toString() === learnerId
+        ) || null;
+
+        const mentorReview = reviews.find(
+            (r) => (r.reviewer?._id || r.reviewer)?.toString() === mentorId
+        ) || null;
+
+        const myReview = reviews.find(
+            (r) => (r.reviewer?._id || r.reviewer)?.toString() === currentUserId
+        ) || null;
+
         return res.json({
-            review:
-                review || null
+            review: myReview || null,
+            reviews,
+            learnerReview,
+            mentorReview
         });
 
     } catch (error) {

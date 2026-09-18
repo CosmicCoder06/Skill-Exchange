@@ -10,7 +10,19 @@ import PaymentReceipt from '../Components/booking/PaymentReceipt';
 import SuggestSlotsModal from '../Components/booking/SuggestSlotsModal';
 import Modal from "../Components/common/Modal";
 import SessionStatusCard from "../Components/booking/SessionStatusCard";
-import { FileText, MessageSquare, Check, Star } from "lucide-react";
+import {
+    FileText,
+    MessageSquare,
+    Check,
+    Star,
+    Calendar,
+    CheckCircle2,
+    Clock,
+    AlertTriangle,
+    CreditCard,
+    Sparkles,
+    Layers
+} from "lucide-react";
 
 import "./MyBookings.css";
 
@@ -121,49 +133,28 @@ const getCreatedDate = (booking) => {
         : date.getTime();
 };
 
+const getSessionTimestamp = (booking) => {
+    const d = parseSessionDateTime(booking?.date, booking?.time);
+    return d ? d.getTime() : 0;
+};
+
 const sortBookings = (bookings) => {
-    const priority = {
-        accepted: 1,
-        pending: 2,
-        completed: 3,
-        rejected: 4,
-        cancelled: 5
-    };
+    return [...bookings].sort((a, b) => {
+        const timeA = getSessionTimestamp(a);
+        const timeB = getSessionTimestamp(b);
 
-    return [...bookings].sort(
-        (a, b) => {
-            const priorityA =
-                priority[a.status] || 99;
-
-            const priorityB =
-                priority[b.status] || 99;
-
-            if (
-                priorityA !==
-                priorityB
-            ) {
-                return (
-                    priorityA -
-                    priorityB
-                );
-            }
-
-            if (
-                a.status ===
-                "accepted"
-            ) {
-                return (
-                    getSessionStartDate(a) -
-                    getSessionStartDate(b)
-                );
-            }
-
-            return (
-                getCreatedDate(b) -
-                getCreatedDate(a)
-            );
+        if (timeA > 0 && timeB > 0 && timeA !== timeB) {
+            return timeB - timeA;
         }
-    );
+        if (timeA > 0 && (!timeB || timeB === 0)) {
+            return -1;
+        }
+        if (timeB > 0 && (!timeA || timeA === 0)) {
+            return 1;
+        }
+
+        return getCreatedDate(b) - getCreatedDate(a);
+    });
 };
 
 function MyBookings({
@@ -208,6 +199,12 @@ function MyBookings({
 
     const [suggestSlotsBooking, setSuggestSlotsBooking] = useState(null);
     const [detailsBooking, setDetailsBooking] = useState(null);
+    const [sessionTab, setSessionTab] = useState("active");
+    const [detailsReviews, setDetailsReviews] = useState({
+        loading: false,
+        learnerReview: null,
+        mentorReview: null
+    });
 
     const API =
         import.meta.env.VITE_API_URL;
@@ -289,6 +286,42 @@ function MyBookings({
             prev && prev._id === bookingId ? { ...prev, meetingUrl } : prev
         );
     };
+
+    useEffect(() => {
+        if (!detailsBooking?._id) {
+            setDetailsReviews({ loading: false, learnerReview: null, mentorReview: null });
+            return;
+        }
+
+        let isMounted = true;
+        setDetailsReviews({ loading: true, learnerReview: null, mentorReview: null });
+
+        fetch(`${API}/reviews/booking/${detailsBooking._id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (isMounted && data) {
+                    setDetailsReviews({
+                        loading: false,
+                        learnerReview: data.learnerReview || null,
+                        mentorReview: data.mentorReview || null
+                    });
+                }
+            })
+            .catch((err) => {
+                console.error("Error fetching session details reviews:", err);
+                if (isMounted) {
+                    setDetailsReviews({ loading: false, learnerReview: null, mentorReview: null });
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [detailsBooking?._id, API, token]);
 
     const fetchRequests =
         useCallback(async () => {
@@ -620,6 +653,23 @@ function MyBookings({
                 })
             );
 
+            if (detailsBooking && detailsBooking._id === reviewBooking._id) {
+                fetch(`${API}/reviews/booking/${reviewBooking._id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                    .then((res) => (res.ok ? res.json() : null))
+                    .then((d) => {
+                        if (d) {
+                            setDetailsReviews({
+                                loading: false,
+                                learnerReview: d.learnerReview || null,
+                                mentorReview: d.mentorReview || null
+                            });
+                        }
+                    })
+                    .catch(() => {});
+            }
+
             setReviewBooking(null);
             setRating(5);
             setComment("");
@@ -670,6 +720,97 @@ function MyBookings({
             )
         );
 
+    const isSessionBooker = (b) => {
+        const mentorId = b.mentor?._id || b.mentor?.id || b.mentor;
+        return String(mentorId) !== String(currentUserId);
+    };
+
+    // 1. Payment Pending: Time slot approved awaiting payment, or alternate slots offered to booker
+    const paymentPendingSessions = mySessions.filter((b) => {
+        if (b.status === "approved") return true;
+        if (b.status === "slots_offered" && isSessionBooker(b)) return true;
+        return false;
+    });
+
+    // 2. Upcoming / Active: Confirmed & accepted sessions (not missed, not completed)
+    const upcomingSessions = mySessions.filter((b) => {
+        if (b.status === "accepted" && !isMissedSession(b)) return true;
+        if (b.status === "slots_offered" && !isSessionBooker(b)) return true;
+        return false;
+    });
+
+    // 3. Pending Approval: Requests awaiting mentor's decision
+    const pendingApprovalSessions = mySessions.filter((b) => {
+        return b.status === "pending" && isSessionBooker(b);
+    });
+
+    // 4. Completed Sessions
+    const completedSessions = mySessions.filter((b) => {
+        return b.status === "completed";
+    });
+
+    // 5. Cancelled / Declined / Missed Sessions
+    const cancelledSessions = mySessions.filter((b) => {
+        return b.status === "cancelled" || b.status === "rejected" || isMissedSession(b);
+    });
+
+    // Combined Active view (Payment Pending + Upcoming + Pending Approval)
+    const activeSessions = [
+        ...paymentPendingSessions,
+        ...upcomingSessions,
+        ...pendingApprovalSessions
+    ];
+
+    function renderSessionGroupSection({
+        id,
+        title,
+        subtitle,
+        icon: Icon,
+        count,
+        items,
+        emptyMessage,
+        isUrgent = false
+    }) {
+        if (items.length === 0 && emptyMessage) {
+            return (
+                <div className="tab-empty-state" key={id}>
+                    <div className="tab-empty-icon">
+                        <Icon size={32} />
+                    </div>
+                    <h4>{emptyMessage.title}</h4>
+                    <p>{emptyMessage.description}</p>
+                </div>
+            );
+        }
+
+        if (items.length === 0) return null;
+
+        return (
+            <div className={`session-group-section ${isUrgent ? "is-urgent-group" : ""}`} key={id}>
+                <div className="session-group-header">
+                    <div className="session-group-title-wrap">
+                        <div className={`session-group-icon-bubble ${isUrgent ? "urgent-bubble" : ""}`}>
+                            <Icon size={18} />
+                        </div>
+                        <div>
+                            <div className="session-group-heading-line">
+                                <h3>{title}</h3>
+                                <span className={`session-group-badge ${isUrgent ? "urgent" : ""}`}>
+                                    {count}
+                                </span>
+                            </div>
+                            {subtitle && <p className="session-group-subtext">{subtitle}</p>}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="booking-grid">
+                    {items.map((booking) => renderBookingCard(booking))}
+                </div>
+            </div>
+        );
+    }
+
     function renderBookingCard(
         booking
     ) {
@@ -708,7 +849,7 @@ function MyBookings({
         const showMentorAddMeetingLink = isMentor && isAccepted && !booking.meetingUrl && !isMissed;
 
         return (
-            <article className="booking-card modern-session-card">
+            <article className="booking-card modern-session-card" key={booking._id}>
                 {/* 1. CARD TOP HEADER */}
                 <div className="card-top-bar">
                     <div className="card-identity-group">
@@ -977,7 +1118,7 @@ function MyBookings({
                     </div>
                 ) : (
                     <div className="booking-grid">
-                        {requests.map(
+                        {sortBookings(requests).map(
                             (booking) => (
                                 <article
                                     className="booking-card"
@@ -1114,52 +1255,256 @@ function MyBookings({
 
             {/* MY SESSIONS */}
 
-            <section className="booking-section">
+            <section className="booking-section sessions-grouped-section">
                 <div className="section-heading">
-                    <h2>
-                        My Sessions
-                    </h2>
+                    <div>
+                        <h2>My Sessions</h2>
+                        <p className="section-subtext">Manage, attend, and review your skill exchange sessions</p>
+                    </div>
 
                     <span className="booking-count">
                         {mySessions.length}
                     </span>
                 </div>
 
-                {mySessions.length ===
-                0 ? (
-                    <div className="empty-bookings">
-                        <div className="empty-icon">
-                            📅
-                        </div>
+                {/* SESSIONS FILTER TABS */}
+                <div className="sessions-tab-bar" role="tablist">
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "active" ? "active" : ""}`}
+                        onClick={() => setSessionTab("active")}
+                        role="tab"
+                        aria-selected={sessionTab === "active"}
+                    >
+                        <Sparkles size={14} />
+                        <span>Active</span>
+                        <span className="tab-count-badge">{activeSessions.length}</span>
+                    </button>
 
-                        <h3>
-                            No sessions yet
-                        </h3>
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "payment_pending" ? "active" : ""} ${paymentPendingSessions.length > 0 ? "has-urgent" : ""}`}
+                        onClick={() => setSessionTab("payment_pending")}
+                        role="tab"
+                        aria-selected={sessionTab === "payment_pending"}
+                    >
+                        <CreditCard size={14} />
+                        <span>Payment Pending</span>
+                        <span className={`tab-count-badge ${paymentPendingSessions.length > 0 ? "urgent-badge" : ""}`}>
+                            {paymentPendingSessions.length}
+                        </span>
+                    </button>
 
-                        <p>
-                            Book a mentor to
-                            start your
-                            learning
-                            journey.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="booking-grid">
-                        {mySessions.map(
-                            (booking) => (
-                                <div
-                                    key={
-                                        booking._id
-                                    }
-                                >
-                                    {renderBookingCard(
-                                        booking
-                                    )}
-                                </div>
-                            )
-                        )}
-                    </div>
-                )}
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "upcoming" ? "active" : ""}`}
+                        onClick={() => setSessionTab("upcoming")}
+                        role="tab"
+                        aria-selected={sessionTab === "upcoming"}
+                    >
+                        <Calendar size={14} />
+                        <span>Upcoming</span>
+                        <span className="tab-count-badge">{upcomingSessions.length}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "completed" ? "active" : ""}`}
+                        onClick={() => setSessionTab("completed")}
+                        role="tab"
+                        aria-selected={sessionTab === "completed"}
+                    >
+                        <CheckCircle2 size={14} />
+                        <span>Completed</span>
+                        <span className="tab-count-badge">{completedSessions.length}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "cancelled" ? "active" : ""}`}
+                        onClick={() => setSessionTab("cancelled")}
+                        role="tab"
+                        aria-selected={sessionTab === "cancelled"}
+                    >
+                        <AlertTriangle size={14} />
+                        <span>Cancelled / Declined</span>
+                        <span className="tab-count-badge">{cancelledSessions.length}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "all" ? "active" : ""}`}
+                        onClick={() => setSessionTab("all")}
+                        role="tab"
+                        aria-selected={sessionTab === "all"}
+                    >
+                        <Layers size={14} />
+                        <span>All</span>
+                        <span className="tab-count-badge">{mySessions.length}</span>
+                    </button>
+                </div>
+
+                {/* SESSIONS CONTENT BY TAB */}
+                <div className="sessions-tab-content">
+                    {sessionTab === "active" && (
+                        activeSessions.length === 0 ? (
+                            <div className="tab-empty-state">
+                                <div className="tab-empty-icon">✨</div>
+                                <h4>No active sessions right now</h4>
+                                <p>When you book sessions or have pending payments, they will appear right here.</p>
+                            </div>
+                        ) : (
+                            <>
+                                {renderSessionGroupSection({
+                                    id: "active-payment-pending",
+                                    title: "Action Required: Payment Pending",
+                                    subtitle: "Your mentor approved this time slot. Choose your payment method to finalize the booking.",
+                                    icon: CreditCard,
+                                    count: paymentPendingSessions.length,
+                                    items: paymentPendingSessions,
+                                    isUrgent: true
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "active-upcoming",
+                                    title: "Confirmed & Upcoming Sessions",
+                                    subtitle: "Confirmed sessions ready to attend. Access your meeting link and chat room below.",
+                                    icon: Calendar,
+                                    count: upcomingSessions.length,
+                                    items: upcomingSessions
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "active-pending-approval",
+                                    title: "Pending Mentor Approval",
+                                    subtitle: "Session requests sent to mentors awaiting approval or suggested alternative times.",
+                                    icon: Clock,
+                                    count: pendingApprovalSessions.length,
+                                    items: pendingApprovalSessions
+                                })}
+                            </>
+                        )
+                    )}
+
+                    {sessionTab === "payment_pending" && (
+                        renderSessionGroupSection({
+                            id: "tab-payment-pending",
+                            title: "Payment Pending",
+                            subtitle: "Sessions approved by mentors awaiting your payment confirmation.",
+                            icon: CreditCard,
+                            count: paymentPendingSessions.length,
+                            items: paymentPendingSessions,
+                            isUrgent: true,
+                            emptyMessage: {
+                                title: "No pending payments",
+                                description: "You are all caught up! No sessions are awaiting payment."
+                            }
+                        })
+                    )}
+
+                    {sessionTab === "upcoming" && (
+                        renderSessionGroupSection({
+                            id: "tab-upcoming",
+                            title: "Confirmed & Upcoming Sessions",
+                            subtitle: "Active sessions scheduled on your calendar.",
+                            icon: Calendar,
+                            count: upcomingSessions.length,
+                            items: upcomingSessions,
+                            emptyMessage: {
+                                title: "No upcoming sessions",
+                                description: "You have no scheduled sessions coming up. Explore mentors to start learning!"
+                            }
+                        })
+                    )}
+
+                    {sessionTab === "completed" && (
+                        renderSessionGroupSection({
+                            id: "tab-completed",
+                            title: "Completed Sessions",
+                            subtitle: "Past sessions successfully concluded. Share feedback and review your session history.",
+                            icon: CheckCircle2,
+                            count: completedSessions.length,
+                            items: completedSessions,
+                            emptyMessage: {
+                                title: "No completed sessions yet",
+                                description: "Once your sessions are completed, they will appear here so you can leave reviews and view receipts."
+                            }
+                        })
+                    )}
+
+                    {sessionTab === "cancelled" && (
+                        renderSessionGroupSection({
+                            id: "tab-cancelled",
+                            title: "Cancelled & Declined Sessions",
+                            subtitle: "Sessions that were declined by mentors, cancelled, or expired.",
+                            icon: AlertTriangle,
+                            count: cancelledSessions.length,
+                            items: cancelledSessions,
+                            emptyMessage: {
+                                title: "No cancelled sessions",
+                                description: "None of your sessions have been cancelled or declined."
+                            }
+                        })
+                    )}
+
+                    {sessionTab === "all" && (
+                        mySessions.length === 0 ? (
+                            <div className="tab-empty-state">
+                                <div className="tab-empty-icon">📅</div>
+                                <h4>No sessions yet</h4>
+                                <p>Book a mentor to begin your skill exchange journey.</p>
+                            </div>
+                        ) : (
+                            <>
+                                {renderSessionGroupSection({
+                                    id: "all-payment-pending",
+                                    title: "Payment Pending",
+                                    subtitle: "Approved slots awaiting payment",
+                                    icon: CreditCard,
+                                    count: paymentPendingSessions.length,
+                                    items: paymentPendingSessions,
+                                    isUrgent: true
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "all-upcoming",
+                                    title: "Confirmed & Upcoming",
+                                    subtitle: "Confirmed sessions ready to attend",
+                                    icon: Calendar,
+                                    count: upcomingSessions.length,
+                                    items: upcomingSessions
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "all-pending-approval",
+                                    title: "Pending Approval",
+                                    subtitle: "Awaiting mentor approval",
+                                    icon: Clock,
+                                    count: pendingApprovalSessions.length,
+                                    items: pendingApprovalSessions
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "all-completed",
+                                    title: "Completed Sessions",
+                                    subtitle: "Successfully concluded sessions",
+                                    icon: CheckCircle2,
+                                    count: completedSessions.length,
+                                    items: completedSessions
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "all-cancelled",
+                                    title: "Cancelled & Declined",
+                                    subtitle: "Cancelled, declined, or expired sessions",
+                                    icon: AlertTriangle,
+                                    count: cancelledSessions.length,
+                                    items: cancelledSessions
+                                })}
+                            </>
+                        )
+                    )}
+                </div>
             </section>
 
             {/* SESSION REVIEW MODAL */}
@@ -1334,6 +1679,95 @@ function MyBookings({
                                         currentUserId={currentUserId}
                                         onLinkSaved={(newUrl) => handleMeetingUrlUpdated(detailsBooking._id, newUrl)}
                                     />
+                                </div>
+                            )}
+
+                            {/* Rating & Feedback / Session Reviews Section */}
+                            {(detailsBooking.status === "completed" || detailsReviews.learnerReview || detailsReviews.mentorReview) && (
+                                <div className="details-reviews-section">
+                                    <h4 className="details-section-title">Session Reviews & Ratings</h4>
+                                    {detailsReviews.loading ? (
+                                        <div className="details-reviews-loading">
+                                            <span>Loading reviews…</span>
+                                        </div>
+                                    ) : !detailsReviews.learnerReview && !detailsReviews.mentorReview ? (
+                                        <div className="details-no-reviews-box">
+                                            <span className="no-review-icon">⭐</span>
+                                            <p>No reviews submitted yet for this session.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="details-reviews-container">
+                                            {/* Learner's Review Block */}
+                                            {detailsReviews.learnerReview && (
+                                                <div className="details-review-card learner-review-card">
+                                                    <div className="review-card-header">
+                                                        <div className="reviewer-meta">
+                                                            <span className="review-role-badge learner">Learner's Review</span>
+                                                            <strong className="reviewer-name">
+                                                                {detailsReviews.learnerReview.reviewer?.name || "Learner"}
+                                                            </strong>
+                                                        </div>
+                                                        <div className="review-rating-score">
+                                                            <span className="review-stars-visual">
+                                                                {"★".repeat(detailsReviews.learnerReview.rating)}
+                                                                {"☆".repeat(5 - detailsReviews.learnerReview.rating)}
+                                                            </span>
+                                                            <span className="review-numeric-score">{detailsReviews.learnerReview.rating}/5</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="review-card-body">
+                                                        <p className="review-comment-text">
+                                                            {detailsReviews.learnerReview.comment
+                                                                ? `“${detailsReviews.learnerReview.comment}”`
+                                                                : <em className="review-empty-note">No written feedback provided.</em>}
+                                                        </p>
+                                                    </div>
+                                                    {detailsReviews.learnerReview.createdAt && (
+                                                        <div className="review-card-footer">
+                                                            <span className="review-timestamp">
+                                                                Reviewed on {new Date(detailsReviews.learnerReview.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Mentor's Review Block */}
+                                            {detailsReviews.mentorReview && (
+                                                <div className="details-review-card mentor-review-card">
+                                                    <div className="review-card-header">
+                                                        <div className="reviewer-meta">
+                                                            <span className="review-role-badge mentor">Mentor's Review</span>
+                                                            <strong className="reviewer-name">
+                                                                {detailsReviews.mentorReview.reviewer?.name || "Mentor"}
+                                                            </strong>
+                                                        </div>
+                                                        <div className="review-rating-score">
+                                                            <span className="review-stars-visual">
+                                                                {"★".repeat(detailsReviews.mentorReview.rating)}
+                                                                {"☆".repeat(5 - detailsReviews.mentorReview.rating)}
+                                                            </span>
+                                                            <span className="review-numeric-score">{detailsReviews.mentorReview.rating}/5</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="review-card-body">
+                                                        <p className="review-comment-text">
+                                                            {detailsReviews.mentorReview.comment
+                                                                ? `“${detailsReviews.mentorReview.comment}”`
+                                                                : <em className="review-empty-note">No written feedback provided.</em>}
+                                                        </p>
+                                                    </div>
+                                                    {detailsReviews.mentorReview.createdAt && (
+                                                        <div className="review-card-footer">
+                                                            <span className="review-timestamp">
+                                                                Reviewed on {new Date(detailsReviews.mentorReview.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

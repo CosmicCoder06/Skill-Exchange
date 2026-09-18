@@ -1,567 +1,519 @@
+/* =========================================================
+   SKILL EXCHANGE — LEARNER STUDIO & JOURNEY
+   Adheres strictly to the Mentor Dashboard visual system:
+   Cream background (#f4f1e9), dark forest green (#12362c, #123d31),
+   accent emerald (#2b9c76), Georgia serif headlines,
+   dividers (#b9c9bd), and refined editorial spacing.
+========================================================= */
+
+.learner-studio,
 .learner-dashboard {
     min-height: 100vh;
-    background:
-        radial-gradient(
-            circle at 85% 0%,
-            rgba(124, 92, 255, 0.08),
-            transparent 28%
-        ),
-        #f6f7fb;
-    color: #171717;
-    padding: 28px 24px 50px;
+    padding: clamp(24px, 4vw, 70px);
+    color: #12362c;
+    background: #f4f1e9;
     box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
 }
 
-.learner-dashboard-shell {
-    width: min(1240px, 100%);
-    margin: 0 auto;
-}
-
-.dashboard-topbar {
-    min-height: 66px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #e7e7eb;
-    border-radius: 18px;
-    padding: 10px 14px 10px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    box-shadow: 0 12px 35px rgba(20, 20, 40, 0.05);
-}
-
-.dashboard-brand {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    min-width: 190px;
-}
-
-.brand-mark {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    background: #111;
-    color: #fff;
-    font-weight: 800;
-}
-
-.dashboard-brand strong,
-.dashboard-brand span {
-    display: block;
-}
-
-.dashboard-brand strong {
-    font-size: 14px;
-}
-
-.dashboard-brand span {
-    color: #8a8a92;
-    font-size: 11px;
-    margin-top: 2px;
-}
-
-.dashboard-nav {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.dashboard-nav button {
-    border: 0;
-    background: transparent;
-    color: #777;
-    padding: 10px 13px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-}
-
-.dashboard-nav button:hover {
-    background: #f3f3f6;
-    color: #111;
-}
-
-.dashboard-nav .dashboard-nav-active {
-    background: #111;
-    color: #fff;
-}
-
-.dashboard-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 0;
-    background: #ece9ff;
-    color: #6248dc;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.dashboard-hero {
-    margin: 30px 0 22px;
-    padding: 34px;
-    border-radius: 24px;
-    background:
-        linear-gradient(
-            120deg,
-            #ffffff 0%,
-            #ffffff 60%,
-            #f0edff 100%
-        );
-    border: 1px solid #e7e5ee;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 30px;
-}
-
-.dashboard-eyebrow,
-.panel-kicker {
-    margin: 0 0 8px;
-    color: #7258e9;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.8px;
-}
-
-.dashboard-hero h1 {
-    margin: 0;
-    font-size: clamp(30px, 4vw, 46px);
-    line-height: 1.08;
-    letter-spacing: -1.7px;
-}
-
-.dashboard-hero h1 span {
-    color: #7258e9;
-}
-
-.dashboard-hero-text {
-    max-width: 650px;
-    margin: 12px 0 0;
-    color: #74747d;
-    line-height: 1.65;
-    font-size: 15px;
-}
-
-.hero-actions {
-    display: flex;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-.dashboard-primary,
-.dashboard-secondary {
-    border-radius: 11px;
-    padding: 12px 17px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.dashboard-primary {
-    background: #111;
-    color: white;
-    border: 1px solid #111;
-}
-
-.dashboard-secondary {
-    background: white;
-    color: #222;
-    border: 1px solid #dedee4;
-}
-
-.overview-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin-bottom: 18px;
-}
-
-.overview-card {
-    background: #fff;
-    border: 1px solid #e7e7eb;
-    border-radius: 18px;
-    padding: 19px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-height: 105px;
-}
-
-.overview-icon {
-    width: 43px;
-    height: 43px;
-    border-radius: 13px;
-    display: grid;
-    place-items: center;
-    font-weight: 900;
-    font-size: 17px;
-    flex-shrink: 0;
-}
-
-.overview-icon.purple {
-    background: #eeeaff;
-    color: #7156e8;
-}
-
-.overview-icon.green {
-    background: #e6f8ef;
-    color: #168454;
-}
-
-.overview-icon.orange {
-    background: #fff1df;
-    color: #c87817;
-}
-
-.overview-icon.blue {
-    background: #e6f1ff;
-    color: #3979ca;
-}
-
-.overview-card span,
-.overview-card strong,
-.overview-card small {
-    display: block;
-}
-
-.overview-card span {
-    font-size: 12px;
-    color: #85858d;
-}
-
-.overview-card strong {
-    font-size: 25px;
-    margin: 4px 0 1px;
-}
-
-.overview-card small {
-    font-size: 10px;
-    color: #a0a0a7;
-}
-
-.dashboard-main-grid,
-.dashboard-secondary-grid {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 18px;
-    margin-bottom: 18px;
-}
-
-.dashboard-secondary-grid {
-    grid-template-columns: 1fr 1fr;
-}
-
-.dashboard-panel {
-    background: #fff;
-    border: 1px solid #e6e6eb;
-    border-radius: 20px;
-    padding: 25px;
-    box-sizing: border-box;
-}
-
-.panel-heading {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 15px;
-}
-
-.panel-heading h2 {
-    margin: 0;
-    font-size: 21px;
-    letter-spacing: -0.5px;
-}
-
-.panel-badge {
-    background: #f4f3f8;
-    color: #777;
-    border-radius: 30px;
-    padding: 7px 10px;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.skill-chart {
-    margin-top: 27px;
-    display: grid;
-    grid-template-columns: 180px 1fr;
-    gap: 30px;
-    align-items: center;
-}
-
-.donut-wrapper {
-    display: grid;
-    place-items: center;
-}
-
-.skill-donut {
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-}
-
-.donut-inner {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background: #fff;
+.learner-state {
     display: grid;
     place-content: center;
     text-align: center;
-    box-shadow: 0 5px 20px rgba(20, 20, 40, 0.06);
 }
 
-.donut-inner strong {
-    font-size: 28px;
-}
-
-.donut-inner span {
-    color: #909098;
-    font-size: 11px;
-}
-
-.chart-details {
+.learner-loading-box {
     display: flex;
     flex-direction: column;
-    gap: 13px;
-}
-
-.chart-legend {
-    display: grid;
-    grid-template-columns: 10px 1fr auto;
-    gap: 10px;
     align-items: center;
-    padding: 12px;
-    background: #fafafa;
-    border-radius: 12px;
+    gap: 16px;
+    padding: 60px 30px;
 }
 
-.legend-dot {
-    width: 9px;
-    height: 9px;
+.learner-spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid #cbdcd0;
+    border-top-color: #123d31;
     border-radius: 50%;
+    animation: learnerSpin 0.75s linear infinite;
 }
 
-.learn-dot {
-    background: #7c5cff;
+@keyframes learnerSpin {
+    to { transform: rotate(360deg); }
 }
 
-.teach-dot {
-    background: #19a974;
+.learner-loading-box h2,
+.learner-state h2 {
+    font-family: Georgia, serif;
+    font-size: 28px;
+    font-weight: 500;
+    margin: 0;
+    color: #12362c;
 }
 
-.chart-legend strong,
-.chart-legend span {
-    display: block;
-}
-
-.chart-legend strong {
+.learner-loading-box p,
+.learner-state p {
+    color: #587067;
+    margin: 0;
     font-size: 15px;
 }
 
-.chart-legend span {
-    color: #85858d;
+/* =========================================================
+   HERO HEADER
+========================================================= */
+.learner-hero {
+    display: flex;
+    justify-content: space-between;
+    gap: 32px;
+    padding-bottom: 58px;
+    border-bottom: 1px solid #b9c9bd;
+}
+
+.learner-kicker {
+    margin: 0 0 12px;
+    color: #23755b;
     font-size: 11px;
-    margin-top: 2px;
+    font-weight: 900;
+    letter-spacing: .16em;
+    text-transform: uppercase;
 }
 
-.chart-legend b {
-    font-size: 12px;
+.learner-hero h1 {
+    margin: 0;
+    max-width: 740px;
+    font-family: Georgia, serif;
+    font-size: clamp(44px, 6.5vw, 88px);
+    line-height: .92;
+    font-weight: 500;
+    letter-spacing: -.07em;
+    color: #12362c;
 }
 
-.chart-message {
-    color: #777;
-    line-height: 1.5;
-    font-size: 12px;
-    padding: 4px 2px;
+.learner-hero h1 em {
+    color: #2b9c76;
+    font-weight: 400;
+    font-style: italic;
 }
 
-.health-score {
-    font-size: 22px;
-    font-weight: 800;
-    color: #18a26d;
+.learner-lede {
+    max-width: 520px;
+    margin: 22px 0 0;
+    color: #587067;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
-.progress-track {
-    height: 8px;
-    background: #ededf0;
-    border-radius: 20px;
-    overflow: hidden;
-    margin: 22px 0 18px;
-}
-
-.progress-fill {
-    height: 100%;
-    border-radius: inherit;
-    background: linear-gradient(90deg, #7c5cff, #19a974);
-    transition: width 0.4s ease;
-}
-
-.health-list {
+.learner-hero-actions {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: flex-end;
+    gap: 15px;
+    white-space: nowrap;
 }
 
-.health-item {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 11px;
-    border-radius: 12px;
-    background: #fafafa;
-}
-
-.health-item > span {
-    width: 25px;
-    height: 25px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: #ededed;
-    color: #888;
-    font-size: 12px;
-}
-
-.health-item.done > span {
-    background: #dff6ea;
-    color: #168454;
-}
-
-.health-item strong,
-.health-item small {
-    display: block;
-}
-
-.health-item strong {
-    font-size: 12px;
-}
-
-.health-item small {
-    color: #999;
-    font-size: 10px;
-    margin-top: 2px;
-}
-
-.panel-link {
+.learner-hero-actions button {
     border: 0;
-    background: transparent;
-    color: #654bdf;
-    font-weight: 800;
-    font-size: 12px;
     cursor: pointer;
-    margin-top: 15px;
-    padding: 0;
-}
-
-.roadmap-list {
-    margin-top: 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.roadmap-item {
-    display: grid;
-    grid-template-columns: 38px 1fr 110px;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid #ededf0;
-    border-radius: 13px;
-}
-
-.roadmap-number {
-    width: 34px;
-    height: 34px;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-    background: #eeeaff;
-    color: #7054e4;
-    font-size: 10px;
+    font: inherit;
     font-weight: 800;
 }
 
-.roadmap-content strong,
-.roadmap-content span {
-    display: block;
+.learner-action-primary {
+    padding: 14px 20px;
+    background: #123d31;
+    color: white;
+    border-radius: 4px;
+    border: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 14px;
+    transition: background 0.15s ease;
 }
 
-.roadmap-content strong {
+.learner-action-primary:hover {
+    background: #0a251e;
+}
+
+.learner-action-primary span {
+    color: #a9e6c5;
+}
+
+.learner-action-secondary {
+    padding: 13px 18px;
+    background: #e3ede5;
+    color: #123d31;
+    border: 1px solid #b9c9bd;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+}
+
+.learner-action-secondary:hover {
+    background: #d4e3d7;
+}
+
+.hero-upcoming-bubble {
+    background: #123d31;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 12px;
+}
+
+/* =========================================================
+   TAB PILL SWITCHER
+========================================================= */
+.learner-view-switcher {
+    display: inline-flex;
+    gap: 8px;
+    margin-top: 28px;
+    background: #e6ede7;
+    padding: 4px;
+    border-radius: 30px;
+    border: 1px solid #c2d2c6;
+}
+
+.learner-tab-pill {
+    border: none;
+    background: transparent;
+    color: #355247;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 24px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+}
+
+.learner-tab-pill:hover {
+    color: #123d31;
+}
+
+.learner-tab-pill.active {
+    background: #123d31;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(18, 61, 49, 0.18);
+}
+
+.learner-tab-badge {
+    background: #2b9c76;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 12px;
+}
+
+/* =========================================================
+   SCORELINE (4 STAT METRICS)
+========================================================= */
+.learner-scoreline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 35px 0;
+    border-bottom: 1px solid #b9c9bd;
+}
+
+.learner-scoreline > div {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 28px;
+    border-left: 1px solid #c7d2c8;
+}
+
+.learner-scoreline > div:first-child {
+    padding-left: 0;
+    border-left: 0;
+}
+
+.learner-scoreline strong {
+    font-family: Georgia, serif;
+    font-size: clamp(35px, 4vw, 56px);
+    font-weight: 400;
+    line-height: 1;
+    color: #12362c;
+}
+
+.learner-scoreline span {
+    color: #567166;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.35;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+
+/* =========================================================
+   WORKBENCH GRID (1.12fr .88fr split)
+========================================================= */
+.learner-workbench {
+    display: grid;
+    grid-template-columns: 1.12fr .88fr;
+    gap: clamp(35px, 6vw, 95px);
+    padding: 60px 0;
+    border-bottom: 1px solid #b9c9bd;
+}
+
+.learner-section-heading p {
+    margin: 0 0 8px;
+    color: #23755b;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.learner-section-heading h2 {
+    margin: 0;
+    font-family: Georgia, serif;
+    font-size: clamp(26px, 2.8vw, 40px);
+    font-weight: 400;
+    letter-spacing: -.05em;
+    color: #12362c;
+}
+
+/* SKILL PROGRESS BARS */
+.learner-skill-bars {
+    margin-top: 32px;
+    display: grid;
+    gap: 22px;
+}
+
+.learner-skill-row > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.learner-skill-row strong {
+    font-size: 15px;
+    color: #12362c;
+}
+
+.learner-skill-row span {
+    color: #5d776c;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.learner-skill-track {
+    height: 9px;
+    background: #d6ded4;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.learner-skill-track i {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #1d604d, #69c79d);
+    border-radius: 5px;
+}
+
+.learner-empty-card {
+    margin-top: 24px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px dashed #b9c9bd;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.learner-empty-card p {
+    margin: 0 0 12px;
+    color: #587067;
+}
+
+.learner-link-btn {
+    border: none;
+    background: none;
+    color: #23755b;
+    font-weight: 800;
+    cursor: pointer;
     font-size: 13px;
 }
 
-.roadmap-content span {
-    color: #999;
-    font-size: 10px;
-    margin-top: 3px;
+/* RHYTHM CHART SECTION */
+.learner-rhythm-section {
+    padding-top: 50px;
+    margin-top: 45px;
+    border-top: 1px solid #c7d2c8;
 }
 
-.roadmap-line {
-    height: 5px;
-    border-radius: 10px;
-    background: #eeeef2;
-    overflow: hidden;
+.learner-rhythm-chart {
+    min-height: 270px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    margin-top: 32px;
+    padding: 20px 12px 0;
+    border-bottom: 1px solid #9db1a3;
 }
 
-.roadmap-line span {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: #7c5cff;
-}
-
-.empty-dashboard {
-    margin-top: 20px;
-    padding: 30px 15px;
-    text-align: center;
-    background: #fafafa;
-    border-radius: 14px;
-}
-
-.empty-dashboard span {
-    font-size: 28px;
-    color: #7c5cff;
-}
-
-.empty-dashboard strong {
-    display: block;
-    margin-top: 8px;
-}
-
-.empty-dashboard p {
-    color: #888;
-    font-size: 12px;
-}
-
-.week-bars {
-    height: 210px;
-    margin-top: 25px;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    align-items: end;
-}
-
-.week-column {
-    height: 100%;
+.learner-rhythm-bar {
+    flex: 1;
+    min-width: 55px;
+    height: 220px;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: flex-end;
+    gap: 7px;
+}
+
+.learner-rhythm-bar i {
+    width: min(52px, 72%);
+    display: block;
+    background: #2b9c76;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.3s ease;
+}
+
+.learner-rhythm-bar strong {
+    color: #175b45;
+    font-size: 13px;
+}
+
+.learner-rhythm-bar span {
+    color: #42695a;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.learner-rhythm-bar small {
+    color: #7a8e84;
+    font-size: 10px;
+}
+
+.learner-empty-chart {
+    margin-top: 28px;
+    padding: 30px 20px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px dashed #b9c9bd;
+    text-align: center;
+}
+
+.empty-chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 16px;
+    height: 120px;
+    margin-bottom: 16px;
+    opacity: 0.35;
+}
+
+.empty-chart-bars div {
+    width: 32px;
+    background: #2b9c76;
+    border-radius: 3px 3px 0 0;
+}
+
+.learner-empty-chart p {
+    margin: 0;
+    color: #688075;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   FLOW FIELD & WEEKLY AVAILABILITY (RIGHT COLUMN)
+========================================================= */
+.learner-flow-field {
+    padding-left: clamp(0px, 4vw, 62px);
+    border-left: 1px solid #c4d0c6;
+}
+
+.learner-flow-line {
+    display: flex;
+    align-items: center;
+    margin: 40px 0 20px;
+}
+
+.learner-flow-line > div {
+    width: 90px;
+    text-align: center;
+}
+
+.learner-flow-line b {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    background: #dce8dd;
+    color: #165942;
+    font-family: Georgia, serif;
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.learner-flow-line span {
+    color: #587067;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.learner-flow-line > i {
+    height: 1px;
+    flex: 1;
+    background: #9ab5a5;
+}
+
+.learner-flow-line .flow-complete b {
+    background: #123d31;
+    color: #ffffff;
+}
+
+.learner-flow-note {
+    color: #688075;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 40px;
+}
+
+/* WEEKLY PANEL */
+.learner-week-panel {
+    padding-top: 36px;
+    border-top: 1px solid #c7d2c8;
+}
+
+.learner-week-bars {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 12px 8px;
+    background: #ffffff;
+    border: 1px solid #c9d5cb;
+    border-radius: 8px;
+}
+
+.learner-week-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 8px;
 }
 
-.bar-area {
-    height: 165px;
+.bar-slot {
+    height: 90px;
     width: 100%;
     display: flex;
     align-items: flex-end;
@@ -570,257 +522,473 @@
 
 .week-bar {
     width: 70%;
-    max-width: 26px;
-    min-height: 12px;
-    border-radius: 8px 8px 4px 4px;
-    background: #ececf0;
+    background: #d6ded4;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.25s ease;
 }
 
 .week-bar.active {
-    background: linear-gradient(180deg, #7c5cff, #a897ff);
+    background: #123d31;
 }
 
-.week-column > span {
-    color: #8c8c94;
-    font-size: 10px;
+.learner-week-col span {
+    font-size: 11px;
+    font-weight: 700;
+    color: #587067;
 }
 
-.availability-summary {
-    margin-top: 15px;
-    padding: 11px 13px;
-    background: #f8faf9;
-    border-radius: 12px;
+.learner-availability-meta {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: #587067;
 }
 
-.summary-dot {
+.meta-pulse-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #19a974;
+    background: #2b9c76;
+    box-shadow: 0 0 0 3px #d6eee2;
 }
 
-.availability-summary p {
-    margin: 0;
-    font-size: 11px;
-    color: #777;
+.learner-availability-meta strong {
+    color: #12362c;
 }
 
-.quick-actions {
-    margin-top: 8px;
-}
-
-.quick-actions-heading {
-    margin-bottom: 12px;
-}
-
-.quick-actions-heading h2 {
-    margin: 0;
-    font-size: 21px;
-}
-
-.quick-action-grid {
+/* QUICK SHORTCUTS */
+.learner-quick-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 13px;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 32px;
 }
 
-.quick-action-card {
-    border: 1px solid #e7e7eb;
-    background: #fff;
-    border-radius: 17px;
-    padding: 17px;
-    display: grid;
-    grid-template-columns: 42px 1fr auto;
+.learner-quick-card {
+    display: flex;
     align-items: center;
     gap: 12px;
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid #c9d5cb;
+    border-radius: 8px;
     text-align: left;
     cursor: pointer;
-    transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease;
+    transition: all 0.15s ease;
+    color: #12362c;
 }
 
-.quick-action-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(20, 20, 40, 0.07);
+.learner-quick-card:hover {
+    border-color: #123d31;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(18, 54, 44, 0.05);
 }
 
-.quick-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
+.learner-quick-card div {
+    flex: 1;
+    min-width: 0;
+}
+
+.learner-quick-card strong {
+    display: block;
+    font-size: 13px;
+    color: #12362c;
+}
+
+.learner-quick-card span {
+    display: block;
+    font-size: 11px;
+    color: #6a8277;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =========================================================
+   TAB 2: CURRICULUM & GOALS VIEW
+========================================================= */
+.learner-curriculum-view {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    padding-top: 42px;
+}
+
+.curriculum-summary-grid {
     display: grid;
-    place-items: center;
-    background: #f0edff;
-    color: #6d52e4;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.curriculum-stat-card {
+    background: #ffffff;
+    border: 1px solid #c9d5cb;
+    border-radius: 10px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 14px rgba(18, 54, 44, 0.04);
+}
+
+.curriculum-stat-card.highlight {
+    background: #edf7f1;
+    border-color: #84c49d;
+    box-shadow: 0 6px 18px rgba(23, 107, 78, 0.08);
+}
+
+.stat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-kicker {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .12em;
+    color: #23755b;
+    text-transform: uppercase;
+}
+
+.stat-icon-wrap {
+    font-size: 15px;
+    font-weight: 800;
+    color: #23755b;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #e4f2ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-live-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #176b4e;
+    background: #d7f0e1;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.stat-amount {
+    font-family: Georgia, serif;
+    font-size: clamp(30px, 3.2vw, 40px);
+    font-weight: 400;
+    color: #12362c;
+    line-height: 1;
+}
+
+.stat-subtext {
+    margin: 0;
+    font-size: 12px;
+    color: #5c7367;
+    line-height: 1.4;
+}
+
+/* CURRICULUM SPLIT */
+.curriculum-detail-split {
+    display: grid;
+    grid-template-columns: 1.25fr .75fr;
+    gap: 28px;
+}
+
+.curriculum-main-panel,
+.curriculum-side-panel {
+    background: #ffffff;
+    border: 1px solid #c9d5cb;
+    border-radius: 10px;
+    padding: 28px;
+    box-shadow: 0 4px 16px rgba(18, 54, 44, 0.04);
+}
+
+.panel-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2ebe4;
+    margin-bottom: 22px;
+}
+
+.panel-header-bar h2 {
+    margin: 0;
+    font-family: Georgia, serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: #12362c;
+}
+
+.curriculum-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.curriculum-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 8px;
+    background: #fafbfa;
+    border: 1px solid #e2ebe4;
+}
+
+.curriculum-index {
+    font-family: Georgia, serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: #23755b;
+    width: 32px;
+}
+
+.curriculum-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.curriculum-info strong {
+    display: block;
+    font-size: 15px;
+    color: #12362c;
+    margin-bottom: 3px;
+}
+
+.curriculum-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #688075;
+}
+
+.btn-find-mentor {
+    padding: 8px 14px;
+    background: #123d31;
+    color: #ffffff;
+    border: 0;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+}
+
+.btn-find-mentor:hover {
+    background: #0a251e;
+}
+
+.learner-empty-curriculum {
+    padding: 40px 20px;
+    text-align: center;
+    color: #688075;
+}
+
+.learner-empty-curriculum p {
+    margin-bottom: 16px;
+}
+
+/* READINESS METER & CHECKLIST */
+.readiness-meter {
+    margin: 24px 0;
+}
+
+.readiness-track {
+    height: 10px;
+    background: #e2ebe4;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.readiness-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #1d604d, #2b9c76);
+    border-radius: 6px;
+}
+
+.readiness-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #587067;
+}
+
+.readiness-labels strong {
+    color: #12362c;
     font-weight: 800;
 }
 
-.quick-action-card strong,
-.quick-action-card span {
+.readiness-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.readiness-checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #9aa8a1;
+}
+
+.readiness-checklist li.checked {
+    color: #23755b;
+}
+
+.readiness-checklist strong {
     display: block;
-}
-
-.quick-action-card strong {
     font-size: 13px;
+    color: #12362c;
 }
 
-.quick-action-card div span {
-    color: #92929a;
-    font-size: 10px;
-    line-height: 1.45;
-    margin-top: 4px;
-}
-
-.quick-action-card b {
-    color: #777;
-}
-
-.dashboard-footer {
-    margin-top: 30px;
-    padding: 20px 4px 0;
-    border-top: 1px solid #e2e2e6;
-    display: flex;
-    justify-content: space-between;
-    color: #999;
+.readiness-checklist small {
+    display: block;
     font-size: 11px;
+    color: #6a8077;
+    margin-top: 2px;
 }
 
-.dashboard-footer div {
-    display: flex;
-    gap: 15px;
-}
-
-.dashboard-footer button {
-    border: 0;
-    background: transparent;
-    color: #777;
+.btn-polish-profile {
+    width: 100%;
+    padding: 12px;
+    background: #e3ede5;
+    color: #123d31;
+    border: 1px solid #b9c9bd;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 13px;
     cursor: pointer;
-    font-size: 11px;
+    transition: all 0.15s ease;
 }
 
-.learner-loading,
-.learner-error {
-    min-height: 80vh;
-    display: grid;
-    place-content: center;
-    text-align: center;
+.btn-polish-profile:hover {
+    background: #d4e3d7;
 }
 
-.learner-loading h2,
-.learner-error h1 {
-    margin: 15px 0 5px;
+/* =========================================================
+   FOOTER
+========================================================= */
+.learner-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px 0 20px;
+    margin-top: 40px;
+    border-top: 1px solid #c7d2c8;
 }
 
-.learner-loading p,
-.learner-error > p {
-    color: #888;
+.learner-footer-brand strong {
+    display: block;
+    font-size: 14px;
+    color: #12362c;
 }
 
-.loader-ring {
-    width: 38px;
-    height: 38px;
-    margin: 0 auto;
-    border: 3px solid #e6e1ff;
-    border-top-color: #7258e9;
-    border-radius: 50%;
-    animation: learner-spin 0.8s linear infinite;
+.learner-footer-brand span {
+    font-size: 12px;
+    color: #6a8077;
 }
 
-.error-icon {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto;
-    display: grid;
-    place-items: center;
-    border-radius: 15px;
-    background: #ffeaea;
-    color: #d44949;
-    font-size: 20px;
-    font-weight: 900;
+.learner-footer-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-@keyframes learner-spin {
-    to {
-        transform: rotate(360deg);
-    }
+.learner-footer-links button {
+    border: none;
+    background: none;
+    color: #42695a;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
 }
 
-@media (max-width: 1000px) {
-    .overview-grid {
+.learner-footer-links button:hover {
+    color: #123d31;
+}
+
+/* =========================================================
+   RESPONSIVE BREAKPOINTS (MATCHING MENTOR DASHBOARD)
+========================================================= */
+@media (max-width: 960px) {
+    .curriculum-summary-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-
-    .dashboard-main-grid,
-    .dashboard-secondary-grid {
+    .curriculum-detail-split {
         grid-template-columns: 1fr;
-    }
-
-    .quick-action-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .dashboard-nav {
-        display: none;
     }
 }
 
-@media (max-width: 650px) {
-    .learner-dashboard {
-        padding: 14px;
-    }
-
-    .dashboard-topbar {
-        border-radius: 14px;
-    }
-
-    .dashboard-brand {
-        min-width: auto;
-    }
-
-    .dashboard-brand span {
-        display: none;
-    }
-
-    .dashboard-hero {
-        padding: 24px;
+@media (max-width: 800px) {
+    .learner-hero,
+    .learner-workbench {
+        grid-template-columns: 1fr;
         flex-direction: column;
+    }
+    .learner-hero-actions {
         align-items: flex-start;
-    }
-
-    .hero-actions {
-        width: 100%;
-    }
-
-    .hero-actions button {
-        flex: 1;
-    }
-
-    .overview-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .skill-chart {
-        grid-template-columns: 1fr;
-    }
-
-    .roadmap-item {
-        grid-template-columns: 38px 1fr;
-    }
-
-    .roadmap-line {
-        display: none;
-    }
-
-    .dashboard-panel {
-        padding: 19px;
-    }
-
-    .dashboard-footer {
         flex-direction: column;
-        gap: 12px;
+    }
+    .learner-scoreline {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px 0;
+    }
+    .learner-scoreline > div:nth-child(3) {
+        padding-left: 0;
+        border-left: 0;
+    }
+    .learner-flow-field {
+        padding: 40px 0 0;
+        border-left: 0;
+        border-top: 1px solid #c4d0c6;
+    }
+    .learner-rhythm-chart {
+        gap: 8px;
+        overflow-x: auto;
+    }
+    .learner-rhythm-bar {
+        min-width: 68px;
+    }
+    .learner-quick-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .curriculum-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 500px) {
+    .learner-studio,
+    .learner-dashboard {
+        padding: 24px 16px;
+    }
+    .learner-scoreline > div {
+        padding: 0 12px;
+        gap: 9px;
+    }
+    .learner-scoreline strong {
+        font-size: 32px;
+    }
+    .learner-flow-line > div {
+        width: 74px;
+    }
+    .learner-flow-line b {
+        width: 46px;
+        height: 46px;
+    }
+    .learner-lede {
+        font-size: 15px;
     }
 }

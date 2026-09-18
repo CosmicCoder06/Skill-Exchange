@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Wallet, ShieldCheck, QrCode, ArrowUpRight, PlusCircle } from "lucide-react";
 import WalletModal from "../wallet/WalletModal";
 
@@ -42,11 +42,12 @@ export default function PaymentReceipt({
     const [walletBalance, setWalletBalance] = useState(0);
     const [walletLoading, setWalletLoading] = useState(true);
     const [showWalletModal, setShowWalletModal] = useState(false);
+    const [showFullBreakdown, setShowFullBreakdown] = useState(false);
 
     const isMentor =
         String(booking.mentor?._id || booking.mentor?.id || booking.mentor) === String(currentUserId);
     const isLearner =
-        String(booking.learner?._id || booking.learner?.id || booking.learner) === String(currentUserId);
+        String(booking.learner?._id || booking.learner?.id || booking.learner) === String(currentUserId) || !isMentor;
 
     const duration = Number(booking.duration) || 60;
     const mentorId = booking.mentor?._id || booking.mentor?.id || booking.mentor;
@@ -74,17 +75,6 @@ export default function PaymentReceipt({
     const mentorEarnings = Number(booking.mentorEarnings) > 0
         ? Number(booking.mentorEarnings)
         : roundToTwo(grossAmountWithGst - mentorPlatformFee);
-
-    // Is UPI / Card method used?
-    const isUpiOrCard = ["upi", "card", "upi_card", "qr"].includes(String(booking.paymentMethod || "").toLowerCase());
-    const learnerFeeApplied = (Number(booking.learnerConvenienceFee) > 0) || (isUpiOrCard && baseAmount > 0);
-    const learnerConvenienceFee = Number(booking.learnerConvenienceFee) > 0
-        ? Number(booking.learnerConvenienceFee)
-        : (learnerFeeApplied ? roundToTwo(grossAmountWithGst * 0.03) : 0);
-    const totalCharged = Number(booking.totalAmountPaid) > 0
-        ? Number(booking.totalAmountPaid)
-        : roundToTwo(grossAmountWithGst + (learnerFeeApplied ? learnerConvenienceFee : 0));
-    const upiTotalAmount = roundToTwo(grossAmountWithGst + roundToTwo(grossAmountWithGst * 0.03));
 
     // Derive effective payment status based on booking status
     const effectivePaymentStatus = (() => {
@@ -115,11 +105,33 @@ export default function PaymentReceipt({
         return payStatus || "unpaid";
     })();
 
+    const isPaymentPending = bookingStatus === "approved" && effectivePaymentStatus !== "verified";
+
+    // Dynamic fee calculation based on active radio selection (for pending payment)
+    const isWalletMode = paymentMode === "wallet";
+    const upiTotalAmount = roundToTwo(grossAmountWithGst + roundToTwo(grossAmountWithGst * 0.03));
+    const activeLearnerConvenienceFee = isWalletMode ? 0 : roundToTwo(grossAmountWithGst * 0.03);
+    const activeTotalDue = isWalletMode ? grossAmountWithGst : upiTotalAmount;
+    const activePaymentModeLabel = isWalletMode ? "Skill Exchange Wallet" : "UPI / Card";
+
+    // Historical finalized fee calculation (for completed / already verified bookings)
+    const isUpiOrCard = ["upi", "card", "upi_card", "qr"].includes(String(booking.paymentMethod || "").toLowerCase());
+    const historicalFeeApplied = (Number(booking.learnerConvenienceFee) > 0) || (isUpiOrCard && baseAmount > 0);
+    const historicalConvenienceFee = Number(booking.learnerConvenienceFee) > 0
+        ? Number(booking.learnerConvenienceFee)
+        : (historicalFeeApplied ? roundToTwo(grossAmountWithGst * 0.03) : 0);
+    const historicalTotal = Number(booking.totalAmountPaid) > 0
+        ? Number(booking.totalAmountPaid)
+        : roundToTwo(grossAmountWithGst + (historicalFeeApplied ? historicalConvenienceFee : 0));
+
+    // Wallet balance validation strictly against wallet requirement (grossAmountWithGst)
+    const walletRequiredAmount = Number(grossAmountWithGst) || 0;
+    const isWalletInsufficient = !walletLoading && (Number(walletBalance) + 0.0001 < walletRequiredAmount);
+
     // Fetch learner's wallet balance reliably
-    useEffect(() => {
+    const refreshWalletBalance = useCallback(() => {
         const activeToken = token || localStorage.getItem("token");
-        if (bookingStatus === "approved" && isLearner && activeToken) {
-            let active = true;
+        if (isLearner && activeToken) {
             setWalletLoading(true);
             fetch(`${import.meta.env.VITE_API_URL}/wallet`, {
                 headers: { Authorization: `Bearer ${activeToken}` }
@@ -129,24 +141,42 @@ export default function PaymentReceipt({
                     return res.json();
                 })
                 .then((data) => {
-                    if (active && data?.wallet) {
+                    if (data?.wallet) {
                         setWalletBalance(Number(data.wallet.balance) || 0);
                     }
                 })
                 .catch(() => {
-                    if (active) setWalletBalance(0);
+                    setWalletBalance(0);
                 })
                 .finally(() => {
-                    if (active) setWalletLoading(false);
+                    setWalletLoading(false);
                 });
+        }
+    }, [isLearner, token]);
 
-            return () => {
-                active = false;
-            };
+    useEffect(() => {
+        if (bookingStatus === "approved" && isLearner) {
+            refreshWalletBalance();
         } else {
             setWalletLoading(false);
         }
-    }, [bookingStatus, isLearner, token]);
+    }, [bookingStatus, isLearner, refreshWalletBalance]);
+
+    // Live listener for real-time wallet updates across components/modals without page refresh
+    useEffect(() => {
+        const handleWalletEvent = (e) => {
+            if (e?.detail?.balance !== undefined) {
+                setWalletBalance(Number(e.detail.balance) || 0);
+                setError("");
+            } else {
+                refreshWalletBalance();
+            }
+        };
+        window.addEventListener("wallet_balance_updated", handleWalletEvent);
+        return () => {
+            window.removeEventListener("wallet_balance_updated", handleWalletEvent);
+        };
+    }, [refreshWalletBalance]);
 
     // Load mentor QR code if booking is approved and payment is pending
     useEffect(() => {
@@ -204,18 +234,18 @@ export default function PaymentReceipt({
     function formatPaymentMode(method) {
         if (!method) return "—";
         const m = String(method).toLowerCase();
-        if (m === "wallet") return "Wallet";
-        if (m === "upi" || m === "card" || m === "upi_card" || m === "qr") return "UPI/Card";
-        if (m === "free") return "Free";
-        if (m === "pay_later") return "Pay Later";
+        if (m === "wallet") return "Skill Exchange Wallet";
+        if (m === "upi" || m === "card" || m === "upi_card" || m === "qr") return "UPI / Card";
+        if (m === "free") return "Free Session";
+        if (m === "pay_later") return "Pending Payment";
         return method;
     }
 
     async function handleCompletePayment() {
         if (baseAmount > 0) {
             if (paymentMode === "wallet") {
-                if (walletBalance < grossAmountWithGst) {
-                    setError(`Insufficient wallet balance (${formatCurrency(walletBalance)}). Required: ${formatCurrency(grossAmountWithGst)}. Please top up your wallet or choose UPI/Card.`);
+                if (isWalletInsufficient) {
+                    setError(`Insufficient wallet balance (${formatCurrency(walletBalance)}). Required: ${formatCurrency(walletRequiredAmount)}. Please top up your wallet or choose UPI/Card.`);
                     return;
                 }
             } else if (paymentMode === "direct") {
@@ -261,11 +291,58 @@ export default function PaymentReceipt({
             setBookingStatus("accepted");
             setStatus(data.booking?.paymentStatus || "verified");
 
+            if (chosenMethod === "wallet") {
+                refreshWalletBalance();
+            }
+
             if (onBookingUpdated) {
                 onBookingUpdated(data.booking);
             }
         } catch (e) {
             setError(e.message);
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    async function handleCancelBookingAtPayment() {
+        const confirmed = window.confirm(
+            "Are you sure you want to cancel this booking? The mentor has already approved this time slot. This slot will be released and you'll need to submit a new request if you change your mind."
+        );
+        if (!confirmed) return;
+
+        setBusy(true);
+        setError("");
+        try {
+            const activeToken = token || localStorage.getItem("token");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${booking._id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${activeToken}`
+                },
+                body: JSON.stringify({
+                    reason: "Cancelled by learner before payment."
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || "Failed to cancel booking");
+            }
+            const updatedBooking = data.booking || {
+                ...booking,
+                status: "cancelled",
+                paymentStatus: "cancelled",
+                cancelledBy: "learner",
+                cancellationReason: "Cancelled by learner before payment."
+            };
+            setBookingStatus("cancelled");
+            setStatus("cancelled");
+            if (onBookingUpdated) {
+                onBookingUpdated(updatedBooking);
+            }
+        } catch (err) {
+            setError(err.message || "Unable to cancel booking");
         } finally {
             setBusy(false);
         }
@@ -295,67 +372,150 @@ export default function PaymentReceipt({
     // Purely financial/payment-related details
     // ==========================================
     if (isLearner) {
+        const isPaymentPending = bookingStatus === "approved";
+
         return (
             <div className="payment-receipt-container">
-                <section className="receipt-role-card booker-receipt-card">
+                <section className={`receipt-role-card booker-receipt-card ${isPaymentPending ? "is-payment-pending-card" : ""}`}>
                     <div className="receipt-role-header">
                         <span className="receipt-card-title">Payment Summary</span>
                         <span className="receipt-duration-chip">⏱ {duration} MINS</span>
                     </div>
 
-                    <div className="receipt-details-list">
-                        <div className="receipt-detail-item">
-                            <span className="item-label">Session Rate</span>
-                            <strong className="item-val">{baseAmount === 0 ? "Free" : formatCurrency(baseAmount)}</strong>
-                        </div>
-                        {baseAmount > 0 && (
-                            <>
-                                <div className="receipt-detail-item">
-                                    <span className="item-label">GST (18%)</span>
-                                    <strong className="item-val font-accent">+{formatCurrency(gstAmount)}</strong>
+                    {isPaymentPending && !showFullBreakdown ? (
+                        /* COMPACT SUMMARY FOR PAYMENT PENDING CARDS:
+                           Shows essentials (Session Rate, Total Due, Status, and Active Payment Mode)
+                           dynamically synced with the chosen payment mode. */
+                        <div className="receipt-details-list compact-summary">
+                            <div className="receipt-detail-item">
+                                <span className="item-label">Session Rate</span>
+                                <strong className="item-val">{baseAmount === 0 ? "Free" : formatCurrency(baseAmount)}</strong>
+                            </div>
+                            {baseAmount > 0 && (
+                                <div className="receipt-detail-item item-total-row">
+                                    <span className="item-label">Total Amount Due</span>
+                                    <strong className="item-val total-amount">{formatCurrency(activeTotalDue)}</strong>
                                 </div>
-                                {learnerFeeApplied ? (
-                                    <>
-                                        <div className="receipt-detail-item">
-                                            <span className="item-label">Subtotal (with GST)</span>
-                                            <strong className="item-val">{formatCurrency(grossAmountWithGst)}</strong>
-                                        </div>
-                                        <div className="receipt-detail-item">
-                                            <span className="item-label">Platform Convenience Fee (3%)</span>
-                                            <strong className="item-val font-accent">+{formatCurrency(learnerConvenienceFee)}</strong>
-                                        </div>
-                                        <div className="receipt-detail-item item-total-row">
-                                            <span className="item-label">Total Amount Paid</span>
-                                            <strong className="item-val total-amount">{formatCurrency(totalCharged)}</strong>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="receipt-detail-item item-total-row">
-                                        <span className="item-label">Total Session Fee (with GST)</span>
-                                        <strong className="item-val total-amount">{formatCurrency(grossAmountWithGst)}</strong>
-                                    </div>
-                                )}
-                            </>
-                        )}
-                        <div className="receipt-detail-item">
-                            <span className="item-label">Payment Status</span>
-                            <div className="item-val">{renderStatusBadge(effectivePaymentStatus)}</div>
+                            )}
+                            <div className="receipt-detail-item">
+                                <span className="item-label">Payment Status</span>
+                                <div className="item-val">{renderStatusBadge(effectivePaymentStatus)}</div>
+                            </div>
+                            <div className="receipt-detail-item">
+                                <span className="item-label">Payment Mode</span>
+                                <strong className="item-val">{activePaymentModeLabel}</strong>
+                            </div>
+                            {baseAmount > 0 && (
+                                <div className="receipt-breakdown-toggle-row">
+                                    <button
+                                        type="button"
+                                        className="receipt-breakdown-toggle-btn"
+                                        onClick={() => setShowFullBreakdown(true)}
+                                    >
+                                        Show fee breakdown ▾
+                                    </button>
+                                </div>
+                            )}
                         </div>
-                        {booking.paymentMethod && (
+                    ) : (
+                        /* FULL DETAILED BREAKDOWN */
+                        <div className="receipt-details-list">
+                            <div className="receipt-detail-item">
+                                <span className="item-label">Session Rate</span>
+                                <strong className="item-val">{baseAmount === 0 ? "Free" : formatCurrency(baseAmount)}</strong>
+                            </div>
+                            {baseAmount > 0 && (
+                                <>
+                                    <div className="receipt-detail-item">
+                                        <span className="item-label">GST (18%)</span>
+                                        <strong className="item-val font-accent">+{formatCurrency(gstAmount)}</strong>
+                                    </div>
+                                    <div className="receipt-detail-item">
+                                        <span className="item-label">Subtotal (with GST)</span>
+                                        <strong className="item-val">{formatCurrency(grossAmountWithGst)}</strong>
+                                    </div>
+                                    {isPaymentPending ? (
+                                        /* Dynamic breakdown synced with chosen payment mode */
+                                        <>
+                                            {isWalletMode ? (
+                                                <>
+                                                    <div className="receipt-detail-item">
+                                                        <span className="item-label">Platform Convenience Fee (0%)</span>
+                                                        <strong className="item-val font-accent" style={{ color: "#059669" }}>
+                                                            ₹0 (No Fee)
+                                                        </strong>
+                                                    </div>
+                                                    <div className="receipt-detail-item item-total-row">
+                                                        <span className="item-label">Total Amount Due</span>
+                                                        <strong className="item-val total-amount">{formatCurrency(grossAmountWithGst)}</strong>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="receipt-detail-item">
+                                                        <span className="item-label">Platform Convenience Fee (3%)</span>
+                                                        <strong className="item-val font-accent">+{formatCurrency(activeLearnerConvenienceFee)}</strong>
+                                                    </div>
+                                                    <div className="receipt-detail-item item-total-row">
+                                                        <span className="item-label">Total Amount Due</span>
+                                                        <strong className="item-val total-amount">{formatCurrency(upiTotalAmount)}</strong>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </>
+                                    ) : (
+                                        /* Historical finalized breakdown */
+                                        <>
+                                            {historicalFeeApplied ? (
+                                                <>
+                                                    <div className="receipt-detail-item">
+                                                        <span className="item-label">Platform Convenience Fee (3%)</span>
+                                                        <strong className="item-val font-accent">+{formatCurrency(historicalConvenienceFee)}</strong>
+                                                    </div>
+                                                    <div className="receipt-detail-item item-total-row">
+                                                        <span className="item-label">Total Amount Paid</span>
+                                                        <strong className="item-val total-amount">{formatCurrency(historicalTotal)}</strong>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="receipt-detail-item item-total-row">
+                                                    <span className="item-label">Total Session Fee (with GST)</span>
+                                                    <strong className="item-val total-amount">{formatCurrency(grossAmountWithGst)}</strong>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </>
+                            )}
+                            <div className="receipt-detail-item">
+                                <span className="item-label">Payment Status</span>
+                                <div className="item-val">{renderStatusBadge(effectivePaymentStatus)}</div>
+                            </div>
                             <div className="receipt-detail-item">
                                 <span className="item-label">Payment Mode</span>
                                 <strong className="item-val">
-                                    {formatPaymentMode(booking.paymentMethod)}
+                                    {isPaymentPending ? activePaymentModeLabel : formatPaymentMode(booking.paymentMethod)}
                                 </strong>
                             </div>
-                        )}
-                        {booking.paymentReference && (
-                            <div className="receipt-detail-item">
-                                <span className="item-label">Reference</span>
-                                <code className="item-code">{booking.paymentReference}</code>
-                            </div>
-                        )}
-                    </div>
+                            {booking.paymentReference && (
+                                <div className="receipt-detail-item">
+                                    <span className="item-label">Reference</span>
+                                    <code className="item-code">{booking.paymentReference}</code>
+                                </div>
+                            )}
+                            {isPaymentPending && baseAmount > 0 && (
+                                <div className="receipt-breakdown-toggle-row">
+                                    <button
+                                        type="button"
+                                        className="receipt-breakdown-toggle-btn"
+                                        onClick={() => setShowFullBreakdown(false)}
+                                    >
+                                        Hide breakdown ▴
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </section>
 
                 {/* APPROVAL UNLOCKED PAYMENT FORM */}
@@ -400,7 +560,7 @@ export default function PaymentReceipt({
                                             <Wallet size={14} />
                                             <span>Your Balance:</span>
                                             <strong>{walletLoading ? "Fetching…" : formatCurrency(walletBalance)}</strong>
-                                            {!walletLoading && walletBalance < grossAmountWithGst && (
+                                            {isWalletInsufficient && (
                                                 <span className="balance-shortage-badge">Insufficient</span>
                                             )}
                                         </div>
@@ -441,7 +601,7 @@ export default function PaymentReceipt({
                                     <div className="mode-pricing-line">
                                         <span className="mode-amount">{formatCurrency(upiTotalAmount)}</span>
                                         <span className="convenience-breakdown">
-                                            ({formatCurrency(grossAmountWithGst)} session fee + 3% convenience fee {formatCurrency(learnerConvenienceFee)})
+                                            ({formatCurrency(grossAmountWithGst)} session fee + 3% convenience fee {formatCurrency(roundToTwo(grossAmountWithGst * 0.03))})
                                         </span>
                                     </div>
 
@@ -485,6 +645,15 @@ export default function PaymentReceipt({
                                 ? `Pay ${formatCurrency(grossAmountWithGst)} from Wallet & Confirm`
                                 : `Pay ${formatCurrency(upiTotalAmount)} & Confirm`}
                         </button>
+
+                        <button
+                            type="button"
+                            className="btn-cancel-unpaid-booking"
+                            disabled={busy}
+                            onClick={handleCancelBookingAtPayment}
+                        >
+                            ✕ Cancel Booking
+                        </button>
                     </div>
                 )}
 
@@ -492,10 +661,13 @@ export default function PaymentReceipt({
 
                 {showWalletModal && (
                     <WalletModal
-                        token={token}
-                        onClose={() => setShowWalletModal(false)}
+                        token={token || localStorage.getItem("token")}
+                        onClose={() => {
+                            setShowWalletModal(false);
+                            refreshWalletBalance();
+                        }}
                         onBalanceUpdated={(newBal) => {
-                            setWalletBalance(newBal);
+                            setWalletBalance(Number(newBal) || 0);
                             setError("");
                         }}
                     />

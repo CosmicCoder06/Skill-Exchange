@@ -21,3 +21,5 @@ import './premium.css';
 import './editorial.css';
 import './chat-restored.css';
 import './session-receipts.css';
+import './Pages/Learner Dashboard/LearnerDashboard.css';
+import './Pages/Mentor Dashboard/MentorDashboard.css';

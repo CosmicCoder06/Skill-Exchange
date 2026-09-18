@@ -81,3 +81,86 @@ test('terminal booking states update paymentStatus accordingly', () => {
   assert.equal(getEffectivePaymentStatus("verified", "completed"), "verified");
 });
 
+test('completed session reviews assign reviewee symmetrically', () => {
+  function getReviewee(currentUserId, booking) {
+    const learnerId = booking.learner.toString();
+    const mentorId = booking.mentor.toString();
+    if (currentUserId !== learnerId && currentUserId !== mentorId) {
+      throw new Error("Forbidden");
+    }
+    return currentUserId === learnerId ? booking.mentor : booking.learner;
+  }
+
+  const booking = {
+    learner: "user_learner_1",
+    mentor: "user_mentor_2",
+    status: "completed"
+  };
+
+  // Learner reviewing mentor
+  assert.equal(getReviewee("user_learner_1", booking), "user_mentor_2");
+  // Mentor reviewing learner
+  assert.equal(getReviewee("user_mentor_2", booking), "user_learner_1");
+  // Unrelated user
+  assert.throws(() => getReviewee("user_intruder_3", booking), /Forbidden/);
+});
+
+test('booking reviews partitioning accurately separates learner and mentor reviews', () => {
+  function partitionReviews(reviews, booking, currentUserId) {
+    const learnerId = (booking.learner?._id || booking.learner).toString();
+    const mentorId = (booking.mentor?._id || booking.mentor).toString();
+
+    const learnerReview = reviews.find(
+      (r) => (r.reviewer?._id || r.reviewer)?.toString() === learnerId
+    ) || null;
+
+    const mentorReview = reviews.find(
+      (r) => (r.reviewer?._id || r.reviewer)?.toString() === mentorId
+    ) || null;
+
+    const myReview = reviews.find(
+      (r) => (r.reviewer?._id || r.reviewer)?.toString() === currentUserId
+    ) || null;
+
+    return { review: myReview, reviews, learnerReview, mentorReview };
+  }
+
+  const booking = {
+    _id: "booking_123",
+    learner: { _id: "learner_01", name: "Alice" },
+    mentor: { _id: "mentor_02", name: "Bob" }
+  };
+
+  const sampleLearnerReview = {
+    _id: "rev_1",
+    reviewer: { _id: "learner_01", name: "Alice" },
+    rating: 5,
+    comment: "Great session!"
+  };
+
+  const sampleMentorReview = {
+    _id: "rev_2",
+    reviewer: { _id: "mentor_02", name: "Bob" },
+    rating: 4,
+    comment: "Quick learner and engaged."
+  };
+
+  // Case 1: Both reviews exist
+  const resBoth = partitionReviews([sampleLearnerReview, sampleMentorReview], booking, "learner_01");
+  assert.equal(resBoth.learnerReview._id, "rev_1");
+  assert.equal(resBoth.mentorReview._id, "rev_2");
+  assert.equal(resBoth.review._id, "rev_1");
+
+  // Case 2: Only learner reviewed
+  const resLearnerOnly = partitionReviews([sampleLearnerReview], booking, "mentor_02");
+  assert.equal(resLearnerOnly.learnerReview._id, "rev_1");
+  assert.equal(resLearnerOnly.mentorReview, null);
+  assert.equal(resLearnerOnly.review, null);
+
+  // Case 3: Neither reviewed
+  const resNone = partitionReviews([], booking, "learner_01");
+  assert.equal(resNone.learnerReview, null);
+  assert.equal(resNone.mentorReview, null);
+  assert.equal(resNone.review, null);
+});
+

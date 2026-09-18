@@ -153,6 +153,42 @@ const getLearnerDashboard = async (req, res) => {
             });
         }
 
+        const learnerId = user._id;
+        const [
+            completedBookings,
+            upcomingSessions,
+            mentorsConnected,
+            monthlyLearning,
+            learnerWallet
+        ] = await Promise.all([
+            Booking.find({ learner: learnerId, status: "completed" })
+                .populate("mentor", "name email avatarUrl skillsToTeach"),
+            Booking.countDocuments({
+                learner: learnerId,
+                status: { $in: ["pending", "accepted", "slots_offered"] }
+            }),
+            Booking.distinct("mentor", { learner: learnerId, status: "completed" }),
+            Booking.aggregate([
+                { $match: { learner: learnerId, status: "completed" } },
+                { $group: { _id: { $substr: ["$date", 0, 7] }, sessions: { $sum: 1 }, duration: { $sum: "$duration" } } },
+                { $sort: { _id: 1 } },
+                { $limit: 6 }
+            ]),
+            Wallet.findOne({ user: learnerId })
+        ]);
+
+        const sessionsAttended = completedBookings.length;
+        const totalLearningMinutes = completedBookings.reduce((sum, b) => sum + (Number(b.duration) || 60), 0);
+        const learningHours = roundToTwo(totalLearningMinutes / 60);
+
+        const skillsExploredSet = new Set(user.skillsToLearn || []);
+        completedBookings.forEach((b) => {
+            (b.mentor?.skillsToTeach || []).forEach((s) => {
+                if (s && typeof s === "string") skillsExploredSet.add(s.trim());
+            });
+        });
+        const skillsExploredCount = skillsExploredSet.size;
+
         res.status(200).json({
             message: "Learner dashboard data fetched successfully",
             dashboard: {
@@ -165,7 +201,20 @@ const getLearnerDashboard = async (req, res) => {
                 availability: user.availability,
                 hourlyRate: user.hourlyRate,
                 avatarUrl: user.avatarUrl,
-                profileCompleted: user.profileCompleted
+                profileCompleted: user.profileCompleted,
+                sessionsAttended,
+                upcomingSessions,
+                mentorsConnected: mentorsConnected.length,
+                learningHours,
+                skillsExploredCount,
+                monthlyLearning: monthlyLearning.map((row) => ({
+                    month: row._id,
+                    sessions: row.sessions,
+                    hours: roundToTwo((row.duration || 60) / 60)
+                })),
+                walletBalance: learnerWallet ? roundToTwo(learnerWallet.balance) : 0,
+                earnedBalance: learnerWallet ? roundToTwo(learnerWallet.earnedBalance || 0) : 0,
+                topupBalance: learnerWallet ? roundToTwo(learnerWallet.topupBalance || 0) : 0
             }
         });
 

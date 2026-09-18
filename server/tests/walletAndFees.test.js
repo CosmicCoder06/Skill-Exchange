@@ -80,3 +80,128 @@ test('wallet balance settlement and topup math with GST', () => {
   assert.equal(fees.mentorEarnings, 686.76);   // 708 - 21.24
   assert.equal(mentorBalance, 686.76);
 });
+
+test('dual-balance wallet rules: top-up-first deduction and earned-balance-only withdrawals', () => {
+  // Scenario: Learner has both topupBalance and earnedBalance
+  const roundToTwo = (num) => Math.round((Number(num) + Number.EPSILON) * 100) / 100;
+
+  let wallet = {
+    earnedBalance: 300,
+    topupBalance: 500,
+    balance: 800
+  };
+
+  // 1. Top-up: adds directly to topupBalance
+  const topupAmount = 200;
+  wallet.topupBalance = roundToTwo(wallet.topupBalance + topupAmount);
+  wallet.balance = roundToTwo(wallet.earnedBalance + wallet.topupBalance);
+  assert.equal(wallet.topupBalance, 700);
+  assert.equal(wallet.earnedBalance, 300);
+  assert.equal(wallet.balance, 1000);
+
+  // 2. Paying for a session of ₹800: deducts from topupBalance first, then earnedBalance
+  const sessionCost = 800;
+  let remaining = sessionCost;
+  const deductTopup = Math.min(wallet.topupBalance, remaining);
+  wallet.topupBalance = roundToTwo(wallet.topupBalance - deductTopup);
+  remaining = roundToTwo(remaining - deductTopup);
+  assert.equal(deductTopup, 700);
+  assert.equal(wallet.topupBalance, 0);
+  assert.equal(remaining, 100);
+
+  if (remaining > 0) {
+    wallet.earnedBalance = roundToTwo(wallet.earnedBalance - remaining);
+  }
+  wallet.balance = roundToTwo(wallet.earnedBalance + wallet.topupBalance);
+  assert.equal(wallet.earnedBalance, 200);
+  assert.equal(wallet.balance, 200);
+
+  // 3. Withdrawal validation: can only withdraw up to earnedBalance
+  const attemptWithdrawMoreThanEarned = 250;
+  const canWithdraw = attemptWithdrawMoreThanEarned <= wallet.earnedBalance;
+  assert.equal(canWithdraw, false);
+
+  // 4. Withdrawal of valid amount from earnedBalance
+  const validWithdraw = 150;
+  assert.equal(validWithdraw <= wallet.earnedBalance, true);
+  wallet.earnedBalance = roundToTwo(wallet.earnedBalance - validWithdraw);
+  wallet.balance = roundToTwo(wallet.earnedBalance + wallet.topupBalance);
+  assert.equal(wallet.earnedBalance, 50);
+  assert.equal(wallet.topupBalance, 0);
+  assert.equal(wallet.balance, 50);
+
+  // 5. Mentor session earning credited strictly to earnedBalance
+  const mentorEarning = 450;
+  wallet.earnedBalance = roundToTwo(wallet.earnedBalance + mentorEarning);
+  wallet.balance = roundToTwo(wallet.earnedBalance + wallet.topupBalance);
+  assert.equal(wallet.earnedBalance, 500);
+  assert.equal(wallet.topupBalance, 0);
+  assert.equal(wallet.balance, 500);
+});
+
+test('computeBalancesFromLedger accurately reconstructs balance from transaction history (fixes ₹0 bug)', async () => {
+  const { computeBalancesFromLedger } = require('../Utils/walletHelper');
+
+  // Case 1: The user's exact reported scenario
+  // Top-up of +₹500 followed by session payment of -₹23.60
+  const userLedger = [
+    {
+      type: 'topup',
+      amount: 500,
+      createdAt: new Date('2026-09-18T10:00:00Z')
+    },
+    {
+      type: 'session_payment',
+      amount: -23.6,
+      createdAt: new Date('2026-09-18T10:30:00Z')
+    }
+  ];
+
+  const result1 = await computeBalancesFromLedger(userLedger);
+  assert.ok(result1 !== null);
+  // Total balance MUST NOT be 0; must be exactly ₹476.40
+  assert.equal(result1.balance, 476.4);
+  assert.equal(result1.topupBalance, 476.4);
+  assert.equal(result1.earnedBalance, 0);
+
+  // Case 2: Full dual-balance ledger lifecycle with earnings, cross-deduction, and withdrawal
+  const fullLedger = [
+    {
+      type: 'topup',
+      amount: 500,
+      createdAt: new Date('2026-09-18T08:00:00Z')
+    },
+    {
+      type: 'session_payment',
+      amount: -23.6,
+      createdAt: new Date('2026-09-18T09:00:00Z')
+    },
+    {
+      type: 'session_earning',
+      amount: 1144.6,
+      createdAt: new Date('2026-09-18T10:00:00Z')
+    },
+    {
+      type: 'session_payment',
+      amount: -500, // Debits 476.4 from topup (exhausts it), remaining 23.6 from earnedBalance
+      createdAt: new Date('2026-09-18T11:00:00Z')
+    },
+    {
+      type: 'withdrawal',
+      amount: -500, // Debits strictly from earnedBalance
+      createdAt: new Date('2026-09-18T12:00:00Z')
+    }
+  ];
+
+  const result2 = await computeBalancesFromLedger(fullLedger);
+  assert.ok(result2 !== null);
+  assert.equal(result2.topupBalance, 0);
+  assert.equal(result2.earnedBalance, 621);
+  assert.equal(result2.balance, 621);
+
+  // Case 3: Empty ledger returns null so caller uses defaults
+  const emptyResult = await computeBalancesFromLedger([]);
+  assert.equal(emptyResult, null);
+});
+
+

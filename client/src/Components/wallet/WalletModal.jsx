@@ -3,6 +3,57 @@ import { Wallet as WalletIcon, ArrowDownLeft, ArrowUpRight, PlusCircle, CheckCir
 import Modal from "../common/Modal";
 import "./WalletModal.css";
 
+function computeBalancesFromLedger(transactions) {
+    if (!transactions || transactions.length === 0) return null;
+
+    const sorted = [...transactions].sort((a, b) => {
+        const timeA = new Date(a.createdAt || 0).getTime();
+        const timeB = new Date(b.createdAt || 0).getTime();
+        return timeA - timeB;
+    });
+
+    let topup = 0;
+    let earned = 0;
+
+    for (const tx of sorted) {
+        const amt = Math.round((Number(tx.amount) + Number.EPSILON) * 100) / 100;
+        const type = tx.type;
+
+        if (type === "topup") {
+            topup = Math.round((topup + Math.abs(amt) + Number.EPSILON) * 100) / 100;
+        } else if (type === "session_earning") {
+            earned = Math.round((earned + Math.abs(amt) + Number.EPSILON) * 100) / 100;
+        } else if (type === "withdrawal") {
+            earned = Math.max(0, Math.round((earned - Math.abs(amt) + Number.EPSILON) * 100) / 100);
+        } else if (type === "session_payment") {
+            const spend = Math.abs(amt);
+            const deductFromTopup = Math.min(topup, spend);
+            topup = Math.round((topup - deductFromTopup + Number.EPSILON) * 100) / 100;
+            const remainingSpend = Math.round((spend - deductFromTopup + Number.EPSILON) * 100) / 100;
+            if (remainingSpend > 0) {
+                earned = Math.max(0, Math.round((earned - remainingSpend + Number.EPSILON) * 100) / 100);
+            }
+        } else if (type === "refund") {
+            topup = Math.round((topup + Math.abs(amt) + Number.EPSILON) * 100) / 100;
+        } else {
+            if (amt > 0) {
+                topup = Math.round((topup + amt + Number.EPSILON) * 100) / 100;
+            } else {
+                const spend = Math.abs(amt);
+                const deductFromTopup = Math.min(topup, spend);
+                topup = Math.round((topup - deductFromTopup + Number.EPSILON) * 100) / 100;
+                const remainingSpend = Math.round((spend - deductFromTopup + Number.EPSILON) * 100) / 100;
+                if (remainingSpend > 0) {
+                    earned = Math.max(0, Math.round((earned - remainingSpend + Number.EPSILON) * 100) / 100);
+                }
+            }
+        }
+    }
+
+    const total = Math.round((topup + earned + Number.EPSILON) * 100) / 100;
+    return { balance: total, topupBalance: topup, earnedBalance: earned };
+}
+
 export default function WalletModal({ token, onClose, onBalanceUpdated, initialTab = "topup" }) {
     const [balance, setBalance] = useState(0);
     const [earnedBalance, setEarnedBalance] = useState(0);
@@ -38,12 +89,31 @@ export default function WalletModal({ token, onClose, onBalanceUpdated, initialT
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || "Failed to load wallet");
-            setBalance(data.wallet?.balance || 0);
-            setEarnedBalance(data.wallet?.earnedBalance !== undefined ? data.wallet.earnedBalance : (data.wallet?.balance || 0));
-            setTopupBalance(data.wallet?.topupBalance || 0);
-            setTransactions(data.transactions || []);
+
+            const txs = Array.isArray(data.transactions) ? data.transactions : [];
+            const ledger = computeBalancesFromLedger(txs);
+
+            const activeBalance = ledger !== null
+                ? ledger.balance
+                : (Number(data.wallet?.balance) || 0);
+
+            const activeEarned = ledger !== null
+                ? ledger.earnedBalance
+                : (data.wallet?.earnedBalance !== undefined ? Number(data.wallet.earnedBalance) : (Number(data.wallet?.balance) || 0));
+
+            const activeTopup = ledger !== null
+                ? ledger.topupBalance
+                : (Number(data.wallet?.topupBalance) || 0);
+
+            setBalance(activeBalance);
+            setEarnedBalance(activeEarned);
+            setTopupBalance(activeTopup);
+            setTransactions(txs);
             if (onBalanceUpdated) {
-                onBalanceUpdated(data.wallet?.balance || 0);
+                onBalanceUpdated(activeBalance);
+            }
+            if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("wallet_balance_updated", { detail: { balance: activeBalance } }));
             }
         } catch (err) {
             console.error("Wallet fetch error:", err);
@@ -79,12 +149,16 @@ export default function WalletModal({ token, onClose, onBalanceUpdated, initialT
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || "Top-up failed");
 
-            setBalance(data.wallet?.balance || 0);
+            const updatedBal = Number(data.wallet?.balance) || 0;
+            setBalance(updatedBal);
             setEarnedBalance(data.wallet?.earnedBalance !== undefined ? data.wallet.earnedBalance : 0);
             setTopupBalance(data.wallet?.topupBalance || 0);
             setSuccessMsg(`Successfully added ₹${amt.toLocaleString("en-IN")} to your Top-Up balance!`);
             if (onBalanceUpdated) {
-                onBalanceUpdated(data.wallet?.balance || 0);
+                onBalanceUpdated(updatedBal);
+            }
+            if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("wallet_balance_updated", { detail: { balance: updatedBal } }));
             }
             await fetchWalletData();
         } catch (err) {

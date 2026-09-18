@@ -152,24 +152,13 @@ export default function SessionStatusCard({
                 </div>
             )}
 
-            {/* Review Section for Completed Sessions */}
-            {status === "completed" && (
+            {/* Review Section for Completed Sessions (Only reviewed confirmation indicator) */}
+            {status === "completed" && alreadyReviewed && (
                 <div className="status-card-review-section">
-                    {!alreadyReviewed && onLeaveReview ? (
-                        <button
-                            type="button"
-                            className="status-card-review-btn"
-                            onClick={onLeaveReview}
-                        >
-                            <Star size={15} />
-                            <span>Leave Session Review</span>
-                        </button>
-                    ) : alreadyReviewed ? (
-                        <div className="status-card-reviewed-indicator">
-                            <Star size={14} className="star-filled-icon" />
-                            <span>Review submitted — Thank you for your feedback!</span>
-                        </div>
-                    ) : null}
+                    <div className="status-card-reviewed-indicator">
+                        <Star size={14} className="star-filled-icon" />
+                        <span>Review submitted — Thank you for your feedback!</span>
+                    </div>
                 </div>
             )}
         </div>
