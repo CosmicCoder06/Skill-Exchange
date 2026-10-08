@@ -129,8 +129,8 @@ button { transition:background .18s ease, box-shadow .18s ease, color .18s ease;
  .home-page .hero-actions { flex-direction:column; align-items:stretch; gap:18px; }
  .home-page .hero-actions .home-primary { justify-content:center; }
 }
-/* User preference: flat, open layouts; no cards or boxed content panels. */
-body :is(.review-card,.person-row,.profile-section,.side-section,.profile-stats,.dashboard-section,.overview-card,.overview-rail,.mentor-panel,.mentor-section,.mentor-stat,.account-management-card,.admin-users-panel,.admin-stat-card,.admin-report-card,.completion-panel,.login-card,.new-chat-panel,.booking-calendar-section,.booking-section,.chat-list-item) {
+/* User preference: flat, open layouts; no cards or boxed content panels for user-facing views. */
+body :is(.review-card,.person-row,.profile-section,.side-section,.profile-stats,.dashboard-section,.overview-card,.overview-rail,.mentor-panel,.mentor-section,.mentor-stat,.account-management-card,.admin-users-panel,.completion-panel,.login-card,.new-chat-panel,.booking-calendar-section,.booking-section,.chat-list-item) {
  border:0 !important; border-bottom:1px solid var(--premium-line) !important;
  border-radius:0 !important; box-shadow:none !important; background:transparent !important;
 }

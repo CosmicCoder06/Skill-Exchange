@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./CompleteProfile.css";
 
 const emptyProfile = {
+    name: "",
     bio: "",
     skillsToTeach: "",
     teachingSkillLevels: {},
@@ -40,6 +41,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                 const { profile } = await response.json();
 
                 setFormData({
+                    name: profile.name || "",
                     bio: profile.bio || "",
 
                     skillsToTeach:
@@ -129,16 +131,22 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
         )
     ];
 
-    if (bio.length < 10) {
-        return "Bio must contain at least 10 characters.";
-    }
+    if (role === "admin") {
+        if (bio.length > 0 && bio.length < 5) {
+            return "Bio should contain at least 5 characters.";
+        }
+    } else {
+        if (bio.length < 10) {
+            return "Bio must contain at least 10 characters.";
+        }
 
-    if (skillsToTeach.length === 0) {
-        return "Add at least one skill you can teach.";
-    }
+        if (skillsToTeach.length === 0) {
+            return "Add at least one skill you can teach.";
+        }
 
-    if (role !== "mentor" && skillsToLearn.length === 0) {
-        return "Add at least one skill you want to learn.";
+        if (role !== "mentor" && skillsToLearn.length === 0) {
+            return "Add at least one skill you want to learn.";
+        }
     }
 
     if (
@@ -152,7 +160,11 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
     }
 
     const validateUrl = (value, fieldName) => {
-        if (!value.trim()) {
+        if (!value || !value.trim()) {
+            return null;
+        }
+
+        if (value.startsWith("data:image/")) {
             return null;
         }
 
@@ -229,12 +241,13 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                     },
 
                     body: JSON.stringify({
+                        name: formData.name?.trim(),
                         bio: formData.bio,
 
                         skillsToTeach,
                         teachingSkillLevels: Object.fromEntries(skillsToTeach.map((skill) => [skill, formData.teachingSkillLevels[skill] || formData.teachingSkillLevels[skill.toLowerCase()] || "Beginner"])),
 
-                        ...(role === "mentor" ? {} : { skillsToLearn }),
+                        ...(role === "mentor" || role === "admin" ? {} : { skillsToLearn }),
 
                         availability:
                             asList(
@@ -321,31 +334,102 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                     <div className="form-heading">
 
                         <h2>
-                            Complete your profile
+                            {role === "admin" ? "Edit Admin Profile" : "Complete your profile"}
                         </h2>
 
                         <p>
-                            Fields marked <b>*</b> are required.
+                            {role === "admin"
+                                ? "Update your administrator details, photo, and bio."
+                                : "Fields marked * are required."}
                         </p>
 
                     </div>
 
 
+                    {/* FULL NAME */}
+
+                    <label>
+                        Full Name {role !== "admin" && <b>*</b>}
+
+                        <input
+                            name="name"
+                            type="text"
+                            value={formData.name || ""}
+                            placeholder="Your full name"
+                            onChange={handleChange}
+                        />
+                    </label>
+
+
                     {/* PROFILE IMAGE */}
 
                     <label>
-                        Profile image URL
+                        Profile Image
 
-                        <input
-                            name="avatarUrl"
-                            type="url"
-                            value={formData.avatarUrl}
-                            placeholder="https://..."
-                            onChange={handleChange}
-                        />
+                        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                            <input
+                                name="avatarUrl"
+                                type="text"
+                                value={formData.avatarUrl}
+                                placeholder="https://... or upload from device"
+                                onChange={handleChange}
+                                style={{ flex: 1 }}
+                            />
 
+                            <label
+                                style={{
+                                    cursor: "pointer",
+                                    padding: "9px 14px",
+                                    background: "#eaf3ef",
+                                    border: "1px solid #176b4e",
+                                    borderRadius: "8px",
+                                    fontSize: "12px",
+                                    fontWeight: 700,
+                                    color: "#176b4e",
+                                    whiteSpace: "nowrap"
+                                }}
+                            >
+                                📷 Choose File
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: "none" }}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            if (file.size > 2 * 1024 * 1024) {
+                                                setError("Image must be smaller than 2MB.");
+                                                return;
+                                            }
+                                            const reader = new FileReader();
+                                            reader.onload = () => {
+                                                setFormData((prev) => ({ ...prev, avatarUrl: reader.result }));
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                            </label>
+                        </div>
+
+                        {formData.avatarUrl && (
+                            <div style={{ marginTop: "8px", display: "flex", alignItems: "center", gap: "10px" }}>
+                                <img
+                                    src={formData.avatarUrl}
+                                    alt="Avatar preview"
+                                    style={{ width: "42px", height: "42px", borderRadius: "50%", objectFit: "cover", border: "2px solid #176b4e" }}
+                                />
+                                <button
+                                    type="button"
+                                    style={{ background: "none", border: "none", color: "#b91c1c", fontSize: "12px", cursor: "pointer", padding: 0 }}
+                                    onClick={() => setFormData((prev) => ({ ...prev, avatarUrl: "" }))}
+                                >
+                                    Remove photo
+                                </button>
+                            </div>
+                        )}
                         <small>
-                            Add a profile picture URL.
+                            Add an image URL or choose a file from your device.
                         </small>
                     </label>
 
@@ -353,12 +437,12 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                     {/* BIO */}
 
                     <label>
-                        About you <b>*</b>
+                        About you {role !== "admin" && <b>*</b>}
 
                         <textarea
                             name="bio"
                             value={formData.bio}
-                            placeholder="Tell the community a little about yourself"
+                            placeholder={role === "admin" ? "Describe your admin responsibilities or background..." : "Tell the community a little about yourself"}
                             onChange={handleChange}
                         />
                     </label>
@@ -366,36 +450,38 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
 
                     {/* SKILLS */}
 
-                    <div className="form-grid">
+                    {role !== "admin" && (
+                        <div className="form-grid">
 
-                        <label>
-                            Skills you can teach <b>*</b>
+                            <label>
+                                Skills you can teach <b>*</b>
 
-                            <input
-                                name="skillsToTeach"
-                                value={
-                                    formData.skillsToTeach
-                                }
-                                placeholder="React, Java"
-                                onChange={handleChange}
-                            />
-                        </label>
+                                <input
+                                    name="skillsToTeach"
+                                    value={
+                                        formData.skillsToTeach
+                                    }
+                                    placeholder="React, Java"
+                                    onChange={handleChange}
+                                />
+                            </label>
 
 
-                        {role !== "mentor" && <label>
-                            Skills you want to learn <b>*</b>
+                            {role !== "mentor" && <label>
+                                Skills you want to learn <b>*</b>
 
-                            <input
-                                name="skillsToLearn"
-                                value={
-                                    formData.skillsToLearn
-                                }
-                                placeholder="Design, Python"
-                                onChange={handleChange}
-                            />
-                        </label>}
+                                <input
+                                    name="skillsToLearn"
+                                    value={
+                                        formData.skillsToLearn
+                                    }
+                                    placeholder="Design, Python"
+                                    onChange={handleChange}
+                                />
+                            </label>}
 
-                    </div>
+                        </div>
+                    )}
 
                     {role === "mentor" && asList(formData.skillsToTeach).length > 0 && (
                         <section className="skill-level-picker">

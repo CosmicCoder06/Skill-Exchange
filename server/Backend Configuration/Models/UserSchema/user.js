@@ -3,7 +3,10 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
     {
-        paymentQr: { type: String, default: '', select: false },
+        paymentQr: {
+            type: mongoose.Schema.Types.Mixed,
+            default: "",
+        },
         // =========================
         // AUTH FIELDS
         // =========================

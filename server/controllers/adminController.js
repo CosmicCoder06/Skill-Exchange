@@ -7,8 +7,176 @@ const Review = require("../models/Review");
 const ActivityLog = require("../models/ActivityLog");
 const { escapeRegex, fillDailySeries } = require("../Utils/adminAnalytics");
 
-const SAFE_USER_FIELDS = "name email role isVerified isActive profileCompleted skillsToTeach createdAt updatedAt";
+const SAFE_USER_FIELDS = "name email role isVerified isActive profileCompleted skillsToTeach skillsToLearn bio avatarUrl createdAt updatedAt";
 const USER_ROLES = new Set(["learner", "mentor", "admin"]);
+
+async function getStats(req, res) {
+  try {
+    const [
+      totalUsers,
+      mentors,
+      learners,
+      pendingVerification,
+      awaitingPayments,
+      totalSessions,
+      recentMembers,
+      pendingPayments,
+      recentSessions,
+    ] = await Promise.all([
+      User.countDocuments(),
+      User.countDocuments({ role: "mentor" }),
+      User.countDocuments({ role: "learner" }),
+      User.countDocuments({ isVerified: { $ne: true } }),
+      Booking.countDocuments({
+        $or: [
+          { paymentStatus: { $in: ["awaiting_payment", "payment_submitted", "unpaid", "pending_verification"] } },
+          { "payment.status": { $in: ["awaiting_payment", "payment_submitted"] } },
+        ],
+        status: { $nin: ["completed", "cancelled"] },
+      }),
+      Booking.countDocuments(),
+      User.find({ role: { $ne: "admin" } })
+        .select(SAFE_USER_FIELDS)
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .lean(),
+      Booking.find({
+        $or: [
+          { paymentStatus: { $in: ["payment_submitted", "pending_verification"] } },
+          { "payment.status": "payment_submitted" },
+        ],
+        status: { $nin: ["completed", "cancelled"] },
+      })
+        .populate("learner", "name email avatarUrl")
+        .populate("mentor", "name email avatarUrl")
+        .sort({ updatedAt: -1 })
+        .limit(5)
+        .lean(),
+      Booking.find()
+        .populate("learner", "name email avatarUrl")
+        .populate("mentor", "name email avatarUrl")
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .lean(),
+    ]);
+
+    return res.json({
+      stats: {
+        totalUsers,
+        mentors,
+        learners,
+        pendingVerification,
+        awaitingPayments,
+        totalSessions,
+      },
+      recentMembers,
+      pendingPayments,
+      recentSessions,
+    });
+  } catch (error) {
+    console.error("getStats error:", error);
+    return res.status(500).json({ message: "Unable to load admin stats" });
+  }
+}
+
+async function getUserDetails(req, res) {
+  try {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    const user = await User.findById(id).select("-password -refreshToken");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const [
+      sessionsAsMentor,
+      sessionsAsLearner,
+      totalMentorSessions,
+      completedMentorSessions,
+      totalLearnerSessions,
+      completedLearnerSessions,
+    ] = await Promise.all([
+      Booking.find({ mentor: id })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .populate("learner", "name email avatarUrl")
+        .lean(),
+      Booking.find({ learner: id })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .populate("mentor", "name email avatarUrl")
+        .lean(),
+      Booking.countDocuments({ mentor: id }),
+      Booking.countDocuments({ mentor: id, status: "completed" }),
+      Booking.countDocuments({ learner: id }),
+      Booking.countDocuments({ learner: id, status: "completed" }),
+    ]);
+
+    return res.json({
+      user,
+      sessionsSummary: {
+        totalSessions: totalMentorSessions + totalLearnerSessions,
+        completedSessions: completedMentorSessions + completedLearnerSessions,
+        asMentor: {
+          total: totalMentorSessions,
+          completed: completedMentorSessions,
+          recent: sessionsAsMentor,
+        },
+        asLearner: {
+          total: totalLearnerSessions,
+          completed: completedLearnerSessions,
+          recent: sessionsAsLearner,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("getUserDetails error:", error);
+    return res.status(500).json({ message: "Unable to load user details" });
+  }
+}
+
+async function listSessions(req, res) {
+  try {
+    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 20, 1), 100);
+    const query = {};
+
+    if (req.query.status && req.query.status !== "all") {
+      query.status = req.query.status;
+    }
+    if (req.query.paymentStatus && req.query.paymentStatus !== "all") {
+      query.$or = [
+        { paymentStatus: req.query.paymentStatus },
+        { "payment.status": req.query.paymentStatus },
+      ];
+    }
+
+    const [sessions, total] = await Promise.all([
+      Booking.find(query)
+        .populate("learner", "name email avatarUrl")
+        .populate("mentor", "name email avatarUrl")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      Booking.countDocuments(query),
+    ]);
+
+    return res.json({
+      sessions,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.max(Math.ceil(total / limit), 1),
+      },
+    });
+  } catch (error) {
+    console.error("listSessions error:", error);
+    return res.status(500).json({ message: "Unable to load sessions" });
+  }
+}
 
 async function getOverview(req, res) {
   try {
@@ -81,6 +249,11 @@ async function listUsers(req, res) {
     const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 25, 1), 100);
     const query = {};
 
+    const currentUserId = req.user?.id || req.user?._id;
+    if (currentUserId && mongoose.isValidObjectId(currentUserId)) {
+      query._id = { $ne: new mongoose.Types.ObjectId(currentUserId) };
+    }
+
     if (req.query.search?.trim()) {
       const search = new RegExp(escapeRegex(req.query.search.trim()), "i");
       query.$or = [{ name: search }, { email: search }];
@@ -118,10 +291,15 @@ async function updateUser(req, res) {
     const target = await User.findById(id);
     if (!target) return res.status(404).json({ message: "User not found" });
 
+    const editingSelf = String(req.user.id) === String(id) || String(req.user._id) === String(id);
+    if (editingSelf && req.body.role !== undefined) {
+      return res.status(400).json({ message: "You cannot change your own role" });
+    }
+
     const updates = {};
     if (req.body.role !== undefined) {
       if (!USER_ROLES.has(req.body.role)) {
-        return res.status(400).json({ message: "Invalid role" });
+        return res.status(400).json({ message: "Invalid role. Role must be learner, mentor, or admin." });
       }
       updates.role = req.body.role;
     }
@@ -132,12 +310,10 @@ async function updateUser(req, res) {
       return res.status(400).json({ message: "No supported updates provided" });
     }
 
-    const editingSelf = String(req.user.id) === String(id);
     if (
       editingSelf &&
       (
         updates.isVerified !== undefined ||
-        (updates.role && updates.role !== "admin") ||
         updates.isActive === false
       )
     ) {
@@ -235,5 +411,14 @@ async function getReports(req, res) {
   }
 }
 
-module.exports = { deleteUser, getOverview, getReports, listUsers, updateUser };
+module.exports = {
+  deleteUser,
+  getOverview,
+  getReports,
+  getStats,
+  getUserDetails,
+  listSessions,
+  listUsers,
+  updateUser,
+};
 // @teamcosmiccoders

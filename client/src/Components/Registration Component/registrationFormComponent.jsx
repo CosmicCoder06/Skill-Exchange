@@ -9,6 +9,7 @@ function Register({ onBackToLogin, onRegistered }) {
         password: "",
         role: "learner"
     });
+    const [agreedTerms, setAgreedTerms] = useState(false);
 
     const [loading, setLoading] = useState(false);
 
@@ -29,6 +30,11 @@ function Register({ onBackToLogin, onRegistered }) {
             !user.role
         ) {
             alert("Please fill all fields");
+            return;
+        }
+
+        if (!agreedTerms) {
+            alert("Please confirm you are 18+ and agree to the Terms & Privacy Policy.");
             return;
         }
 
@@ -177,10 +183,24 @@ function Register({ onBackToLogin, onRegistered }) {
 
                     </div>
 
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", margin: "16px 0", fontSize: "13px", color: "#334155" }}>
+                        <input
+                            type="checkbox"
+                            id="termsCheckbox"
+                            required
+                            checked={agreedTerms}
+                            onChange={(e) => setAgreedTerms(e.target.checked)}
+                            style={{ marginTop: "3px", cursor: "pointer" }}
+                        />
+                        <label htmlFor="termsCheckbox" style={{ cursor: "pointer", fontWeight: "500", textTransform: "none", margin: 0 }}>
+                            I am 18+ and agree to Terms &amp; Privacy Policy
+                        </label>
+                    </div>
+
                     <button
                         className={styles.registerButton}
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || !agreedTerms}
                     >
                         {loading
                             ? "Creating account..."

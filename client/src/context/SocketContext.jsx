@@ -16,7 +16,9 @@ export function SocketProvider({ token, children }) {
                 auth: {
                     token: token
                 },
-                transports: ['websocket', 'polling']
+                transports: ['polling', 'websocket'],
+                reconnectionAttempts: 5,
+                timeout: 10000
             }
         );
 
@@ -33,8 +35,8 @@ export function SocketProvider({ token, children }) {
         };
 
         const handleConnectError = (error) => {
-            console.error(
-                "Socket connection error:",
+            console.warn(
+                "Socket connection notice:",
                 error.message
             );
         };
@@ -47,7 +49,11 @@ export function SocketProvider({ token, children }) {
             instance.off("connect", handleConnect);
             instance.off("disconnect", handleDisconnect);
             instance.off("connect_error", handleConnectError);
-            instance.disconnect();
+            if (instance.connected) {
+                instance.disconnect();
+            } else {
+                instance.close();
+            }
         };
     }, [token]);
 

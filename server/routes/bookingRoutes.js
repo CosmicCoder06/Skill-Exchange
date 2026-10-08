@@ -12,7 +12,9 @@ const {
     getMentorRequests,
     updateBookingStatus,
     cancelBooking,
-    updateMeeting
+    updateMeeting,
+    getBookingPaymentQR,
+    submitBookingPayment
 } = require("../controllers/bookingController");
 
 
@@ -22,6 +24,8 @@ const authMiddleware =
 
 router.get('/bookings/check-availability', authMiddleware, checkAvailability);
 router.put('/bookings/:id/pay', authMiddleware, completeBookingPayment);
+router.get('/bookings/:id/payment-qr', authMiddleware, getBookingPaymentQR);
+router.post('/bookings/:id/submit-payment', authMiddleware, submitBookingPayment);
 router.put('/bookings/:id/suggest-slots', authMiddleware, suggestSlots);
 router.put('/bookings/:id/choose-slot', authMiddleware, chooseSlot);
 router.put('/bookings/:id/meeting', authMiddleware, updateMeeting);

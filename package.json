@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@vercel/analytics": "^2.0.1"
+    "@vercel/analytics": "^2.0.1",
+    "qrcode": "^1.5.4"
   }
 }

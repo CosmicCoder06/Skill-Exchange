@@ -71,7 +71,26 @@ const bookingSchema = new mongoose.Schema(
         gstAmount: { type: Number, default: 0, min: 0 },
         grossAmountWithGst: { type: Number, default: 0, min: 0 },
         paymentMethod: { type: String, enum: ['free', 'pay_later', 'qr', 'wallet', 'upi', 'card', 'upi_card'] },
-        paymentStatus: { type: String, enum: ['not_required', 'awaiting_approval', 'unpaid', 'pending_verification', 'verified', 'declined', 'cancelled'] },
+        paymentStatus: {
+            type: String,
+            enum: [
+                'awaiting_payment',
+                'payment_submitted',
+                'confirmed',
+                'rejected',
+                'refunded',
+                'paid_out',
+                // legacy backward compatibility
+                'not_required',
+                'awaiting_approval',
+                'unpaid',
+                'pending_verification',
+                'verified',
+                'declined',
+                'cancelled'
+            ],
+            default: 'awaiting_payment'
+        },
         paymentReference: { type: String, maxlength: 64, default: '' },
         learnerConvenienceFee: { type: Number, default: 0, min: 0 },
         mentorPlatformFee: { type: Number, default: 0, min: 0 },
@@ -83,6 +102,32 @@ const bookingSchema = new mongoose.Schema(
             default: 60,
             min: 15,
             max: 480
+        },
+        payment: {
+            status: {
+                type: String,
+                enum: ['awaiting_payment', 'payment_submitted', 'confirmed', 'rejected', 'refunded', 'paid_out'],
+                default: 'awaiting_payment'
+            },
+            amount: { type: Number, default: 0, min: 0 },
+            platformFeePercent: { type: Number, default: 10 },
+            platformFee: { type: Number, default: 0, min: 0 },
+            mentorPayout: { type: Number, default: 0, min: 0 },
+            utr: { type: String, default: '', trim: true },
+            screenshot: { type: String, default: '' },
+            paytmTxnRef: { type: String, default: '', trim: true },
+            rejectReason: { type: String, default: '' },
+            refundReason: { type: String, default: '' },
+            payoutRef: { type: String, default: '' },
+            logs: [
+                {
+                    by: { type: String, default: 'system' },
+                    from: { type: String, default: '' },
+                    to: { type: String, default: '' },
+                    at: { type: Date, default: Date.now },
+                    note: { type: String, default: '' }
+                }
+            ]
         },
         mentor: {
             type: mongoose.Schema.Types.ObjectId,
