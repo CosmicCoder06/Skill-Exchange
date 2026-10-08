@@ -1,12 +1,10 @@
 import ThemeToggle from './ThemeToggle';
 import { AIExtension } from '../AIExtension';
 import { useState } from 'react';
-import { Menu, X, ArrowUpRight, LogOut, UserRound, Settings, Wallet as WalletIcon } from 'lucide-react';
-import WalletModal from './wallet/WalletModal';
+import { Menu, X, ArrowUpRight, LogOut, UserRound, Settings } from 'lucide-react';
 
 export default function TopNavigation({ activePage, onHome, onDiscover, onMessages, onBookings, onProfile, onDashboard, onAccount, onLogout, token, onSelectMentor }) {
   const [expanded, setExpanded] = useState(false);
-  const [showWallet, setShowWallet] = useState(false);
   const items = [['home', 'Overview', onHome], ['discover', 'Discover', onDiscover], ['bookings', 'Sessions', onBookings], ['chat', 'Messages', onMessages], ['dashboard', 'Dashboard', onDashboard]];
   const go = action => { setExpanded(false); action?.(); };
   return (
@@ -20,7 +18,6 @@ export default function TopNavigation({ activePage, onHome, onDiscover, onMessag
           </nav>
           <div className="premium-account">
             <AIExtension token={token} onSelectMentor={onSelectMentor} />
-            <button onClick={() => setShowWallet(true)} aria-label="Wallet" title="Skill Exchange Wallet"><WalletIcon size={19}/></button>
             <button onClick={() => go(onAccount)} aria-label="Account settings" title="Account settings"><Settings size={19}/></button>
             <ThemeToggle />
             <button className="premium-profile" onClick={() => go(onProfile)} aria-label="Your profile" title="Your profile"><UserRound size={19}/></button>
@@ -28,7 +25,6 @@ export default function TopNavigation({ activePage, onHome, onDiscover, onMessag
           </div>
         </div>
       </header>
-      {showWallet && <WalletModal token={token} onClose={() => setShowWallet(false)} />}
     </>
   );
 }

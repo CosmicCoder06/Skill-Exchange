@@ -130,6 +130,7 @@ function parseLocation(pathname, role) {
     }
     if (clean === "/chat" || clean === "/messages") return { page: "chat" };
     if (clean === "/account") return { page: "account" };
+    if (clean.startsWith("/admin")) return { page: "admin" };
     return { page: "home" };
 }
 

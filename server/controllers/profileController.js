@@ -23,12 +23,16 @@ const cleanStringList = (value) => {
         .filter(Boolean);
 };
 
-const calculateProfileComplete = (profile) =>
-    Boolean(
+const calculateProfileComplete = (profile) => {
+    if (profile.role === "admin") {
+        return Boolean(hasValue(profile.bio) || hasValue(profile.avatarUrl));
+    }
+    return Boolean(
         hasValue(profile.bio) &&
         hasSkill(profile.skillsToTeach) &&
         (profile.role === "mentor" || hasSkill(profile.skillsToLearn))
     );
+};
 
 
 // ===============================
@@ -79,6 +83,7 @@ const getMyProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const {
+            name,
             bio,
             skillsToTeach,
             teachingSkillLevels,
@@ -124,6 +129,7 @@ const updateProfile = async (req, res) => {
 
         if (
             req.user.role !== "mentor" &&
+            req.user.role !== "admin" &&
             skillsToLearn !== undefined &&
             !Array.isArray(skillsToLearn)
         ) {
@@ -153,6 +159,7 @@ const updateProfile = async (req, res) => {
         // -------------------------
 
         if (
+            req.user.role !== "admin" &&
             skillsToTeach !== undefined &&
             cleanedSkillsToTeach.length === 0
         ) {
@@ -163,6 +170,7 @@ const updateProfile = async (req, res) => {
 
         if (
             req.user.role !== "mentor" &&
+            req.user.role !== "admin" &&
             skillsToLearn !== undefined &&
             cleanedSkillsToLearn.length === 0
         ) {
@@ -217,6 +225,10 @@ const updateProfile = async (req, res) => {
         }
 
         const updates = {};
+
+        if (name !== undefined && typeof name === "string" && name.trim()) {
+            updates.name = name.trim();
+        }
 
         if (bio !== undefined) {
             updates.bio = bio.trim();

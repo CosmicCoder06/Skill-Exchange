@@ -75,6 +75,7 @@ export default function AdminUserTable({
     onUpdate,
     onDelete,
     onRemovePhoto,
+    onViewUser,
 }) {
     const [previewUser, setPreviewUser] =
         useState(null);
@@ -119,7 +120,23 @@ export default function AdminUserTable({
         closeRemoveModal();
     }
 
-    if (!users.length) {
+    const displayUsers = users.filter(
+        (user) => String(user._id || user.id) !== String(currentUserId)
+    );
+
+    function handleRoleChange(user, newRole) {
+        if (newRole === user.role) return;
+        const isPromotingToAdmin = newRole === "admin";
+        const message = isPromotingToAdmin
+            ? `Promote ${user.name || "this member"} to Administrator?\n\nAdmins have full access to platform governance, payments, and member records.`
+            : `Change ${user.name || "this member"}'s role to ${newRole.toUpperCase()}?`;
+
+        if (window.confirm(message)) {
+            onUpdate(user._id, { role: newRole });
+        }
+    }
+
+    if (!displayUsers.length) {
         return (
             <div className="admin-empty-state">
 
@@ -160,7 +177,7 @@ export default function AdminUserTable({
 
                     <tbody>
 
-                        {users.map((user) => {
+                        {displayUsers.map((user) => {
                             const isSelf =
                                 String(user._id) ===
                                 String(currentUserId);
@@ -196,18 +213,11 @@ export default function AdminUserTable({
 
                                             <button
                                                 type="button"
-                                                className="admin-member-avatar-button"
-                                                disabled={!hasAvatar}
+                                                className="admin-member-avatar-button clickable"
+                                                title="View full profile"
                                                 onClick={() => {
-                                                    if (
-                                                        hasAvatar
-                                                    ) {
-                                                        setPreviewUser(
-                                                            {
-                                                                ...user,
-                                                                avatarUrl,
-                                                            }
-                                                        );
+                                                    if (onViewUser) {
+                                                        onViewUser(user._id);
                                                     }
                                                 }}
                                             >
@@ -228,15 +238,29 @@ export default function AdminUserTable({
                                                     </span>
                                                 )}
 
-                                                {hasAvatar && (
-                                                    <span className="admin-avatar-view-icon">
-                                                        ↗
-                                                    </span>
-                                                )}
+                                                <span className="admin-avatar-view-icon">
+                                                    ↗
+                                                </span>
                                             </button>
 
-                                            <div>
-                                                <strong>
+                                            <div
+                                                className="admin-member-name-block"
+                                                role="button"
+                                                tabIndex={0}
+                                                title="View full profile"
+                                                onClick={() => {
+                                                    if (onViewUser) {
+                                                        onViewUser(user._id);
+                                                    }
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter" && onViewUser) {
+                                                        onViewUser(user._id);
+                                                    }
+                                                }}
+                                                style={{ cursor: "pointer" }}
+                                            >
+                                                <strong className="admin-member-name-link">
                                                     {user.name ||
                                                         "Unnamed member"}
                                                 </strong>
@@ -245,12 +269,6 @@ export default function AdminUserTable({
                                                     {user.email ||
                                                         "No email"}
                                                 </span>
-
-                                                {isSelf && (
-                                                    <small>
-                                                        Your account
-                                                    </small>
-                                                )}
                                             </div>
 
                                         </div>
@@ -268,13 +286,9 @@ export default function AdminUserTable({
                                                 isSelf
                                             }
                                             onChange={(e) =>
-                                                onUpdate(
-                                                    user._id,
-                                                    {
-                                                        role: e
-                                                            .target
-                                                            .value,
-                                                    }
+                                                handleRoleChange(
+                                                    user,
+                                                    e.target.value
                                                 )
                                             }
                                         >

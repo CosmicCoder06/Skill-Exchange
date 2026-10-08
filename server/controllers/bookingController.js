@@ -194,6 +194,7 @@ const { recordActivity } = require("../Utils/activityLogger");
 const User = require(
     "../Backend Configuration/Models/UserSchema/user"
 );
+const paymentService = require("../services/paymentService");
 
 const getCurrentUserId = (req) => {
     return String(req.user._id || req.user.id);
@@ -413,6 +414,8 @@ const createBooking = async (req, res) => {
         let payment;
         try { payment = paymentDetails(mentorUser, { ...req.body, isRequest: true }, durationMins); }
         catch (error) { return res.status(400).json({ message: error.message }); }
+
+        const platformPayment = paymentService.createPayment(mentorUser.hourlyRate, durationMins);
         
         const now = new Date();
         const actionExpiresAt = new Date(now.getTime() + FOUR_HOURS_MS);
@@ -420,6 +423,7 @@ const createBooking = async (req, res) => {
         // Create booking
         const booking = await Booking.create({
             ...payment,
+            ...platformPayment,
             duration: durationMins,
             mentor,
             learner: learnerId,
@@ -1157,6 +1161,33 @@ const updateMeeting = async (req, res) => {
     }
 };
 
+const getBookingPaymentQR = async (req, res) => {
+    try {
+        const userId = getCurrentUserId(req);
+        const userRole = req.user?.role;
+        const result = await paymentService.generateBookingQR(req.params.id, userId, userRole);
+        return res.json(result);
+    } catch (error) {
+        console.error("getBookingPaymentQR error:", error);
+        return res.status(error.statusCode || 500).json({ message: error.message || "Failed to generate payment QR" });
+    }
+};
+
+const submitBookingPayment = async (req, res) => {
+    try {
+        const userId = getCurrentUserId(req);
+        const { utr, screenshot } = req.body;
+        const booking = await paymentService.submitPayment(req.params.id, userId, { utr, screenshot });
+        return res.json({
+            message: "Payment submitted successfully. Awaiting administrator verification.",
+            booking
+        });
+    } catch (error) {
+        console.error("submitBookingPayment error:", error);
+        return res.status(error.statusCode || 500).json({ message: error.message || "Failed to submit payment" });
+    }
+};
+
 module.exports = {
     checkAvailability,
     completeBookingPayment,
@@ -1167,6 +1198,8 @@ module.exports = {
     getBookings,
     getMentorRequests,
     updateBookingStatus,
-    cancelBooking
+    cancelBooking,
+    getBookingPaymentQR,
+    submitBookingPayment
 };
 // @teamcosmiccoders

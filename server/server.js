@@ -156,7 +156,7 @@ app.use("/api", reviewRoutes);
 app.use("/api", dashboardRoutes);
 
 app.use("/api", mentorRoutes);
-app.use("/api", require("./routes/walletRoutes"));
+// wallet routes removed (demo)
 app.use("/api", skillCategoryRoutes);
 app.use("/api", settingRoutes);
 app.use("/api", activityLogRoutes);

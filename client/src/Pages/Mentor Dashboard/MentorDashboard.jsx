@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Wallet, ArrowUpRight, PlusCircle, CheckCircle2, Clock, Search, Filter, ArrowDownLeft, ExternalLink } from "lucide-react";
-import WalletModal from "../../Components/wallet/WalletModal";
+import { ArrowUpRight, CheckCircle2, Clock, Search, Filter, ExternalLink } from "lucide-react";
 import "./MentorDashboard.css";
 
 const levelPercent = { Beginner: 25, Intermediate: 50, Advanced: 75, Expert: 100 };
@@ -9,10 +8,6 @@ function MentorDashboard({ token, onHome, onBookings }) {
     const [dashboard, setDashboard] = useState(null);
     const [error, setError] = useState("");
     const [activeTab, setActiveTab] = useState("studio"); // "studio" | "earnings"
-    
-    // Wallet modal state
-    const [isWalletOpen, setIsWalletOpen] = useState(false);
-    const [walletInitialTab, setWalletInitialTab] = useState("topup");
 
     // Earnings ledger filters
     const [statusFilter, setStatusFilter] = useState("all"); // "all" | "credited" | "pending"
@@ -125,25 +120,10 @@ function MentorDashboard({ token, onHome, onBookings }) {
                         <div className="mentor-wallet-quick-actions">
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setWalletInitialTab("withdraw");
-                                    setIsWalletOpen(true);
-                                }}
+                                onClick={onBookings}
                                 className="mentor-action-primary"
-                                disabled={earnings.walletBalance < 100}
-                                title={earnings.walletBalance < 100 ? "Minimum withdrawal is ₹100" : "Request UPI Withdrawal"}
                             >
-                                Request Payout <span>↗</span>
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setWalletInitialTab("topup");
-                                    setIsWalletOpen(true);
-                                }}
-                                className="mentor-action-secondary"
-                            >
-                                <Wallet size={15} /> Open Wallet
+                                View Sessions <span>↗</span>
                             </button>
                         </div>
                     ) : (
@@ -228,33 +208,11 @@ function MentorDashboard({ token, onHome, onBookings }) {
 
                         <div className="earnings-stat-card wallet-highlight">
                             <div className="stat-card-header">
-                                <span className="stat-kicker">WALLET BALANCE</span>
-                                <span className="stat-live-badge">● Live</span>
+                                <span className="stat-kicker">SETTLED PAYOUTS</span>
+                                <span className="stat-live-badge">● Paytm UPI</span>
                             </div>
-                            <strong className="stat-amount">₹{(earnings.walletBalance || 0).toLocaleString("en-IN")}</strong>
-                            <div className="stat-card-actions">
-                                <button
-                                    type="button"
-                                    className="btn-card-action withdraw"
-                                    onClick={() => {
-                                        setWalletInitialTab("withdraw");
-                                        setIsWalletOpen(true);
-                                    }}
-                                    disabled={earnings.walletBalance < 100}
-                                >
-                                    Withdraw
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn-card-action topup"
-                                    onClick={() => {
-                                        setWalletInitialTab("topup");
-                                        setIsWalletOpen(true);
-                                    }}
-                                >
-                                    + Top Up
-                                </button>
-                            </div>
+                            <strong className="stat-amount">₹{(earnings.totalEarnings || 0).toLocaleString("en-IN")}</strong>
+                            <p className="stat-subtext">Admin disburses earnings directly to your UPI upon session completion.</p>
                         </div>
 
                         <div className="earnings-stat-card">
@@ -395,21 +353,6 @@ function MentorDashboard({ token, onHome, onBookings }) {
                         )}
                     </section>
                 </div>
-            )}
-
-            {/* WALLET MODAL */}
-            {isWalletOpen && (
-                <WalletModal
-                    token={token}
-                    initialTab={walletInitialTab}
-                    onClose={() => {
-                        setIsWalletOpen(false);
-                        loadDashboard();
-                    }}
-                    onBalanceUpdated={() => {
-                        loadDashboard();
-                    }}
-                />
             )}
         </main>
     );
