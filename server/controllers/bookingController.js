@@ -1162,30 +1162,15 @@ const updateMeeting = async (req, res) => {
 };
 
 const getBookingPaymentQR = async (req, res) => {
-    try {
-        const userId = getCurrentUserId(req);
-        const userRole = req.user?.role;
-        const result = await paymentService.generateBookingQR(req.params.id, userId, userRole);
-        return res.json(result);
-    } catch (error) {
-        console.error("getBookingPaymentQR error:", error);
-        return res.status(error.statusCode || 500).json({ message: error.message || "Failed to generate payment QR" });
-    }
+    return res.status(410).json({
+        message: "Manual QR payment flow is deprecated. Please use Razorpay checkout."
+    });
 };
 
 const submitBookingPayment = async (req, res) => {
-    try {
-        const userId = getCurrentUserId(req);
-        const { utr, screenshot } = req.body;
-        const booking = await paymentService.submitPayment(req.params.id, userId, { utr, screenshot });
-        return res.json({
-            message: "Payment submitted successfully. Awaiting administrator verification.",
-            booking
-        });
-    } catch (error) {
-        console.error("submitBookingPayment error:", error);
-        return res.status(error.statusCode || 500).json({ message: error.message || "Failed to submit payment" });
-    }
+    return res.status(410).json({
+        message: "Manual payment proof submission is deprecated. Please use Razorpay checkout."
+    });
 };
 
 module.exports = {

@@ -1,41 +1,47 @@
 import { useState, useEffect } from "react";
 import {
-    getAdminPendingPayments,
-    verifyAdminPayment,
+    getAdminPayments,
     getAdminPayouts,
     markAdminPaidOut,
     refundAdminBooking,
     downloadPaymentLedger
 } from "../../services/adminService";
+import { CreditCard, CheckCircle, Clock, AlertTriangle, Search, Filter, RefreshCw, Download } from "lucide-react";
 
 export default function AdminPayments({ token }) {
-    const [tab, setTab] = useState("pending"); // "pending" | "payouts"
-    const [pendingList, setPendingList] = useState([]);
+    const [tab, setTab] = useState("all-payments"); // "all-payments" | "payouts"
+    const [payments, setPayments] = useState([]);
     const [payoutsList, setPayoutsList] = useState([]);
+    const [stats, setStats] = useState({ totalCollected: 0, paidCount: 0, awaitingCount: 0, failedCount: 0 });
+    const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 1 });
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [actionMsg, setActionMsg] = useState("");
     const [busyId, setBusyId] = useState(null);
 
-    // Image preview modal
-    const [previewImage, setPreviewImage] = useState(null);
+    // Filters for All Payments
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
 
-    // Form states for approval/rejection per booking
-    const [approveChecks, setApproveChecks] = useState({});
-    const [paytmRefs, setPaytmRefs] = useState({});
-    const [rejectReasons, setRejectReasons] = useState({});
-
-    // Payout & refund form states
+    // Form states for payouts & refunds
     const [payoutRefs, setPayoutRefs] = useState({});
     const [refundReasons, setRefundReasons] = useState({});
 
-    async function loadData() {
+    async function loadPaymentsData() {
         setLoading(true);
         setError("");
         try {
-            if (tab === "pending") {
-                const res = await getAdminPendingPayments(token);
-                setPendingList(res.bookings || []);
+            if (tab === "all-payments") {
+                const res = await getAdminPayments(token, {
+                    status: statusFilter,
+                    search,
+                    page: pagination.page,
+                    limit: pagination.limit
+                });
+                setPayments(res.payments || []);
+                if (res.stats) setStats(res.stats);
+                if (res.pagination) setPagination(res.pagination);
             } else {
                 const res = await getAdminPayouts(token);
                 setPayoutsList(res.bookings || []);
@@ -48,42 +54,15 @@ export default function AdminPayments({ token }) {
     }
 
     useEffect(() => {
-        if (token) loadData();
-    }, [token, tab]);
+        if (token) loadPaymentsData();
+    }, [token, tab, statusFilter, pagination.page]);
 
-    async function handleVerify(bookingId, approve) {
-        setError("");
-        setActionMsg("");
-
-        if (approve) {
-            if (!approveChecks[bookingId]) {
-                setError("Please confirm: 'Paytm me exact amount aur UTR mila' checkbox is mandatory.");
-                return;
-            }
-        } else {
-            if (!rejectReasons[bookingId]?.trim()) {
-                setError("Rejection reason is mandatory.");
-                return;
-            }
-        }
-
-        setBusyId(bookingId);
-        try {
-            await verifyAdminPayment(token, bookingId, {
-                approve,
-                matchedExact: Boolean(approveChecks[bookingId]),
-                paytmTxnRef: paytmRefs[bookingId] || "",
-                rejectReason: rejectReasons[bookingId] || ""
-            });
-
-            setActionMsg(approve ? "✓ Payment approved and session unlocked!" : "Payment rejected.");
-            setPendingList((prev) => prev.filter((b) => b._id !== bookingId));
-        } catch (err) {
-            setError(err.message || "Action failed");
-        } finally {
-            setBusyId(null);
-        }
-    }
+    // Handle search with enter or button
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        setPagination((prev) => ({ ...prev, page: 1 }));
+        loadPaymentsData();
+    };
 
     async function handlePayout(bookingId) {
         setError("");
@@ -91,10 +70,10 @@ export default function AdminPayments({ token }) {
         setBusyId(bookingId);
         try {
             await markAdminPaidOut(token, bookingId, {
-                payoutRef: payoutRefs[bookingId] || "MANUAL_UPI_TRANSFER",
-                note: "Paid out via Paytm Business UPI"
+                payoutRef: payoutRefs[bookingId] || `PAYOUT_${Date.now()}`,
+                note: "Paid out to mentor"
             });
-            setActionMsg("✓ Mentor payout recorded as paid out.");
+            setActionMsg("✓ Mentor payout recorded successfully.");
             setPayoutsList((prev) => prev.filter((b) => b._id !== bookingId));
         } catch (err) {
             setError(err.message || "Failed to mark payout");
@@ -124,12 +103,44 @@ export default function AdminPayments({ token }) {
         }
     }
 
+    function renderStatusPill(status, booking) {
+        const st = status || booking?.payment?.status || booking?.paymentStatus;
+        const config = {
+            paid: { label: "Paid", bg: "#ecfdf5", color: "#065f46", border: "#a7f3d0" },
+            confirmed: { label: "Paid", bg: "#ecfdf5", color: "#065f46", border: "#a7f3d0" },
+            verified: { label: "Paid", bg: "#ecfdf5", color: "#065f46", border: "#a7f3d0" },
+            awaiting_payment: { label: "Awaiting", bg: "#fef3c7", color: "#92400e", border: "#fde68a" },
+            unpaid: { label: "Awaiting", bg: "#fef3c7", color: "#92400e", border: "#fde68a" },
+            payment_submitted: { label: "Submitted", bg: "#eff6ff", color: "#1e40af", border: "#bfdbfe" },
+            failed: { label: "Failed", bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+            rejected: { label: "Rejected", bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+            refunded: { label: "Refunded", bg: "#f1f5f9", color: "#475569", border: "#cbd5e1" },
+            paid_out: { label: "Paid Out", bg: "#f0fdf4", color: "#166534", border: "#bbf7d0" },
+            not_required: { label: "Free", bg: "#f8fafc", color: "#64748b", border: "#e2e8f0" }
+        }[st] || { label: String(st || "Unknown"), bg: "#f8fafc", color: "#64748b", border: "#e2e8f0" };
+
+        return (
+            <span style={{
+                display: "inline-block",
+                padding: "3px 10px",
+                borderRadius: "999px",
+                fontSize: "12px",
+                fontWeight: "600",
+                background: config.bg,
+                color: config.color,
+                border: `1px solid ${config.border}`
+            }}>
+                {config.label}
+            </span>
+        );
+    }
+
     return (
         <section className="admin-content-section">
             <div className="admin-section-heading" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
                 <div>
-                    <p className="admin-eyebrow">PAYMENT & PAYOUT OPERATIONS</p>
-                    <h2>Platform Payment Verification</h2>
+                    <p className="admin-eyebrow">FINANCIAL & PAYMENT OPERATIONS</p>
+                    <h2>Razorpay Platform Payments</h2>
                 </div>
                 <div style={{ display: "flex", gap: "10px" }}>
                     <button
@@ -137,15 +148,41 @@ export default function AdminPayments({ token }) {
                         className="admin-outline-button"
                         onClick={() => downloadPaymentLedger(token)}
                     >
-                        📥 Export Ledger (CSV)
+                        <Download size={14} style={{ marginRight: "6px" }} />
+                        Export Ledger (CSV)
                     </button>
                     <button
                         type="button"
                         className="admin-outline-button"
-                        onClick={loadData}
+                        onClick={loadPaymentsData}
                     >
-                        ↻ Refresh
+                        <RefreshCw size={14} style={{ marginRight: "6px" }} />
+                        Refresh
                     </button>
+                </div>
+            </div>
+
+            {/* PAYMENT SUMMARY STATS */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", margin: "20px 0" }}>
+                <div style={{ background: "var(--card-bg, #ffffff)", border: "1px solid var(--border, #e2e8f0)", borderRadius: "10px", padding: "16px" }}>
+                    <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>TOTAL COLLECTED</span>
+                    <h3 style={{ margin: "6px 0 0", fontSize: "24px", color: "#176b4e" }}>₹{stats.totalCollected?.toLocaleString("en-IN") || 0}</h3>
+                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Auto-verified via Razorpay</p>
+                </div>
+                <div style={{ background: "var(--card-bg, #ffffff)", border: "1px solid var(--border, #e2e8f0)", borderRadius: "10px", padding: "16px" }}>
+                    <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>PAID SESSIONS</span>
+                    <h3 style={{ margin: "6px 0 0", fontSize: "24px", color: "#0f766e" }}>{stats.paidCount || 0}</h3>
+                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Successful checkouts</p>
+                </div>
+                <div style={{ background: "var(--card-bg, #ffffff)", border: "1px solid var(--border, #e2e8f0)", borderRadius: "10px", padding: "16px" }}>
+                    <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>AWAITING PAYMENT</span>
+                    <h3 style={{ margin: "6px 0 0", fontSize: "24px", color: "#d97706" }}>{stats.awaitingCount || 0}</h3>
+                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Approved sessions pending pay</p>
+                </div>
+                <div style={{ background: "var(--card-bg, #ffffff)", border: "1px solid var(--border, #e2e8f0)", borderRadius: "10px", padding: "16px" }}>
+                    <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>FAILED PAYMENTS</span>
+                    <h3 style={{ margin: "6px 0 0", fontSize: "24px", color: "#dc2626" }}>{stats.failedCount || 0}</h3>
+                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Failed or declined transactions</p>
                 </div>
             </div>
 
@@ -155,23 +192,23 @@ export default function AdminPayments({ token }) {
                     type="button"
                     style={{
                         padding: "8px 16px",
-                        fontWeight: tab === "pending" ? "700" : "500",
-                        background: tab === "pending" ? "#0f766e" : "transparent",
-                        color: tab === "pending" ? "#ffffff" : "inherit",
+                        fontWeight: tab === "all-payments" ? "700" : "500",
+                        background: tab === "all-payments" ? "#176b4e" : "transparent",
+                        color: tab === "all-payments" ? "#ffffff" : "inherit",
                         borderRadius: "6px",
                         border: "none",
                         cursor: "pointer"
                     }}
-                    onClick={() => setTab("pending")}
+                    onClick={() => setTab("all-payments")}
                 >
-                    Pending Verifications ({pendingList.length})
+                    All Transactions
                 </button>
                 <button
                     type="button"
                     style={{
                         padding: "8px 16px",
                         fontWeight: tab === "payouts" ? "700" : "500",
-                        background: tab === "payouts" ? "#0f766e" : "transparent",
+                        background: tab === "payouts" ? "#176b4e" : "transparent",
                         color: tab === "payouts" ? "#ffffff" : "inherit",
                         borderRadius: "6px",
                         border: "none",
@@ -194,34 +231,119 @@ export default function AdminPayments({ token }) {
                 </div>
             )}
 
-            {/* VERIFICATION WARNING BANNER */}
-            {tab === "pending" && (
-                <div style={{
-                    background: "#fffbeb",
-                    border: "1px solid #fde68a",
-                    borderLeft: "4px solid #f59e0b",
-                    padding: "12px 16px",
-                    borderRadius: "6px",
-                    marginBottom: "16px",
-                    color: "#92400e",
-                    fontSize: "13.5px",
-                    fontWeight: "600"
-                }}>
-                    ⚠️ Paytm for Business app me amount aur UTR match karke hi approve karo. Note field par bharosa mat karo.
-                </div>
+            {tab === "all-payments" && (
+                <>
+                    {/* TOOLBAR: SEARCH & STATUS FILTER */}
+                    <div className="admin-users-panel" style={{ marginBottom: "20px" }}>
+                        <div className="admin-users-toolbar" style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+                            <form onSubmit={handleSearchSubmit} style={{ display: "flex", gap: "8px", flex: 1, minWidth: "260px" }}>
+                                <label className="admin-search" style={{ flex: 1, margin: 0 }}>
+                                    <span>⌕</span>
+                                    <input
+                                        type="search"
+                                        placeholder="Search by learner, mentor, session ID, or payment ID..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                    />
+                                </label>
+                                <button type="submit" className="admin-outline-button" style={{ padding: "0 14px" }}>Search</button>
+                            </form>
+
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => {
+                                    setStatusFilter(e.target.value);
+                                    setPagination((p) => ({ ...p, page: 1 }));
+                                }}
+                                style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid var(--border, #cbd5e1)" }}
+                            >
+                                <option value="all">All Payment Statuses</option>
+                                <option value="paid">Paid / Confirmed</option>
+                                <option value="awaiting">Awaiting Payment</option>
+                                <option value="failed">Failed</option>
+                                <option value="refunded">Refunded</option>
+                                <option value="paid_out">Paid Out</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {loading ? (
+                        <div className="admin-loading"><div className="admin-spinner" /><p>Loading platform payments…</p></div>
+                    ) : payments.length === 0 ? (
+                        <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+                            No payment records found matching the filter criteria.
+                        </div>
+                    ) : (
+                        <div className="admin-table-wrap">
+                            <table className="admin-users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Session ID</th>
+                                        <th>Learner</th>
+                                        <th>Mentor</th>
+                                        <th>Date & Time</th>
+                                        <th>Amount</th>
+                                        <th>Razorpay Payment ID</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {payments.map((p) => {
+                                        const amt = Number(p.payment?.amount || p.baseSessionAmount || p.grossAmountWithGst || p.paymentAmount || 0);
+                                        const rzpId = p.razorpayPaymentId || p.payment?.razorpayPaymentId || "—";
+                                        return (
+                                            <tr key={p._id}>
+                                                <td>
+                                                    <strong>#{String(p._id).slice(-6).toUpperCase()}</strong>
+                                                </td>
+                                                <td>
+                                                    <div>{p.learner?.name || "Learner"}</div>
+                                                    <small style={{ color: "#64748b" }}>{p.learner?.email}</small>
+                                                </td>
+                                                <td>
+                                                    <div>{p.mentor?.name || "Mentor"}</div>
+                                                    <small style={{ color: "#64748b" }}>{p.mentor?.email}</small>
+                                                </td>
+                                                <td>
+                                                    <div>{p.date}</div>
+                                                    <small style={{ color: "#64748b" }}>{p.time} ({p.duration}m)</small>
+                                                </td>
+                                                <td>
+                                                    <strong style={{ color: "#176b4e" }}>₹{amt.toLocaleString("en-IN")}</strong>
+                                                </td>
+                                                <td>
+                                                    {rzpId !== "—" ? (
+                                                        <code style={{ fontSize: "11px", background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px" }}>
+                                                            {rzpId}
+                                                        </code>
+                                                    ) : (
+                                                        <span style={{ color: "#94a3b8" }}>—</span>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    {renderStatusPill(p.payment?.status || p.paymentStatus, p)}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </>
             )}
 
-            {loading ? (
-                <div className="admin-loading"><div className="admin-spinner" /><p>Loading payments…</p></div>
-            ) : tab === "pending" ? (
-                /* PENDING PAYMENTS LIST */
-                pendingList.length === 0 ? (
+            {/* PENDING MENTOR PAYOUTS TAB */}
+            {tab === "payouts" && (
+                loading ? (
+                    <div className="admin-loading"><div className="admin-spinner" /><p>Loading payouts…</p></div>
+                ) : payoutsList.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "32px", color: "#64748b" }}>
-                        ✓ No pending payments awaiting verification!
+                        ✓ No pending mentor payouts! All completed sessions have been disbursed.
                     </div>
                 ) : (
                     <div style={{ display: "grid", gap: "16px" }}>
-                        {pendingList.map((b) => (
+                        {payoutsList.map((b) => (
                             <div
                                 key={b._id}
                                 style={{
@@ -235,217 +357,48 @@ export default function AdminPayments({ token }) {
                                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px" }}>
                                     <div>
                                         <div style={{ fontSize: "12px", color: "#64748b" }}>BOOKING #{String(b._id).slice(-8).toUpperCase()}</div>
-                                        <strong style={{ fontSize: "18px", color: "#0f766e" }}>
-                                            ₹{b.payment?.amount || b.grossAmountWithGst || 0}
+                                        <strong style={{ fontSize: "18px", color: "#176b4e" }}>
+                                            ₹{b.payment?.mentorPayout || b.payment?.amount || 0}
                                         </strong>
                                         <span style={{ marginLeft: "8px", fontSize: "12px", color: "#64748b" }}>
-                                            (Fee: ₹{b.payment?.platformFee || 0} | Mentor Payout: ₹{b.payment?.mentorPayout || 0})
+                                            (Session Total: ₹{b.payment?.amount || 0} | Platform Fee: ₹{b.payment?.platformFee || 0})
                                         </span>
                                     </div>
                                     <div style={{ fontSize: "13px", textAlign: "right" }}>
-                                        <div><strong>Date:</strong> {b.date} at {b.time}</div>
-                                        <div style={{ color: "#64748b" }}>Duration: {b.duration} mins</div>
+                                        <div><strong>Mentor:</strong> {b.mentor?.name} ({b.mentor?.email})</div>
+                                        <div style={{ color: "#64748b" }}>Completed: {b.date} at {b.time}</div>
                                     </div>
                                 </div>
 
-                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px", marginTop: "12px" }}>
-                                    <div>
-                                        <div style={{ fontSize: "12px", color: "#64748b" }}>LEARNER</div>
-                                        <div><strong>{b.learner?.name}</strong></div>
-                                        <div style={{ fontSize: "12px", color: "#64748b" }}>{b.learner?.email}</div>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: "12px", color: "#64748b" }}>MENTOR</div>
-                                        <div><strong>{b.mentor?.name}</strong></div>
-                                        <div style={{ fontSize: "12px", color: "#64748b" }}>{b.mentor?.email}</div>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: "12px", color: "#64748b" }}>SUBMITTED UTR (12 DIGITS)</div>
-                                        <code style={{ fontSize: "15px", fontWeight: "700", background: "#f1f5f9", padding: "2px 6px", borderRadius: "4px" }}>
-                                            {b.payment?.utr || "N/A"}
-                                        </code>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontSize: "12px", color: "#64748b" }}>PAYMENT SCREENSHOT</div>
-                                        {b.payment?.screenshot ? (
-                                            <button
-                                                type="button"
-                                                onClick={() => setPreviewImage(b.payment.screenshot)}
-                                                style={{ fontSize: "12px", color: "#0284c7", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", padding: 0 }}
-                                            >
-                                                👁 View Screenshot Proof
-                                            </button>
-                                        ) : (
-                                            <span style={{ fontSize: "12px", color: "#94a3b8" }}>No screenshot</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* APPROVAL & REJECTION ACTIONS */}
-                                <div style={{ marginTop: "16px", paddingTop: "14px", borderTop: "1px dashed #cbd5e1", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "14px" }}>
-                                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                                        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", fontWeight: "600", cursor: "pointer" }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={Boolean(approveChecks[b._id])}
-                                                onChange={(e) => setApproveChecks({ ...approveChecks, [b._id]: e.target.checked })}
-                                            />
-                                            <span style={{ color: approveChecks[b._id] ? "#15803d" : "#b45309" }}>
-                                                ✓ Paytm me exact amount aur UTR mila
-                                            </span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            placeholder="Optional Paytm Txn Reference"
-                                            value={paytmRefs[b._id] || ""}
-                                            onChange={(e) => setPaytmRefs({ ...paytmRefs, [b._id]: e.target.value })}
-                                            style={{ padding: "4px 8px", fontSize: "12px", borderRadius: "4px", border: "1px solid #cbd5e1", width: "240px" }}
-                                        />
-                                    </div>
-
-                                    <div style={{ display: "flex", gap: "8px" }}>
-                                        <button
-                                            type="button"
-                                            disabled={busyId === b._id || !approveChecks[b._id]}
-                                            onClick={() => handleVerify(b._id, true)}
-                                            style={{
-                                                background: approveChecks[b._id] ? "#16a34a" : "#94a3b8",
-                                                color: "#ffffff",
-                                                border: "none",
-                                                padding: "8px 14px",
-                                                borderRadius: "6px",
-                                                cursor: approveChecks[b._id] ? "pointer" : "not-allowed",
-                                                fontWeight: "600"
-                                            }}
-                                        >
-                                            {busyId === b._id ? "Processing…" : "Approve Payment"}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            disabled={busyId === b._id}
-                                            onClick={() => {
-                                                const reason = prompt("Enter mandatory rejection reason (visible to learner):");
-                                                if (reason) {
-                                                    setRejectReasons({ ...rejectReasons, [b._id]: reason });
-                                                    verifyAdminPayment(token, b._id, { approve: false, rejectReason: reason })
-                                                        .then(() => {
-                                                            setActionMsg("Payment rejected with reason.");
-                                                            setPendingList((prev) => prev.filter((item) => item._id !== b._id));
-                                                        })
-                                                        .catch((e) => setError(e.message));
-                                                }
-                                            }}
-                                            style={{
-                                                background: "#dc2626",
-                                                color: "#ffffff",
-                                                border: "none",
-                                                padding: "8px 14px",
-                                                borderRadius: "6px",
-                                                cursor: "pointer",
-                                                fontWeight: "600"
-                                            }}
-                                        >
-                                            Reject
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )
-            ) : (
-                /* PAYOUTS LIST */
-                payoutsList.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "32px", color: "#64748b" }}>
-                        No completed sessions awaiting payout.
-                    </div>
-                ) : (
-                    <div style={{ display: "grid", gap: "16px" }}>
-                        {payoutsList.map((b) => (
-                            <div
-                                key={b._id}
-                                style={{
-                                    background: "var(--card-bg, #ffffff)",
-                                    border: "1px solid var(--border, #e2e8f0)",
-                                    borderRadius: "10px",
-                                    padding: "18px"
-                                }}
-                            >
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px" }}>
-                                    <div>
-                                        <strong>Session #{String(b._id).slice(-8).toUpperCase()}</strong> - Completed
-                                    </div>
-                                    <div style={{ color: "#0f766e", fontWeight: "700", fontSize: "16px" }}>
-                                        Mentor Payout: ₹{b.payment?.mentorPayout || 0}
-                                    </div>
-                                </div>
-                                <div style={{ margin: "10px 0", fontSize: "13px" }}>
-                                    Mentor: <strong>{b.mentor?.name}</strong> ({b.mentor?.email})
-                                </div>
-
-                                <div style={{ display: "flex", gap: "10px", marginTop: "12px", alignItems: "center", flexWrap: "wrap" }}>
+                                <div style={{ marginTop: "14px", display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
                                     <input
                                         type="text"
-                                        placeholder="Paytm/UPI payout reference"
+                                        placeholder="Payout Transaction Ref (e.g. UTR / IMPS)"
                                         value={payoutRefs[b._id] || ""}
                                         onChange={(e) => setPayoutRefs({ ...payoutRefs, [b._id]: e.target.value })}
-                                        style={{ padding: "6px 10px", fontSize: "12px", borderRadius: "4px", border: "1px solid #cbd5e1", width: "240px" }}
+                                        style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1", flex: 1, minWidth: "220px" }}
                                     />
                                     <button
                                         type="button"
                                         disabled={busyId === b._id}
                                         onClick={() => handlePayout(b._id)}
-                                        style={{ background: "#0f766e", color: "#fff", border: "none", padding: "6px 14px", borderRadius: "4px", cursor: "pointer", fontWeight: "600" }}
+                                        style={{
+                                            padding: "8px 16px",
+                                            background: "#176b4e",
+                                            color: "#fff",
+                                            borderRadius: "6px",
+                                            border: "none",
+                                            fontWeight: "600",
+                                            cursor: "pointer"
+                                        }}
                                     >
                                         Mark Paid Out
-                                    </button>
-                                    <button
-                                        type="button"
-                                        disabled={busyId === b._id}
-                                        onClick={() => {
-                                            const reason = prompt("Enter cancellation/refund reason:");
-                                            if (reason) {
-                                                setRefundReasons({ ...refundReasons, [b._id]: reason });
-                                                handleRefund(b._id);
-                                            }
-                                        }}
-                                        style={{ background: "#f87171", color: "#fff", border: "none", padding: "6px 14px", borderRadius: "4px", cursor: "pointer" }}
-                                    >
-                                        Refund
                                     </button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )
-            )}
-
-            {/* SCREENSHOT LIGHTBOX MODAL */}
-            {previewImage && (
-                <div
-                    onClick={() => setPreviewImage(null)}
-                    style={{
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        width: "100%",
-                        height: "100%",
-                        background: "rgba(0,0,0,0.75)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        zIndex: 9999,
-                        padding: "20px"
-                    }}
-                >
-                    <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", padding: "16px", borderRadius: "8px", maxWidth: "90%", maxHeight: "90%", overflow: "auto" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-                            <strong>Payment Proof Screenshot</strong>
-                            <button onClick={() => setPreviewImage(null)} style={{ border: "none", background: "none", fontSize: "16px", cursor: "pointer" }}>✕</button>
-                        </div>
-                        <img src={previewImage} alt="Payment Screenshot Proof" style={{ maxWidth: "100%", maxHeight: "70vh", display: "block" }} />
-                    </div>
-                </div>
             )}
         </section>
     );

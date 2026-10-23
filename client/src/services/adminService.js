@@ -229,6 +229,17 @@ export async function removeAdminUserPhoto(
    PAYMENTS & PAYOUTS
 ========================================================= */
 
+export async function getAdminPayments(token, params = {}) {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+            query.set(key, value);
+        }
+    });
+    const qs = query.toString();
+    return adminRequest(`/admin/payments${qs ? `?${qs}` : ''}`, token);
+}
+
 export async function getAdminPendingPayments(token) {
     return adminRequest("/admin/payments/pending", token);
 }

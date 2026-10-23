@@ -1,66 +1,3 @@
-// const mongoose = require("mongoose");
-
-
-// const bookingSchema = new mongoose.Schema(
-//     {
-//         mentor: {
-//             type: mongoose.Schema.Types.ObjectId,
-//             ref: "User",
-//             required: true
-//         },
-
-
-//         learner: {
-//             type: mongoose.Schema.Types.ObjectId,
-//             ref: "User",
-//             required: true
-//         },
-
-
-//         date: {
-//             type: String,
-//             required: true
-//         },
-
-
-//         time: {
-//             type: String,
-//             required: true
-//         },
-
-
-//         message: {
-//             type: String,
-//             default: ""
-//         },
-
-
-//         status: {
-//             type: String,
-//             enum: [
-//                 "pending",
-//                 "accepted",
-//                 "rejected",
-//                 "completed",
-//                 "cancelled"
-//             ],
-//             default: "pending"
-//         }
-//     },
-
-
-//     {
-//         timestamps: true
-//     }
-// );
-
-
-// module.exports = mongoose.model(
-//     "Booking",
-//     bookingSchema
-// );
-
-
 const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
@@ -70,13 +7,15 @@ const bookingSchema = new mongoose.Schema(
         baseSessionAmount: { type: Number, default: 0, min: 0 },
         gstAmount: { type: Number, default: 0, min: 0 },
         grossAmountWithGst: { type: Number, default: 0, min: 0 },
-        paymentMethod: { type: String, enum: ['free', 'pay_later', 'qr', 'wallet', 'upi', 'card', 'upi_card'] },
+        paymentMethod: { type: String, enum: ['free', 'pay_later', 'qr', 'wallet', 'upi', 'card', 'upi_card', 'razorpay'] },
         paymentStatus: {
             type: String,
             enum: [
                 'awaiting_payment',
                 'payment_submitted',
                 'confirmed',
+                'paid',
+                'failed',
                 'rejected',
                 'refunded',
                 'paid_out',
@@ -92,6 +31,11 @@ const bookingSchema = new mongoose.Schema(
             default: 'awaiting_payment'
         },
         paymentReference: { type: String, maxlength: 64, default: '' },
+        // Razorpay payment verification fields
+        razorpayOrderId: { type: String, default: '', trim: true, index: true },
+        razorpayPaymentId: { type: String, default: '', trim: true, index: true },
+        razorpaySignature: { type: String, default: '', trim: true },
+        paidAt: { type: Date, default: null },
         learnerConvenienceFee: { type: Number, default: 0, min: 0 },
         mentorPlatformFee: { type: Number, default: 0, min: 0 },
         mentorEarnings: { type: Number, default: 0, min: 0 },
@@ -106,13 +50,19 @@ const bookingSchema = new mongoose.Schema(
         payment: {
             status: {
                 type: String,
-                enum: ['awaiting_payment', 'payment_submitted', 'confirmed', 'rejected', 'refunded', 'paid_out'],
+                enum: ['awaiting_payment', 'payment_submitted', 'confirmed', 'paid', 'failed', 'rejected', 'refunded', 'paid_out'],
                 default: 'awaiting_payment'
             },
             amount: { type: Number, default: 0, min: 0 },
             platformFeePercent: { type: Number, default: 10 },
             platformFee: { type: Number, default: 0, min: 0 },
             mentorPayout: { type: Number, default: 0, min: 0 },
+            // Razorpay payment fields
+            razorpayOrderId: { type: String, default: '', trim: true },
+            razorpayPaymentId: { type: String, default: '', trim: true },
+            razorpaySignature: { type: String, default: '', trim: true },
+            paidAt: { type: Date, default: null },
+            // Deprecated fields (preserved for existing records)
             utr: { type: String, default: '', trim: true },
             screenshot: { type: String, default: '' },
             paytmTxnRef: { type: String, default: '', trim: true },

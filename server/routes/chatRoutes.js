@@ -14,7 +14,7 @@ const {
 
 const router = express.Router()
 
-router.use(verifyToken)
+router.use("/conversations", verifyToken)
 
 router
     .route("/conversations")
