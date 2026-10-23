@@ -12,6 +12,7 @@ const {
   updateUser,
 } = require("../controllers/adminController");
 const {
+  getAllPayments,
   getPendingPayments,
   verifyPayment,
   getPayouts,
@@ -32,7 +33,8 @@ router.delete("/admin/users/:id", deleteUser);
 router.get("/admin/sessions", listSessions);
 router.get("/admin/reports", getReports);
 
-// Platform QR Payment & Payout Administration
+// Platform Razorpay Payment & Payout Administration
+router.get("/admin/payments", getAllPayments);
 router.get("/admin/payments/pending", getPendingPayments);
 router.post("/admin/payments/:id/verify", verifyPayment);
 router.get("/admin/payments/payouts", getPayouts);
@@ -41,5 +43,3 @@ router.post("/admin/payments/:id/refund", refundBooking);
 router.get("/admin/payments/ledger.csv", exportLedger);
 
 module.exports = router;
-
-// @teamcosmiccoders

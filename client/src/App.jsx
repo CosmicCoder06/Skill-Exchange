@@ -455,7 +455,7 @@ function App() {
                 onMessages={() => openNormalChat(page)} onBookings={() => navigateTo('bookings')}
                 onProfile={() => navigateTo('profile')} onDashboard={() => navigateTo(dashboardPageForRole())}
                 onAccount={() => navigateTo('account')} onLogout={handleLogout}
-                onSelectMentor={mentor => { setBookingMentorId(mentor.id); setBookingMentorName(mentor.name); navigateTo('booking'); }} />
+                onSelectMentor={mentor => { setBookingMentorId(mentor.id); setBookingMentorName(mentor.name); navigateTo('booking'); }} onViewProfile={mentorId => { setViewingUserId(String(mentorId)); navigateTo('user-profile'); }} />
             {profileStatus === false ? (
                 <CompleteProfile
                     token={token}

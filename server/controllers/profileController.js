@@ -1,5 +1,6 @@
 const User = require("../Backend Configuration/Models/UserSchema/user");
 const { recordActivity } = require("../Utils/activityLogger");
+const { invalidateMatcherCache } = require("../services/matcherService");
 
 const hasValue = (value) =>
     typeof value === "string" && value.trim().length > 0;
@@ -308,6 +309,7 @@ const updateProfile = async (req, res) => {
             ).select("-password -refreshToken");
 
         recordActivity({ actor: req.user.id, action: "profile.updated", entityType: "User", entityId: user._id });
+        invalidateMatcherCache(req.user.id);
 
         res.status(200).json({
             message: "Profile updated successfully",

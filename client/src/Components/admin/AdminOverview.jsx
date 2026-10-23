@@ -129,7 +129,7 @@ export default function AdminOverview({
                             onClick={onOpenPayments}
                         >
                             <CreditCard size={15} />
-                            <span>Review Payments</span>
+                            <span>Payments & Revenue</span>
                             {awaitingPayments > 0 && (
                                 <span className="admin-action-badge">{awaitingPayments} pending</span>
                             )}
@@ -228,7 +228,7 @@ export default function AdminOverview({
                 <StatCard
                     value={awaitingPayments}
                     title="Awaiting Payments"
-                    description="Payments awaiting proof or admin match"
+                    description="Approved sessions awaiting checkout"
                     tone="tone-blue"
                     icon={CreditCard}
                     onClick={onOpenPayments}

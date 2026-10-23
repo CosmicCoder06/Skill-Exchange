@@ -3,7 +3,118 @@ const paymentService = require('../services/paymentService');
 const paymentConfig = require('../config/paymentConfig');
 
 /**
- * Get all bookings with submitted payments awaiting admin verification
+ * Get all platform payments with pagination, search, status filters, and summary stats
+ */
+async function getAllPayments(req, res) {
+  try {
+    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 20, 1), 100);
+    const { status, search } = req.query;
+
+    const query = {};
+
+    if (status && status !== "all") {
+      if (status === "paid") {
+        query.$or = [
+          { paymentStatus: { $in: ["paid", "confirmed", "verified"] } },
+          { "payment.status": { $in: ["paid", "confirmed", "verified"] } }
+        ];
+      } else if (status === "awaiting") {
+        query.$or = [
+          { paymentStatus: { $in: ["awaiting_payment", "unpaid", "pending_verification"] } },
+          { "payment.status": { $in: ["awaiting_payment"] } }
+        ];
+        query.status = { $nin: ["completed", "cancelled", "rejected"] };
+      } else if (status === "failed") {
+        query.$or = [
+          { paymentStatus: "failed" },
+          { "payment.status": "failed" }
+        ];
+      } else {
+        query.$or = [
+          { paymentStatus: status },
+          { "payment.status": status }
+        ];
+      }
+    }
+
+    let bookings = await Booking.find(query)
+      .populate("learner", "name email avatarUrl")
+      .populate("mentor", "name email avatarUrl")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Client search filter across learner, mentor, session id, and razorpay payment id
+    if (search && search.trim()) {
+      const term = search.trim().toLowerCase();
+      bookings = bookings.filter(b => {
+        const learnerName = b.learner?.name?.toLowerCase() || "";
+        const learnerEmail = b.learner?.email?.toLowerCase() || "";
+        const mentorName = b.mentor?.name?.toLowerCase() || "";
+        const mentorEmail = b.mentor?.email?.toLowerCase() || "";
+        const bookingId = String(b._id).toLowerCase();
+        const rzpPaymentId = (b.razorpayPaymentId || b.payment?.razorpayPaymentId || "").toLowerCase();
+        const rzpOrderId = (b.razorpayOrderId || b.payment?.razorpayOrderId || "").toLowerCase();
+
+        return learnerName.includes(term) ||
+          learnerEmail.includes(term) ||
+          mentorName.includes(term) ||
+          mentorEmail.includes(term) ||
+          bookingId.includes(term) ||
+          rzpPaymentId.includes(term) ||
+          rzpOrderId.includes(term);
+      });
+    }
+
+    const total = bookings.length;
+    const paginated = bookings.slice((page - 1) * limit, page * limit);
+
+    // Global Payment Stats for Admin
+    const allBookings = await Booking.find().select("paymentStatus payment.status payment.amount baseSessionAmount paymentAmount grossAmountWithGst razorpayPaymentId status").lean();
+
+    let totalCollected = 0;
+    let paidCount = 0;
+    let awaitingCount = 0;
+    let failedCount = 0;
+
+    for (const b of allBookings) {
+      const st = b.payment?.status || b.paymentStatus;
+      const amt = Number(b.payment?.amount || b.baseSessionAmount || b.grossAmountWithGst || b.paymentAmount || 0);
+
+      if (["paid", "confirmed", "verified"].includes(st)) {
+        paidCount++;
+        totalCollected += amt;
+      } else if (["awaiting_payment", "unpaid", "pending_verification"].includes(st) && !["completed", "cancelled", "rejected"].includes(b.status)) {
+        awaitingCount++;
+      } else if (st === "failed") {
+        failedCount++;
+      }
+    }
+
+    return res.json({
+      success: true,
+      payments: paginated,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.max(Math.ceil(total / limit), 1)
+      },
+      stats: {
+        totalCollected: Math.round(totalCollected * 100) / 100,
+        paidCount,
+        awaitingCount,
+        failedCount
+      }
+    });
+  } catch (error) {
+    console.error("getAllPayments error:", error);
+    return res.status(500).json({ message: error.message || "Failed to fetch platform payments." });
+  }
+}
+
+/**
+ * Get pending payments (legacy backward compatibility)
  */
 async function getPendingPayments(req, res) {
   try {
@@ -20,7 +131,6 @@ async function getPendingPayments(req, res) {
     res.json({
       success: true,
       count: bookings.length,
-      warningNotice: "Paytm for Business app me amount aur UTR match karke hi approve karo. Note field par bharosa mat karo.",
       bookings
     });
   } catch (error) {
@@ -30,30 +140,13 @@ async function getPendingPayments(req, res) {
 }
 
 /**
- * Admin verifies payment (Approve with exact match check OR Reject with mandatory reason)
+ * Admin verifies payment (DEPRECATED: 410 Gone)
  */
 async function verifyPayment(req, res) {
-  try {
-    const bookingId = req.params.id;
-    const adminId = req.user._id || req.user.id;
-    const { approve, matchedExact, paytmTxnRef, rejectReason } = req.body;
-
-    const updated = await paymentService.verifyPayment(bookingId, adminId, {
-      approve: Boolean(approve),
-      matchedExact: Boolean(matchedExact),
-      paytmTxnRef,
-      rejectReason
-    });
-
-    res.json({
-      success: true,
-      message: approve ? 'Payment verified and session unlocked for mentor' : 'Payment rejected',
-      booking: updated
-    });
-  } catch (error) {
-    console.error('verifyPayment error:', error);
-    res.status(error.statusCode || 500).json({ message: error.message || 'Verification failed' });
-  }
+  return res.status(410).json({
+    success: false,
+    message: "Manual payment verification is deprecated. Payments are automatically verified via Razorpay checkout."
+  });
 }
 
 /**
@@ -64,8 +157,8 @@ async function getPayouts(req, res) {
     const bookings = await Booking.find({
       status: 'completed',
       $or: [
-        { 'payment.status': 'confirmed' },
-        { paymentStatus: 'confirmed' }
+        { 'payment.status': { $in: ['confirmed', 'paid'] } },
+        { paymentStatus: { $in: ['confirmed', 'paid'] } }
       ]
     })
       .populate('mentor', 'name email')
@@ -149,6 +242,7 @@ async function exportLedger(req, res) {
 }
 
 module.exports = {
+  getAllPayments,
   getPendingPayments,
   verifyPayment,
   getPayouts,

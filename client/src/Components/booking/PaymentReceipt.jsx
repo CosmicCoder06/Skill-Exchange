@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, Clock } from "lucide-react";
+import { CheckCircle2, ShieldCheck, AlertCircle, XCircle } from "lucide-react";
 
 function formatCurrency(num) {
     const val = Number(num) || 0;
@@ -23,23 +23,10 @@ export default function PaymentReceipt({
     const [error, setError] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
 
-    // QR & Submission states for learner
-    const [qrData, setQrData] = useState(null);
-    const [loadingQr, setLoadingQr] = useState(false);
-    const [utr, setUtr] = useState(booking.payment?.utr || "");
-    const [screenshot, setScreenshot] = useState(booking.payment?.screenshot || "");
-    const [screenshotPreview, setScreenshotPreview] = useState(booking.payment?.screenshot || "");
-    const [screenshotName, setScreenshotName] = useState("");
-
     useEffect(() => {
         setBookingData(booking);
         setStatus(booking.payment?.status || booking.paymentStatus || "awaiting_payment");
         setBookingStatus(booking.status);
-        if (booking.payment?.utr) setUtr(booking.payment.utr);
-        if (booking.payment?.screenshot) {
-            setScreenshot(booking.payment.screenshot);
-            setScreenshotPreview(booking.payment.screenshot);
-        }
     }, [booking]);
 
     const isMentor =
@@ -63,147 +50,150 @@ export default function PaymentReceipt({
 
     const isCompleted = bookingStatus === "completed" || bookingData.status === "completed";
     const isCancelled = bookingStatus === "cancelled" || bookingData.status === "cancelled";
+    const isDeclined = bookingStatus === "rejected" || bookingData.status === "rejected" || bookingStatus === "declined";
+    const isTerminal = isCompleted || isCancelled || isDeclined;
 
-    // Fetch platform QR for learner when awaiting payment
-    useEffect(() => {
-        let active = true;
-        const currentPaymentStatus = bookingData.payment?.status || bookingData.paymentStatus;
-        const shouldLoadQr = isLearner && !isCompleted && !isCancelled && (currentPaymentStatus === "awaiting_payment" || currentPaymentStatus === "rejected" || currentPaymentStatus === "unpaid" || currentPaymentStatus === "awaiting_approval") && sessionAmount > 0;
+    const currentPaymentStatus = bookingData.payment?.status || bookingData.paymentStatus || status || "awaiting_payment";
+    const isPaid = ["paid", "confirmed", "verified"].includes(currentPaymentStatus);
 
-        if (shouldLoadQr) {
-            setLoadingQr(true);
-            const activeToken = token || localStorage.getItem("token");
-            fetch(`${import.meta.env.VITE_API_URL}/bookings/${booking._id}/payment-qr`, {
-                headers: { Authorization: `Bearer ${activeToken}` }
-            })
-                .then((res) => {
-                    if (!res.ok) throw new Error("Unable to generate payment QR");
-                    return res.json();
-                })
-                .then((data) => {
-                    if (active) {
-                        setQrData(data);
-                        setLoadingQr(false);
-                    }
-                })
-                .catch((err) => {
-                    if (active) {
-                        setError(err.message);
-                        setLoadingQr(false);
-                    }
-                });
-        }
+    // Can pay only when learner, session active, awaiting payment, and amount > 0
+    const canPay =
+        isLearner &&
+        !isTerminal &&
+        !isPaid &&
+        sessionAmount > 0 &&
+        ["awaiting_payment", "unpaid", "awaiting_approval", "failed", "rejected"].includes(currentPaymentStatus);
 
-        return () => {
-            active = false;
-        };
-    }, [booking._id, bookingData.payment?.status, bookingData.paymentStatus, isLearner, isCompleted, isCancelled, sessionAmount, token]);
-
-    // Handle Screenshot File Change (Max 1MB, image only)
-    const handleFileChange = (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            setError("Please upload an image file (PNG, JPG, WebP).");
-            return;
-        }
-
-        if (file.size > 1024 * 1024) {
-            setError("Image size exceeds 1MB limit. Please upload a smaller screenshot.");
-            return;
-        }
-
-        setError("");
-        setScreenshotName(file.name);
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            setScreenshot(reader.result);
-            setScreenshotPreview(reader.result);
-        };
-        reader.onerror = () => {
-            setError("Failed to read image file.");
-        };
-        reader.readAsDataURL(file);
-    };
-
-    // Learner submits payment proof
-    const handleSubmitPayment = async (e) => {
-        e.preventDefault();
+    // Razorpay Checkout Trigger
+    const handleRazorpayPay = async () => {
         setError("");
         setSuccessMsg("");
-
-        const cleanUtr = String(utr).trim();
-        if (!/^\d{12}$/.test(cleanUtr)) {
-            setError("Invalid UTR: Must be exactly 12 numeric digits.");
-            return;
-        }
-
-        if (!screenshot) {
-            setError("Please upload the Paytm / UPI payment screenshot (Max 1MB).");
-            return;
-        }
-
         setBusy(true);
+
         try {
             const activeToken = token || localStorage.getItem("token");
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${booking._id}/submit-payment`, {
+            const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+            // 1. Create order on backend
+            const orderRes = await fetch(`${apiBase}/payments/create-order`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${activeToken}`
                 },
                 body: JSON.stringify({
-                    utr: cleanUtr,
-                    screenshot
+                    bookingId: booking._id
                 })
             });
 
-            const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data.message || "Failed to submit payment proof");
+            const orderData = await orderRes.json();
+            if (!orderRes.ok) {
+                throw new Error(orderData.message || "Unable to initiate Razorpay payment.");
             }
 
-            setStatus("payment_submitted");
-            setSuccessMsg("Payment submitted successfully! Admin will verify your payment via Paytm for Business.");
-            const updated = data.booking || {
-                ...bookingData,
-                paymentStatus: "payment_submitted",
-                payment: {
-                    ...bookingData.payment,
-                    status: "payment_submitted",
-                    utr: cleanUtr,
-                    screenshot
+            // 2. Ensure Razorpay script is loaded
+            if (typeof window.Razorpay === "undefined") {
+                throw new Error("Razorpay Checkout SDK is still loading. Please refresh and try again.");
+            }
+
+            const options = {
+                key: orderData.key,
+                amount: orderData.amount,
+                currency: orderData.currency || "INR",
+                name: "Skill Exchange",
+                description: `Skill Exchange Session with ${mentorName} (${duration} mins)`,
+                order_id: orderData.orderId,
+                prefill: {
+                    name: booking.learner?.name || "",
+                    email: booking.learner?.email || ""
+                },
+                theme: {
+                    color: "#176b4e"
+                },
+                handler: async function (response) {
+                    try {
+                        setBusy(true);
+                        const verifyRes = await fetch(`${apiBase}/payments/verify`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${activeToken}`
+                            },
+                            body: JSON.stringify({
+                                bookingId: booking._id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+
+                        const verifyData = await verifyRes.json();
+                        if (!verifyRes.ok) {
+                            throw new Error(verifyData.message || "Payment signature verification failed.");
+                        }
+
+                        setStatus("paid");
+                        setSuccessMsg("✓ Payment verified successfully! Your session is confirmed.");
+                        const updated = verifyData.booking || {
+                            ...bookingData,
+                            paymentStatus: "paid",
+                            status: "accepted",
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            payment: {
+                                ...bookingData.payment,
+                                status: "paid",
+                                razorpayPaymentId: response.razorpay_payment_id
+                            }
+                        };
+                        setBookingData(updated);
+                        if (onBookingUpdated) {
+                            onBookingUpdated(updated);
+                        }
+                    } catch (verifyErr) {
+                        setError(verifyErr.message || "Failed to verify payment with server.");
+                    } finally {
+                        setBusy(false);
+                    }
+                },
+                modal: {
+                    ondismiss: function () {
+                        setBusy(false);
+                        setError("Payment dismissed. You can click 'Pay' whenever you are ready.");
+                    }
                 }
             };
-            setBookingData(updated);
-            if (onBookingUpdated) {
-                onBookingUpdated(updated);
-            }
+
+            const rzp = new window.Razorpay(options);
+            rzp.on("payment.failed", function (resp) {
+                setBusy(false);
+                const reason = resp.error?.description || resp.error?.reason || "Payment was declined or failed.";
+                setError(`Payment Failed: ${reason}`);
+            });
+
+            rzp.open();
         } catch (err) {
-            setError(err.message || "Error submitting payment");
-        } finally {
             setBusy(false);
+            setError(err.message || "Error initiating payment.");
         }
     };
 
     function renderStatusBadge(st) {
-        const key = st || bookingData.payment?.status || bookingData.paymentStatus;
+        const key = st || currentPaymentStatus;
         const config = {
+            paid: { label: "Paid", cls: "badge-status-verified" },
+            confirmed: { label: "Paid", cls: "badge-status-verified" },
+            verified: { label: "Paid", cls: "badge-status-verified" },
             awaiting_payment: { label: "Awaiting Payment", cls: "badge-status-unpaid" },
+            unpaid: { label: "Awaiting Payment", cls: "badge-status-unpaid" },
+            awaiting_approval: { label: "Awaiting Payment", cls: "badge-status-pending" },
             payment_submitted: { label: "Payment Submitted", cls: "badge-status-verify" },
-            confirmed: { label: "Payment Confirmed", cls: "badge-status-verified" },
-            rejected: { label: "Payment Rejected", cls: "badge-status-declined" },
-            refunded: { label: "Refund Processed", cls: "badge-status-refunded" },
+            failed: { label: "Payment Failed", cls: "badge-status-declined" },
+            rejected: { label: "Payment Failed", cls: "badge-status-declined" },
+            refunded: { label: "Refunded", cls: "badge-status-refunded" },
             paid_out: { label: "Paid Out", cls: "badge-status-verified" },
             not_required: { label: "Free Session", cls: "badge-status-free" },
-            awaiting_approval: { label: "Awaiting Payment", cls: "badge-status-pending" },
-            unpaid: { label: "Awaiting Payment", cls: "badge-status-unpaid" },
-            pending_verification: { label: "Payment Submitted", cls: "badge-status-verify" },
-            verified: { label: "Payment Confirmed", cls: "badge-status-verified" },
-            declined: { label: "Payment Rejected", cls: "badge-status-declined" },
-            cancelled: { label: "Cancelled", cls: "badge-status-cancelled" }
+            cancelled: { label: "Cancelled", cls: "badge-status-cancelled" },
+            declined: { label: "Declined", cls: "badge-status-declined" }
         }[key] || {
             label: String(key).replace(/_/g, " ").toUpperCase(),
             cls: "badge-status-default"
@@ -213,15 +203,9 @@ export default function PaymentReceipt({
     }
 
     // ==========================================
-    // 1. LEARNER RECEIPT & PLATFORM QR PAYMENT
+    // 1. LEARNER RECEIPT & RAZORPAY CHECKOUT
     // ==========================================
     if (isLearner) {
-        const currentPaymentStatus = bookingData.payment?.status || bookingData.paymentStatus || "awaiting_payment";
-        const isAwaitingPayment = !isCompleted && !isCancelled && (currentPaymentStatus === "awaiting_payment" || currentPaymentStatus === "rejected" || currentPaymentStatus === "unpaid") && sessionAmount > 0;
-        const isSubmitted = currentPaymentStatus === "payment_submitted" || currentPaymentStatus === "pending_verification";
-        const isConfirmed = currentPaymentStatus === "confirmed" || currentPaymentStatus === "verified";
-        const isRejected = currentPaymentStatus === "rejected" || currentPaymentStatus === "declined";
-
         return (
             <div className="payment-receipt-container">
                 <section className="receipt-role-card booker-receipt-card">
@@ -243,21 +227,15 @@ export default function PaymentReceipt({
                             <span className="item-label">Payment Status</span>
                             <div className="item-val">{renderStatusBadge(currentPaymentStatus)}</div>
                         </div>
-                        {bookingData.payment?.utr && (
+                        {(bookingData.razorpayPaymentId || bookingData.payment?.razorpayPaymentId) && (
                             <div className="receipt-detail-item">
-                                <span className="item-label">Submitted UTR</span>
-                                <code className="item-code">{bookingData.payment.utr}</code>
-                            </div>
-                        )}
-                        {isRejected && bookingData.payment?.rejectReason && (
-                            <div className="receipt-detail-item" style={{ color: "#dc2626" }}>
-                                <span className="item-label">Rejection Reason</span>
-                                <strong>{bookingData.payment.rejectReason}</strong>
+                                <span className="item-label">Razorpay Payment ID</span>
+                                <code className="item-code">{bookingData.razorpayPaymentId || bookingData.payment?.razorpayPaymentId}</code>
                             </div>
                         )}
                     </div>
 
-                    {/* TERMINAL STATUS BADGES (WHEN COMPLETED OR CANCELLED, NO QR SHOWN) */}
+                    {/* TERMINAL STATUS BADGES */}
                     {isCompleted && (
                         <div className="session-terminal-badge-box completed" style={{
                             display: "inline-flex",
@@ -295,147 +273,120 @@ export default function PaymentReceipt({
                         </div>
                     )}
 
-                    {/* QR CODE & SUBMISSION FLOW FOR LEARNER (ONLY ON awaiting_payment OR rejected, AND NOT COMPLETED/CANCELLED) */}
-                    {isAwaitingPayment && (
-                        <div className="receipt-payment-unlock-box" style={{ marginTop: "16px" }}>
-                            <div className="unlock-header">
-                                <span className="unlock-badge">📱 Platform UPI QR</span>
-                                <h4>Pay via Paytm Business UPI</h4>
-                                <div style={{
-                                    background: "#fef3c7",
-                                    color: "#92400e",
-                                    border: "1px solid #f59e0b",
-                                    padding: "8px 12px",
-                                    borderRadius: "6px",
-                                    fontSize: "13px",
-                                    fontWeight: "600",
-                                    marginTop: "6px"
-                                }}>
-                                    ⚠️ Pay only to this platform QR. Never pay a mentor directly.
-                                </div>
-                            </div>
-
-                            {loadingQr ? (
-                                <p style={{ padding: "16px", textAlign: "center" }}>Generating secure QR code…</p>
-                            ) : qrData ? (
-                                <div className="unlock-qr-section" style={{ textAlign: "center", maxWidth: "100%", overflow: "hidden" }}>
-                                    <div style={{
-                                        display: "inline-flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        background: "#ffffff",
-                                        padding: "10px",
-                                        borderRadius: "12px",
-                                        border: "1px solid #e2e8f0",
-                                        margin: "10px auto",
-                                        maxWidth: "100%",
-                                        boxSizing: "border-box",
-                                        boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
-                                    }}>
-                                        <img
-                                            src={qrData.qrCodeDataUrl}
-                                            alt="Skill Exchange Platform Payment QR"
-                                            style={{
-                                                width: "100%",
-                                                maxWidth: "180px",
-                                                height: "auto",
-                                                aspectRatio: "1/1",
-                                                objectFit: "contain",
-                                                display: "block"
-                                            }}
-                                        />
-                                    </div>
-                                    <p className="qr-hint" style={{ fontSize: "14px", margin: "4px 0" }}>
-                                        Scan with Paytm, GPay, PhonePe or any UPI app.
-                                    </p>
-                                    <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "16px" }}>
-                                        Platform VPA: <strong>{qrData.platformUpiId}</strong> | Amount: <strong>{formatCurrency(sessionAmount)}</strong>
-                                    </p>
-
-                                    {/* UTR + Screenshot Submission Form */}
-                                    <form onSubmit={handleSubmitPayment} style={{ textAlign: "left", marginTop: "12px" }}>
-                                        <div style={{ marginBottom: "12px" }}>
-                                            <label className="unlock-label" style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>
-                                                12-Digit Transaction UTR / Ref No. <span style={{ color: "#dc2626" }}>*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="unlock-input"
-                                                value={utr}
-                                                maxLength={12}
-                                                required
-                                                disabled={busy}
-                                                onChange={(e) => setUtr(e.target.value.replace(/\D/g, "").slice(0, 12))}
-                                                placeholder="e.g. 423156789012 (12 digits)"
-                                                style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                                            />
-                                        </div>
-
-                                        <div style={{ marginBottom: "16px" }}>
-                                            <label className="unlock-label" style={{ display: "block", marginBottom: "4px", fontWeight: "600" }}>
-                                                Payment Screenshot (Max 1MB) <span style={{ color: "#dc2626" }}>*</span>
-                                            </label>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                required={!screenshot}
-                                                disabled={busy}
-                                                onChange={handleFileChange}
-                                                style={{ display: "block", width: "100%", fontSize: "13px" }}
-                                            />
-                                            {screenshotName && <span style={{ fontSize: "12px", color: "#059669" }}>✓ Selected: {screenshotName}</span>}
-                                            {screenshotPreview && (
-                                                <div style={{ marginTop: "8px" }}>
-                                                    <img
-                                                        src={screenshotPreview}
-                                                        alt="Payment Proof Preview"
-                                                        style={{ maxWidth: "160px", maxHeight: "160px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <button
-                                            type="submit"
-                                            className="unlock-confirm-btn"
-                                            disabled={busy || utr.length !== 12 || !screenshot}
-                                            style={{ width: "100%", padding: "10px", fontWeight: "600", cursor: "pointer" }}
-                                        >
-                                            {busy ? "Submitting Payment…" : "Submit Payment Proof & Confirm"}
-                                        </button>
-                                    </form>
-                                </div>
-                            ) : (
-                                <p style={{ color: "#dc2626" }}>{error || "Unable to display QR code"}</p>
-                            )}
+                    {isDeclined && !isCancelled && (
+                        <div className="session-terminal-badge-box declined" style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            padding: "6px 12px",
+                            borderRadius: "999px",
+                            background: "#fff1f2",
+                            color: "#be123c",
+                            border: "1px solid #fecdd3",
+                            fontSize: "12px",
+                            fontWeight: "700",
+                            marginTop: "14px"
+                        }}>
+                            <XCircle size={14} />
+                            <span>Request declined by mentor</span>
                         </div>
                     )}
 
-                    {/* CONFIRMATION / PENDING NOTICES */}
-                    {isSubmitted && (
-                        <div style={{ background: "#eff6ff", border: "1px solid #93c5fd", color: "#1e40af", padding: "12px", borderRadius: "8px", marginTop: "16px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "600" }}>
-                                <Clock size={16} /> Payment Submitted for Verification
-                            </div>
-                            <p style={{ margin: "4px 0 0 0", fontSize: "13px" }}>
-                                Your 12-digit UTR <strong>{bookingData.payment?.utr}</strong> and screenshot are currently being verified against our Paytm Business records by an administrator. Once verified, your session will be unlocked!
-                            </p>
-                        </div>
-                    )}
-
-                    {isConfirmed && (
-                        <div style={{ background: "#ecfdf5", border: "1px solid #6ee7b7", color: "#065f46", padding: "12px", borderRadius: "8px", marginTop: "16px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "600" }}>
+                    {/* CONFIRMED / PAID NOTICE */}
+                    {isPaid && (
+                        <div style={{
+                            background: "#ecfdf5",
+                            border: "1px solid #6ee7b7",
+                            color: "#065f46",
+                            padding: "12px 14px",
+                            borderRadius: "8px",
+                            marginTop: "16px"
+                        }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "700", fontSize: "14px" }}>
                                 <CheckCircle2 size={16} /> Payment Verified & Session Confirmed
                             </div>
-                            <p style={{ margin: "4px 0 0 0", fontSize: "13px" }}>
-                                Your session booking is fully confirmed. You can join the session meeting once the mentor shares the link.
+                            <p style={{ margin: "4px 0 0 0", fontSize: "13px", lineHeight: "1.5" }}>
+                                Your session booking is confirmed. Join the session meeting once your mentor shares the link.
                             </p>
                         </div>
                     )}
 
-                    {error && <p className="receipt-error-alert" role="alert" style={{ marginTop: "12px" }}>{error}</p>}
-                    {successMsg && <p style={{ color: "#059669", fontSize: "13px", marginTop: "8px" }}>{successMsg}</p>}
+                    {/* RAZORPAY INSTANT CHECKOUT BUTTON */}
+                    {canPay && (
+                        <div className="receipt-razorpay-action-box" style={{ marginTop: "16px" }}>
+                            <button
+                                type="button"
+                                className="unlock-confirm-btn razorpay-pay-btn"
+                                disabled={busy}
+                                onClick={handleRazorpayPay}
+                                style={{
+                                    width: "100%",
+                                    padding: "12px 16px",
+                                    backgroundColor: "#176b4e",
+                                    color: "#ffffff",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    fontWeight: "700",
+                                    fontSize: "15px",
+                                    cursor: busy ? "not-allowed" : "pointer",
+                                    opacity: busy ? 0.75 : 1,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: "8px",
+                                    boxShadow: "0 2px 6px rgba(23, 107, 78, 0.2)",
+                                    transition: "background-color 0.15s ease"
+                                }}
+                            >
+                                <ShieldCheck size={18} />
+                                {busy ? "Connecting to Razorpay…" : `Pay ${formatCurrency(sessionAmount)}`}
+                            </button>
+                            <p style={{
+                                fontSize: "12px",
+                                color: "#64748b",
+                                textAlign: "center",
+                                margin: "8px 0 0 0"
+                            }}>
+                                🔒 Secure checkout via Razorpay • UPI, Cards & NetBanking
+                            </p>
+                        </div>
+                    )}
+
+                    {error && (
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            background: "#fef2f2",
+                            border: "1px solid #fecaca",
+                            color: "#b91c1c",
+                            padding: "10px 12px",
+                            borderRadius: "6px",
+                            fontSize: "13px",
+                            marginTop: "12px"
+                        }}>
+                            <AlertCircle size={16} />
+                            <span>{error}</span>
+                        </div>
+                    )}
+
+                    {successMsg && (
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            background: "#f0fdf4",
+                            border: "1px solid #bbf7d0",
+                            color: "#15803d",
+                            padding: "10px 12px",
+                            borderRadius: "6px",
+                            fontSize: "13px",
+                            marginTop: "12px"
+                        }}>
+                            <CheckCircle2 size={16} />
+                            <span>{successMsg}</span>
+                        </div>
+                    )}
                 </section>
             </div>
         );
@@ -471,8 +422,14 @@ export default function PaymentReceipt({
                     )}
                     <div className="receipt-detail-item">
                         <span className="item-label">Payment Status</span>
-                        <div className="item-val">{renderStatusBadge(status)}</div>
+                        <div className="item-val">{renderStatusBadge(currentPaymentStatus)}</div>
                     </div>
+                    {(bookingData.razorpayPaymentId || bookingData.payment?.razorpayPaymentId) && (
+                        <div className="receipt-detail-item">
+                            <span className="item-label">Razorpay Payment ID</span>
+                            <code className="item-code">{bookingData.razorpayPaymentId || bookingData.payment?.razorpayPaymentId}</code>
+                        </div>
+                    )}
                     {bookingData.payment?.payoutRef && (
                         <div className="receipt-detail-item">
                             <span className="item-label">Payout Reference</span>
@@ -518,8 +475,27 @@ export default function PaymentReceipt({
                     </div>
                 )}
 
-                <p className="mentor-fee-policy-footnote" style={{ marginTop: "12px" }}>
-                    * Payments are collected securely via the Platform Paytm Business UPI and disbursed directly to you upon session completion.
+                {isDeclined && !isCancelled && (
+                    <div className="session-terminal-badge-box declined" style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "6px 12px",
+                        borderRadius: "999px",
+                        background: "#fff1f2",
+                        color: "#be123c",
+                        border: "1px solid #fecdd3",
+                        fontSize: "12px",
+                        fontWeight: "700",
+                        marginTop: "12px"
+                    }}>
+                        <XCircle size={14} />
+                        <span>Session declined</span>
+                    </div>
+                )}
+
+                <p className="mentor-fee-policy-footnote" style={{ marginTop: "12px", fontSize: "12px", color: "#64748b" }}>
+                    * Payments are collected securely via Razorpay and disbursed directly to you upon session completion.
                 </p>
 
                 {error && <p className="receipt-error-alert" role="alert">{error}</p>}

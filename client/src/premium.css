@@ -158,3 +158,6 @@ body :is(.admin-stats-grid,.overview-grid) > article { border:0; border-bottom:1
  body .home-page .path-grid article p { grid-column:2; }
  body .home-page .home-cta { padding:28px 0; }
 }
+
+@keyframes seSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spin-icon { animation: seSpin 1s linear infinite; }

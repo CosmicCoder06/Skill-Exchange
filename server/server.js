@@ -85,6 +85,7 @@ const dashboardRoutes =
 const adminRoutes =
     require("./routes/adminRoutes");
 const mentorRoutes = require("./routes/mentorRoutes");
+const matchRoutes = require("./routes/matchRoutes");
 const skillCategoryRoutes = require("./routes/skillCategoryRoutes");
 const settingRoutes = require("./routes/settingRoutes");
 const activityLogRoutes = require("./routes/activityLogRoutes");
@@ -93,7 +94,12 @@ const activityLogRoutes = require("./routes/activityLogRoutes");
 // Middleware
 // =========================
 
-app.use(express.json({ limit: '400kb' }));
+app.use(express.json({
+    limit: '400kb',
+    verify: (req, res, buf) => {
+        req.rawBody = buf;
+    }
+}));
 app.use(cookieParser());
 
 const allowedOrigins = [
@@ -156,6 +162,7 @@ app.use("/api", reviewRoutes);
 app.use("/api", dashboardRoutes);
 
 app.use("/api", mentorRoutes);
+app.use("/api", matchRoutes);
 // wallet routes removed (demo)
 app.use("/api", skillCategoryRoutes);
 app.use("/api", settingRoutes);

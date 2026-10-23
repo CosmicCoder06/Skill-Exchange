@@ -113,6 +113,9 @@ function paymentDetails(mentor, body, duration = 60) {
     ) {
       throw new Error('Mentor pricing changed. Refresh and review the amount before booking.');
     }
+    if (!mentor?.paymentQr) {
+      throw new Error('Mentor payment QR is not available.');
+    }
     const reference = typeof body.paymentReference === 'string' ? body.paymentReference.trim() : '';
     if (!/^[A-Za-z0-9-]{6,64}$/.test(reference)) throw new Error('Enter a valid transaction reference (6–64 letters or numbers).');
     const qrFees = calculateFees(baseAmount, 'qr');
