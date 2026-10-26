@@ -42,17 +42,24 @@ async function adminRequest(
             ? JSON.parse(text)
             : {};
     } catch {
+        const match = text.match(/<pre>(.*?)<\/pre>/i);
+        const cleanMsg = match
+            ? match[1]
+            : (text.includes("<html") || text.includes("<!DOCTYPE")
+                ? `Backend service error (${response.status})`
+                : text);
         data = {
-            message: text,
+            message: cleanMsg,
         };
     }
 
     if (!response.ok) {
-        throw new Error(
-            data?.message ||
-                data?.error ||
-                `Admin request failed (${response.status})`
-        );
+        let msg = data?.message || data?.error || `Admin request failed (${response.status})`;
+        if (typeof msg === "string" && (msg.includes("<!DOCTYPE") || msg.includes("<html"))) {
+            const match = msg.match(/<pre>(.*?)<\/pre>/i);
+            msg = match ? match[1] : `Backend endpoint not available (${response.status})`;
+        }
+        throw new Error(msg);
     }
 
     return data;

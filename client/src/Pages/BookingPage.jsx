@@ -36,26 +36,79 @@ function BookingPage({
         setMentorLoading(true);
         setMentorError("");
 
-        fetch(`${import.meta.env.VITE_API_URL}/mentors/${mentorId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then(async (r) => {
-                const data = await r.json();
-                if (!r.ok) throw new Error(data.message || "Failed to load mentor details");
-                return data;
-            })
-            .then((data) => {
+        async function fetchMentorDetails() {
+            try {
+                // 1. Try primary /mentors/:id endpoint
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/mentors/${mentorId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const text = await res.text();
+                let data = null;
+                try {
+                    data = text ? JSON.parse(text) : null;
+                } catch {
+                    // Non-JSON response (e.g. 404 HTML during rolling deployment)
+                }
+
+                if (res.ok && data?.mentor) {
+                    if (active) {
+                        setMentor(data.mentor);
+                        setMentorLoading(false);
+                    }
+                    return;
+                }
+
+                // 2. Fallback to /profile/:id
+                const profRes = await fetch(`${import.meta.env.VITE_API_URL}/profile/${mentorId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const profText = await profRes.text();
+                let profData = null;
+                try {
+                    profData = profText ? JSON.parse(profText) : null;
+                } catch {}
+
+                if (profRes.ok && (profData?.profile || profData?.user)) {
+                    if (active) {
+                        setMentor(profData.profile || profData.user);
+                        setMentorLoading(false);
+                    }
+                    return;
+                }
+
+                // 3. Fallback to /mentors directory listing
+                const listRes = await fetch(`${import.meta.env.VITE_API_URL}/mentors`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const listText = await listRes.text();
+                let listData = null;
+                try {
+                    listData = listText ? JSON.parse(listText) : null;
+                } catch {}
+
+                const match = listData?.mentors?.find((m) => String(m._id || m.id) === String(mentorId));
+                if (match && active) {
+                    setMentor(match);
+                    setMentorLoading(false);
+                    return;
+                }
+
                 if (active) {
-                    setMentor(data.mentor || null);
+                    const cleanErr = data?.message && !data.message.includes("<")
+                        ? data.message
+                        : "Unable to load mentor profile details";
+                    setMentorError(cleanErr);
                     setMentorLoading(false);
                 }
-            })
-            .catch((err) => {
+            } catch (err) {
                 if (active) {
                     setMentorError(err.message || "Unable to fetch mentor details");
                     setMentorLoading(false);
                 }
-            });
+            }
+        }
+
+        fetchMentorDetails();
 
         return () => {
             active = false;
