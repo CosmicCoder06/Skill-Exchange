@@ -8,51 +8,59 @@ function BookingPage({
     onBack,
     onBookingCreated
 }) {
+    const [mentor, setMentor] = useState(null);
+    const [mentorLoading, setMentorLoading] = useState(true);
+    const [mentorError, setMentorError] = useState("");
+
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const [duration, setDuration] = useState(60);
     const [message, setMessage] = useState("");
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [payment, setPayment] = useState(null);
     const [availability, setAvailability] = useState({
         checking: false,
         available: null,
         message: ""
     });
 
+    // Always fetch fresh mentor details by mentorId to get accurate hourlyRate
     useEffect(() => {
         let active = true;
-        if (!mentorId) return;
+        if (!mentorId) {
+            setMentorLoading(false);
+            setMentorError("No mentor selected.");
+            return;
+        }
 
-        fetch(`${import.meta.env.VITE_API_URL}/mentors/${mentorId}/payment`, {
+        setMentorLoading(true);
+        setMentorError("");
+
+        fetch(`${import.meta.env.VITE_API_URL}/mentors/${mentorId}`, {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(async (r) => {
                 const data = await r.json();
-                if (!r.ok) throw new Error(data.message);
+                if (!r.ok) throw new Error(data.message || "Failed to load mentor details");
                 return data;
             })
             .then((data) => {
                 if (active) {
-                    setPayment(data);
+                    setMentor(data.mentor || null);
+                    setMentorLoading(false);
                 }
             })
-            .catch(() => {
+            .catch((err) => {
                 if (active) {
-                    setPayment({
-                        name: mentorName,
-                        amount: 0,
-                        qr: "",
-                        currency: "INR"
-                    });
+                    setMentorError(err.message || "Unable to fetch mentor details");
+                    setMentorLoading(false);
                 }
             });
 
         return () => {
             active = false;
         };
-    }, [mentorId, mentorName, token]);
+    }, [mentorId, token]);
 
     // Live slot availability check
     useEffect(() => {
@@ -93,12 +101,57 @@ function BookingPage({
         };
     }, [mentorId, date, time, duration, token]);
 
-    const baseHourlyRate = payment?.amount || 0;
-    const calculatedAmount = Math.round((baseHourlyRate * duration) / 60);
+    // Rate validation: must be a defined, non-negative finite number
+    const rawRate = mentor?.hourlyRate;
+    const isRateConfigured =
+        rawRate !== undefined &&
+        rawRate !== null &&
+        rawRate !== "" &&
+        Number.isFinite(Number(rawRate)) &&
+        Number(rawRate) >= 0;
+
+    const hourlyRate = isRateConfigured ? Number(rawRate) : null;
+    const isExplicitlyFree = isRateConfigured && hourlyRate === 0;
+
+    // Fee formula: Math.round(hourlyRate * durationMinutes / 60)
+    const calculatedFee = isRateConfigured
+        ? Math.round((hourlyRate * duration) / 60)
+        : null;
+
+    let rateDisplay;
+    let feeDisplay;
+
+    if (mentorLoading) {
+        rateDisplay = "Loading…";
+        feeDisplay = "Calculating…";
+    } else if (!isRateConfigured) {
+        rateDisplay = "Rate not set";
+        feeDisplay = "Rate not set";
+    } else if (isExplicitlyFree) {
+        rateDisplay = "Free";
+        feeDisplay = "Free Session";
+    } else {
+        rateDisplay = `₹${hourlyRate.toLocaleString("en-IN")}/hr`;
+        feeDisplay = calculatedFee === 0 ? "Free Session" : `₹${calculatedFee.toLocaleString("en-IN")}`;
+    }
+
+    const canSubmit =
+        !loading &&
+        !mentorLoading &&
+        isRateConfigured &&
+        Boolean(date) &&
+        Boolean(time) &&
+        !availability.checking &&
+        availability.available !== false;
 
     async function createBooking() {
         if (!date || !time) {
             alert("Please select date and time.");
+            return;
+        }
+
+        if (!isRateConfigured) {
+            alert("This mentor has not configured an hourly rate yet. Bookings cannot be requested.");
             return;
         }
 
@@ -150,6 +203,8 @@ function BookingPage({
         }
     }
 
+    const displayName = mentor?.name || mentorName || "Mentor";
+
     if (success) {
         return (
             <main className="booking-page booking-success-page">
@@ -169,7 +224,7 @@ function BookingPage({
 
                     <p className="success-main-text">
                         Your session request with{" "}
-                        <strong>{mentorName}</strong> for <strong>{duration} minutes</strong> has been sent.
+                        <strong>{displayName}</strong> for <strong>{duration} minutes</strong> has been sent.
                     </p>
 
                     <div className="pending-notice">
@@ -212,8 +267,25 @@ function BookingPage({
                 <h1>Book Session</h1>
 
                 <p className="booking-with">
-                    With {payment?.name || mentorName}
+                    With {displayName}
                 </p>
+
+                {mentorError && (
+                    <div
+                        role="alert"
+                        style={{
+                            padding: "10px 14px",
+                            marginBottom: "16px",
+                            borderRadius: "6px",
+                            background: "#fef3f2",
+                            border: "1px solid #fee4e2",
+                            color: "#b42318",
+                            fontSize: "13px"
+                        }}
+                    >
+                        ⚠️ {mentorError}
+                    </div>
+                )}
 
                 <div className="booking-approval-steps-card">
                     <div className="approval-step-item">
@@ -247,7 +319,7 @@ function BookingPage({
                             type="button"
                             className={`duration-pill ${duration === mins ? "active" : ""}`}
                             onClick={() => setDuration(mins)}
-                            disabled={loading}
+                            disabled={loading || mentorLoading}
                         >
                             {mins >= 60 ? (mins === 60 ? "1 hr" : `${mins / 60} hrs`) : `${mins} mins`}
                         </button>
@@ -260,7 +332,7 @@ function BookingPage({
                     value={date}
                     min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setDate(e.target.value)}
-                    disabled={loading}
+                    disabled={loading || mentorLoading}
                 />
 
                 <label>Select Time</label>
@@ -268,7 +340,7 @@ function BookingPage({
                     type="time"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    disabled={loading}
+                    disabled={loading || mentorLoading}
                 />
 
                 {date && time && (
@@ -288,13 +360,13 @@ function BookingPage({
                     placeholder="Tell mentor about your goals or topics you want to cover"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    disabled={loading}
+                    disabled={loading || mentorLoading}
                 />
 
                 <div className="pricing-calculation-card">
                     <div className="pricing-calc-row">
                         <span>Mentor Rate:</span>
-                        <strong>{baseHourlyRate === 0 ? "Free" : `₹${baseHourlyRate.toLocaleString("en-IN")}/hr`}</strong>
+                        <strong>{rateDisplay}</strong>
                     </div>
                     <div className="pricing-calc-row">
                         <span>Selected Duration:</span>
@@ -304,9 +376,28 @@ function BookingPage({
                     <div className="pricing-calc-total">
                         <span>Calculated Fee:</span>
                         <strong className="calc-amount">
-                            {calculatedAmount === 0 ? "Free Session" : `₹${calculatedAmount.toLocaleString("en-IN")}`}
+                            {feeDisplay}
                         </strong>
                     </div>
+
+                    {!mentorLoading && !isRateConfigured && (
+                        <div
+                            role="alert"
+                            style={{
+                                padding: "8px 12px",
+                                marginTop: "12px",
+                                borderRadius: "6px",
+                                background: "#fef3f2",
+                                border: "1px solid #fee4e2",
+                                color: "#b42318",
+                                fontSize: "12px",
+                                lineHeight: 1.4
+                            }}
+                        >
+                            ⚠️ <strong>Rate not set:</strong> This mentor has not configured their hourly rate. Bookings cannot be requested until a rate is set in their profile.
+                        </div>
+                    )}
+
                     <p className="pricing-payment-note">
                         💡 <em>Payment is unlocked after the mentor approves this time slot.</em>
                     </p>
@@ -315,9 +406,15 @@ function BookingPage({
                 <button
                     className="confirm-booking"
                     onClick={createBooking}
-                    disabled={loading || !date || !time || availability.checking || availability.available === false}
+                    disabled={!canSubmit}
                 >
-                    {loading ? "Sending Request..." : "Request Time Slot for Approval"}
+                    {loading
+                        ? "Sending Request..."
+                        : mentorLoading
+                        ? "Loading Mentor..."
+                        : !isRateConfigured
+                        ? "Rate Not Configured — Cannot Book"
+                        : "Request Time Slot for Approval"}
                 </button>
             </section>
         </main>

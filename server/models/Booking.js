@@ -40,6 +40,35 @@ const bookingSchema = new mongoose.Schema(
         mentorPlatformFee: { type: Number, default: 0, min: 0 },
         mentorEarnings: { type: Number, default: 0, min: 0 },
         totalAmountPaid: { type: Number, default: 0, min: 0 },
+
+        // Mentor Payout Settlement fields
+        payoutStatus: {
+            type: String,
+            enum: ['pending', 'in_escrow', 'paid', 'not_applicable'],
+            default: 'pending',
+            index: true
+        },
+        payoutReference: {
+            type: String,
+            trim: true,
+            default: undefined,
+            sparse: true,
+            unique: true
+        },
+        payoutNote: { type: String, default: '', trim: true },
+        payoutAt: { type: Date, default: null },
+        settledBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+
+        // Integer paise money fields (Addition 4)
+        grossPaise: { type: Number, min: 0 },
+        mentorFeePaise: { type: Number, min: 0 },
+        mentorPayoutPaise: { type: Number, min: 0 },
+
+        // Refund tracking fields (Addition 1)
+        refundId: { type: String, default: '', trim: true },
+        refundedAt: { type: Date, default: null },
+        refundedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+        refundAmount: { type: Number, default: 0, min: 0 },
         duration: {
             type: Number,
             required: true,

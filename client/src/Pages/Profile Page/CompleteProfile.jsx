@@ -9,6 +9,7 @@ const emptyProfile = {
     skillsToLearn: "",
     availability: "",
     hourlyRate: "",
+    payoutUpiId: "",
     avatarUrl: "",
     coverImageUrl: ""
 };
@@ -63,6 +64,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
 
                     hourlyRate:
                         profile.hourlyRate || "",
+                    payoutUpiId: profile.payoutUpiId || "",
 
                     avatarUrl:
                         profile.avatarUrl || "",
@@ -149,6 +151,10 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
         }
     }
 
+    if (role === "mentor" && (formData.hourlyRate === "" || formData.hourlyRate === null || formData.hourlyRate === undefined)) {
+        return "Please set your hourly rate (enter 0 for free sessions).";
+    }
+
     if (
         formData.hourlyRate !== "" &&
         (
@@ -156,7 +162,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
             Number(formData.hourlyRate) < 0
         )
     ) {
-        return "Hourly rate must be a valid non-negative number.";
+        return "Hourly rate must be a valid non-negative number (use 0 for free sessions).";
     }
 
     const validateUrl = (value, fieldName) => {
@@ -255,9 +261,10 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                             ),
 
                         hourlyRate:
-                            Number(
-                                formData.hourlyRate
-                            ) || 0,
+                            formData.hourlyRate !== "" && Number.isFinite(Number(formData.hourlyRate)) && Number(formData.hourlyRate) >= 0
+                                ? Number(formData.hourlyRate)
+                                : 0,
+                        payoutUpiId: formData.payoutUpiId || "",
 
                         avatarUrl:
                             formData.avatarUrl,
@@ -525,7 +532,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
 
 
                         <label>
-                            Hourly rate
+                            Hourly rate (₹/hr)
 
                             <input
                                 name="hourlyRate"
@@ -534,11 +541,22 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                                 value={
                                     formData.hourlyRate
                                 }
-                                placeholder="Optional"
+                                placeholder={role === "mentor" ? "e.g. 500 (or 0 for Free)" : "Optional"}
                                 onChange={handleChange}
                             />
                         </label>
 
+                        {role === "mentor" && (
+                            <label>
+                                Payout UPI ID (for earnings settlement)
+                                <input
+                                    name="payoutUpiId"
+                                    value={formData.payoutUpiId || ""}
+                                    placeholder="e.g. mentor@oksbi or 9876543210@upi"
+                                    onChange={handleChange}
+                                />
+                            </label>
+                        )}
                     </div>
 
 

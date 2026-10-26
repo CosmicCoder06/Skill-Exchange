@@ -1,14 +1,13 @@
 /**
- * Platform Manual Payment Configuration
- * Paytm Business UPI manual payment & payout settings
+ * Platform Payment & Escrow Configuration
+ * Platform fee settings, Razorpay escrow and refund rules
  */
 
 module.exports = {
   // Platform fee percentage deducted from session price
   platformFeePercent: Number(process.env.PLATFORM_FEE_PERCENT) || 10,
 
-  // Platform UPI details (Paytm Business)
-  getPlatformUpiId: () => process.env.PLATFORM_UPI_ID || "paytmqr.platform@paytm",
+  // Platform details
   getPlatformName: () => process.env.PLATFORM_NAME || "Skill Exchange",
 
   // Refund policies & rules

@@ -41,7 +41,7 @@ function AppFooter() {
                         Contact Us
                     </button>
                 </div>
-                <div>© 2026 @teamcosmiccoders — All payments securely verified via Paytm Business UPI</div>
+                <div>© 2026 @teamcosmiccoders — All payments securely processed via Razorpay</div>
             </footer>
 
             {/* STATIC PAGE MODALS */}
@@ -52,30 +52,52 @@ function AppFooter() {
                         position: "fixed",
                         top: 0,
                         left: 0,
-                        width: "100%",
-                        height: "100%",
-                        background: "rgba(15, 23, 42, 0.65)",
-                        backdropFilter: "blur(4px)",
+                        right: 0,
+                        bottom: 0,
+                        background: "rgba(0,0,0,0.6)",
+                        zIndex: 9999,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        zIndex: 10000,
                         padding: "20px"
                     }}
                 >
                     <div
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                            maxWidth: "850px",
+                            background: "var(--card-bg, #ffffff)",
+                            color: "var(--text-color, #0f172a)",
+                            maxWidth: "760px",
+                            width: "100%",
                             maxHeight: "85vh",
                             overflowY: "auto",
-                            width: "100%"
+                            borderRadius: "12px",
+                            padding: "32px",
+                            boxShadow: "0 20px 25px -5px rgba(0,0,0,0.2)"
                         }}
                     >
-                        {openModal === "terms" && <TermsPage onClose={() => setOpenModal(null)} />}
-                        {openModal === "privacy" && <PrivacyPage onClose={() => setOpenModal(null)} />}
-                        {openModal === "refund" && <RefundPolicyPage onClose={() => setOpenModal(null)} />}
-                        {openModal === "contact" && <ContactPage onClose={() => setOpenModal(null)} />}
+                        <div style={{ textAlign: "right", marginBottom: "12px" }}>
+                            <button
+                                type="button"
+                                onClick={() => setOpenModal(null)}
+                                style={{
+                                    background: "#e2e8f0",
+                                    border: "none",
+                                    borderRadius: "50%",
+                                    width: "28px",
+                                    height: "28px",
+                                    cursor: "pointer",
+                                    fontWeight: "bold"
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {openModal === "terms" && <TermsPage />}
+                        {openModal === "privacy" && <PrivacyPage />}
+                        {openModal === "refund" && <RefundPolicyPage />}
+                        {openModal === "contact" && <ContactPage />}
                     </div>
                 </div>
             )}

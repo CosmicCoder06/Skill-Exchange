@@ -361,7 +361,7 @@ export default function AdminPage({ token, onLogout }) {
             eyebrow: "PAYMENT OPERATIONS",
             title: "Payments & Payouts",
             description:
-                "Verify submitted UPI payments, manage mentor payouts and process booking refunds.",
+                "Track Razorpay transactions, manage mentor payouts and process booking refunds.",
         },
         sessions: {
             eyebrow: "SESSION MONITORING",

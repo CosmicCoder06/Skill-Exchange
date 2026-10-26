@@ -311,6 +311,19 @@ function DiscoverPage({
                                                 : "No reviews yet"}
                                         </span>
 
+                                        {person.role === "mentor" && (
+                                            <>
+                                                <span className="meta-divider">·</span>
+                                                <span style={{ fontWeight: 700, color: "#176b4e" }}>
+                                                    {person.hourlyRate === 0
+                                                        ? "Free"
+                                                        : person.hourlyRate > 0
+                                                        ? `₹${Number(person.hourlyRate).toLocaleString("en-IN")}/hr`
+                                                        : "Rate not set"}
+                                                </span>
+                                            </>
+                                        )}
+
                                         {teachingSkills.length >
                                             0 && (
                                             <>

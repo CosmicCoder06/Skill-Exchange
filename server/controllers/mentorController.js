@@ -36,4 +36,45 @@ const listMentors = async (req, res) => {
   }
 };
 
-module.exports = { listMentors };
+const getMentorById = async (req, res) => {
+  try {
+    const mentor = await User.findOne({
+      _id: req.params.id,
+      role: "mentor",
+      isActive: true
+    }).select("name role bio skillsToTeach teachingSkillLevels availability hourlyRate avatarUrl profileCompleted");
+
+    if (!mentor) {
+      return res.status(404).json({ message: "Mentor not found or unavailable" });
+    }
+
+    return res.json({ mentor });
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to fetch mentor details" });
+  }
+};
+
+const getMentorPaymentInfo = async (req, res) => {
+  try {
+    const mentor = await User.findOne({
+      _id: req.params.id,
+      role: "mentor",
+      isActive: true
+    }).select("name hourlyRate");
+
+    if (!mentor) {
+      return res.status(404).json({ message: "Mentor not found or unavailable" });
+    }
+
+    return res.json({
+      name: mentor.name,
+      amount: mentor.hourlyRate,
+      hourlyRate: mentor.hourlyRate,
+      currency: "INR"
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to fetch mentor payment info" });
+  }
+};
+
+module.exports = { listMentors, getMentorById, getMentorPaymentInfo };

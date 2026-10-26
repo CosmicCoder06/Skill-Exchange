@@ -122,26 +122,57 @@ export async function getAdminUsers(
         }
     );
 
-    const queryString =
-        query.toString();
+    const qs = query.toString();
 
     return adminRequest(
         `/admin/users${
-            queryString
-                ? `?${queryString}`
-                : ""
+            qs ? `?${qs}` : ""
         }`,
         token
     );
 }
 
-export async function fetchAdminUsers(
+export async function updateAdminUser(
     token,
-    params = {}
+    id,
+    data
 ) {
-    return getAdminUsers(
+    return adminRequest(
+        `/admin/users/${id}`,
         token,
-        params
+        {
+            method: "PATCH",
+            body: JSON.stringify(data),
+        }
+    );
+}
+
+export async function deleteAdminUser(
+    token,
+    id
+) {
+    return adminRequest(
+        `/admin/users/${id}`,
+        token,
+        {
+            method: "DELETE",
+        }
+    );
+}
+
+export async function removeAdminUserPhoto(
+    token,
+    id
+) {
+    return adminRequest(
+        `/admin/users/${id}`,
+        token,
+        {
+            method: "PATCH",
+            body: JSON.stringify({
+                avatarUrl: "",
+            }),
+        }
     );
 }
 
@@ -165,79 +196,18 @@ export async function fetchAdminReports(
 }
 
 /* =========================================================
-   UPDATE USER
-========================================================= */
-
-export async function updateAdminUser(
-    token,
-    userId,
-    updates
-) {
-    return adminRequest(
-        `/admin/users/${userId}`,
-        token,
-        {
-            method: "PATCH",
-
-            body: JSON.stringify(
-                updates
-            ),
-        }
-    );
-}
-
-/* =========================================================
-   DELETE USER
-========================================================= */
-
-export async function deleteAdminUser(
-    token,
-    userId
-) {
-    return adminRequest(
-        `/admin/users/${userId}`,
-        token,
-        {
-            method: "DELETE",
-        }
-    );
-}
-
-/* =========================================================
-   REMOVE PROFILE PHOTO
-========================================================= */
-
-export async function removeAdminUserPhoto(
-    token,
-    userId,
-    reason
-) {
-    return adminRequest(
-        `/admin/users/${userId}/avatar`,
-        token,
-        {
-            method: "DELETE",
-
-            body: JSON.stringify({
-                reason,
-            }),
-        }
-    );
-}
-
-/* =========================================================
    PAYMENTS & PAYOUTS
 ========================================================= */
 
 export async function getAdminPayments(token, params = {}) {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
+        if (value !== undefined && value !== null && value !== "") {
             query.set(key, value);
         }
     });
     const qs = query.toString();
-    return adminRequest(`/admin/payments${qs ? `?${qs}` : ''}`, token);
+    return adminRequest(`/admin/payments${qs ? `?${qs}` : ""}`, token);
 }
 
 export async function getAdminPendingPayments(token) {
@@ -253,6 +223,35 @@ export async function verifyAdminPayment(token, bookingId, data) {
 
 export async function getAdminPayouts(token) {
     return adminRequest("/admin/payments/payouts", token);
+}
+
+export async function settleAdminPayouts(token, data) {
+    return adminRequest("/admin/payouts/settle", token, {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+}
+
+export async function getAdminPayoutHistory(token, params = {}) {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+            query.set(key, value);
+        }
+    });
+    const qs = query.toString();
+    return adminRequest(`/admin/payouts/history${qs ? `?${qs}` : ""}`, token);
+}
+
+export async function getAdminRefunds(token) {
+    return adminRequest("/admin/refunds", token);
+}
+
+export async function refundAdminRazorpay(token, bookingId, data = {}) {
+    return adminRequest(`/admin/refunds/${bookingId}`, token, {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
 }
 
 export async function markAdminPaidOut(token, bookingId, data) {

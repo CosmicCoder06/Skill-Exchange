@@ -16,7 +16,7 @@ export default function PrivacyPage({ onClose }) {
                 <p>We collect personal information that you provide to us, including your name, email address, password, role (learner/mentor), profile bio, skills, and session booking details.</p>
 
                 <h3>2. Payment Records & Proofs</h3>
-                <p>When you submit payment verification proofs (such as 12-digit transaction UTRs and screenshot images), these details are stored securely to enable administrator verification against Paytm Business records and ensure fraud prevention.</p>
+                <p>When you make a session payment via Razorpay, transaction identifiers and digital checkout details are securely processed by Razorpay and stored on the server to verify payment signatures and prevent fraud.</p>
 
                 <h3>3. Use of Information</h3>
                 <p>Your information is used solely to facilitate skill-sharing sessions, process payments and mentor payouts, provide customer support, and maintain platform security.</p>

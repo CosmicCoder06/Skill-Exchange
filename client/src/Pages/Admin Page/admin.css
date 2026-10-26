@@ -607,14 +607,18 @@
 }
 
 /* Stat Numbers — High Contrast & Bold */
-.admin-stat-card > strong {
+.admin-stat-card > strong,
+.admin-stat-number {
     display: block;
-    font-size: 42px;
-    line-height: 1;
+    font-size: 38px;
+    line-height: 1.1;
     font-weight: 850;
-    letter-spacing: -1.5px;
+    letter-spacing: -1px;
     margin-bottom: 14px;
     color: #10261f;
+    flex-shrink: 0;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .admin-stat-content h3 {
@@ -2823,11 +2827,22 @@ html[data-theme="dark"] .admin-sidebar {
 ========================================================= */
 .admin-overview-tables-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
     margin-top: 32px;
 }
 
+.admin-overview-table-card.full-span {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+    .admin-overview-tables-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.admin-overview-table-card,
 .admin-overview-panel {
     background: #ffffff;
     border: 1px solid #dbe6e0;
@@ -2836,8 +2851,10 @@ html[data-theme="dark"] .admin-sidebar {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    box-shadow: 0 2px 8px rgba(16, 38, 31, 0.04);
 }
 
+.table-card-head,
 .admin-overview-panel-header {
     display: flex;
     align-items: center;
@@ -2845,6 +2862,7 @@ html[data-theme="dark"] .admin-sidebar {
     gap: 12px;
 }
 
+.table-card-head h4,
 .admin-overview-panel-header h3 {
     margin: 0;
     font-size: 16px;
@@ -2852,6 +2870,13 @@ html[data-theme="dark"] .admin-sidebar {
     color: #10261f;
 }
 
+.table-card-head p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #5a7267;
+}
+
+.card-head-action,
 .admin-see-all-link {
     background: none;
     border: none;
@@ -2859,24 +2884,49 @@ html[data-theme="dark"] .admin-sidebar {
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
-    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s ease;
 }
 
+.card-head-action:hover,
 .admin-see-all-link:hover {
-    text-decoration: underline;
+    background: #edf7f2;
+    text-decoration: none;
+}
+
+.admin-mini-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mini-empty {
+    font-size: 13px;
+    color: #60796e;
+    margin: 0;
+    padding: 12px 0;
 }
 
 .mini-list-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 12px 14px;
+    gap: 12px;
+    padding: 10px 14px;
     background: #f7faf8;
     border: 1px solid #eef3f0;
     border-radius: 10px;
     font-size: 13px;
     transition: all 0.2s ease;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.mini-list-item.clickable {
+    cursor: pointer;
 }
 
 .mini-list-item:hover {
@@ -2884,43 +2934,192 @@ html[data-theme="dark"] .admin-sidebar {
     border-color: #d4ece0;
 }
 
-.mini-list-user {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-}
-
-.mini-list-user img,
-.mini-avatar-placeholder {
-    width: 34px;
-    height: 34px;
+.mini-avatar {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
     border-radius: 50%;
-    object-fit: cover;
-}
-
-.mini-avatar-placeholder {
     display: grid;
     place-items: center;
     background: #eef8f2;
     color: #176b4e;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 14px;
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
+.mini-avatar.payment-avatar {
+    background: #ecfdf5;
+    color: #059669;
+    font-weight: 800;
+}
+
+.mini-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mini-info,
 .mini-user-info {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    gap: 2px;
 }
 
+.mini-info strong,
 .mini-user-info strong {
+    font-size: 13px;
+    font-weight: 700;
     color: #10261f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.mini-info span,
+.mini-user-info span {
+    font-size: 11px;
+    color: #60796e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.mini-tag-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.pill-payment-status {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.pill-payment-status.status-paid {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.pill-payment-status.status-awaiting {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.pill-payment-status.status-failed {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* Recent Platform Sessions Table */
+.admin-sessions-overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+}
+
+.admin-sessions-overview-table th {
+    padding: 12px 16px;
+    background: #f4f8f6;
+    color: #4b6357;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e1ece6;
+    white-space: nowrap;
+}
+
+.admin-sessions-overview-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #edf4f0;
+    color: #10261f;
+    vertical-align: middle;
+}
+
+.admin-sessions-overview-table tr:hover td {
+    background: #f9fbf9;
+}
+
+.session-participant-cell {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 1px;
+}
+
+.session-participant-cell strong {
+    font-size: 13px;
+    font-weight: 700;
+    color: #10261f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.participant-role {
+    font-size: 10px;
+    font-weight: 600;
+    color: #60796e;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.participant-email-muted {
+    font-size: 11px;
+    color: #8fa59c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.session-datetime-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    white-space: nowrap;
+}
+
+.session-date-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #10261f;
+}
+
+.session-time-val {
+    font-size: 11px;
+    color: #60796e;
+}
+
+.session-fee-val {
+    color: #176b4e;
+    font-weight: 700;
     font-size: 13px;
 }
 
-.mini-user-info span {
-    color: #60796e;
-    font-size: 11px;
+.session-fee-free {
+    color: #059669;
+    font-weight: 600;
+    font-size: 12px;
+    background: #ecfdf5;
+    padding: 2px 7px;
+    border-radius: 999px;
 }
 
 .admin-profile-container {
@@ -2990,7 +3189,86 @@ html[data-theme="dark"] .sessions-summary-card strong,
 html[data-theme="dark"] .gov-user-quickinfo strong,
 html[data-theme="dark"] .profile-editorial-title-row h2,
 html[data-theme="dark"] .admin-overview-panel-header h3,
-html[data-theme="dark"] .mini-user-info strong {
+html[data-theme="dark"] .table-card-head h4,
+html[data-theme="dark"] .admin-panel-header h3,
+html[data-theme="dark"] .mini-info strong,
+html[data-theme="dark"] .mini-user-info strong,
+html[data-theme="dark"] .session-participant-cell strong,
+html[data-theme="dark"] .session-date-val {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-stat-card {
+    background: #132820 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .admin-stat-card > strong,
+html[data-theme="dark"] .admin-stat-number {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-stat-card .admin-stat-content h3 {
+    color: #e2e8e5 !important;
+}
+
+html[data-theme="dark"] .admin-stat-card .admin-stat-content p {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .admin-stat-card.tone-mint > strong { color: #34d399 !important; }
+html[data-theme="dark"] .admin-stat-card.tone-sand > strong { color: #fbbf24 !important; }
+html[data-theme="dark"] .admin-stat-card.tone-blue > strong { color: #60a5fa !important; }
+html[data-theme="dark"] .admin-stat-card.tone-lavender > strong { color: #c084fc !important; }
+html[data-theme="dark"] .admin-stat-card.tone-rose > strong { color: #f472b6 !important; }
+
+html[data-theme="dark"] .admin-overview-table-card,
+html[data-theme="dark"] .admin-panel-card {
+    background: #132820 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #e2e8e5 !important;
+}
+
+html[data-theme="dark"] .table-card-head p,
+html[data-theme="dark"] .admin-panel-header p,
+html[data-theme="dark"] .mini-info span,
+html[data-theme="dark"] .participant-role,
+html[data-theme="dark"] .participant-email-muted,
+html[data-theme="dark"] .session-time-val,
+html[data-theme="dark"] .compliance-info span {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .mini-avatar {
+    background: #132820 !important;
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .mini-avatar.payment-avatar {
+    background: #173329 !important;
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .admin-sessions-overview-table th {
+    background: #173329 !important;
+    color: #a7c5b6 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .admin-sessions-overview-table td {
+    color: #e2e8e5 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .admin-sessions-overview-table tr:hover td {
+    background: #1a382e !important;
+}
+
+html[data-theme="dark"] .session-fee-val {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .compliance-info strong {
     color: #ffffff !important;
 }
 

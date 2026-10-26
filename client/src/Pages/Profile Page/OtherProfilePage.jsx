@@ -142,6 +142,25 @@ function OtherProfilePage({
                         Open to meaningful skill exchanges
                     </p>
 
+{profile.role === "mentor" && (
+                        <div className="other-profile-rate-badge" style={{ marginTop: "4px", marginBottom: "6px" }}>
+                            <span style={{
+                                display: "inline-block",
+                                padding: "3px 10px",
+                                borderRadius: "999px",
+                                background: "#e8f4ef",
+                                color: "#176b4e",
+                                fontSize: "12px",
+                                fontWeight: 700
+                            }}>
+                                {profile.hourlyRate === 0
+                                    ? "Free Sessions"
+                                    : profile.hourlyRate > 0
+                                    ? `₹${Number(profile.hourlyRate).toLocaleString("en-IN")}/hr`
+                                    : "Rate not set"}
+                            </span>
+                        </div>
+                    )}
                     <div className="profile-rating-summary">
                         <span className="rating-star">
                             ★
