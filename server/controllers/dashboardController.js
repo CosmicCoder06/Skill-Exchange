@@ -1,3 +1,4 @@
+const payoutService = require("../services/payoutService");
 const User = require("../Backend Configuration/Models/UserSchema/user");
 const Booking = require("../models/Booking");
 const Review = require("../models/Review");
@@ -44,58 +45,7 @@ const getMentorDashboard = async (req, res) => {
                 .limit(50)
         ]);
 
-        const currentMonthPrefix = new Date().toISOString().slice(0, 7);
-        let totalEarnings = 0;
-        let pendingSettlement = 0;
-        let thisMonthEarnings = 0;
-        const history = [];
-
-        (mentorPaidBookings || []).forEach((b) => {
-            const base = Number(b.baseSessionAmount || b.paymentAmount || 0);
-            const isFree = b.paymentMethod === "free" || base === 0;
-            const gross = roundToTwo(b.grossAmountWithGst !== undefined && Number(b.grossAmountWithGst) > 0 ? b.grossAmountWithGst : (base > 0 ? base * 1.18 : 0));
-            const fee = roundToTwo(b.mentorPlatformFee !== undefined && Number(b.mentorPlatformFee) > 0 ? b.mentorPlatformFee : (isFree ? 0 : gross * 0.03));
-            const net = roundToTwo(b.mentorEarnings !== undefined && Number(b.mentorEarnings) > 0 ? b.mentorEarnings : Math.max(0, gross - fee));
-
-            let statusLabel = "Free Session";
-            let isCredited = false;
-
-            if (isFree) {
-                statusLabel = "Free Session";
-            } else if (b.paymentStatus === "verified") {
-                statusLabel = "Credited to Wallet";
-                isCredited = true;
-                totalEarnings += net;
-                if (b.date && b.date.startsWith(currentMonthPrefix)) {
-                    thisMonthEarnings += net;
-                }
-            } else if (b.status === "cancelled" || b.status === "rejected") {
-                statusLabel = b.status === "cancelled" ? "Cancelled" : "Declined";
-            } else if (b.paymentStatus === "pending_verification") {
-                statusLabel = "Pending Verification";
-                pendingSettlement += net;
-            } else if (b.status === "accepted" || b.paymentStatus === "unpaid") {
-                statusLabel = "Pending Settlement";
-                pendingSettlement += net;
-            } else {
-                statusLabel = "Pending";
-            }
-
-            history.push({
-                bookingId: b._id,
-                date: b.date || "—",
-                time: b.time || "—",
-                duration: b.duration || 60,
-                learnerName: b.learner?.name || "Learner",
-                learnerEmail: b.learner?.email || "",
-                grossFee: gross,
-                platformFee: fee,
-                netAmount: net,
-                status: statusLabel,
-                isCredited,
-                paymentMethod: b.paymentMethod || "wallet"
-            });
-        });
+        const earningsSummary = await payoutService.getMentorEarningsSummary(mentorId);
 
         const walletBalance = mentorWallet ? mentorWallet.balance : 0;
         const earnedBalance = mentorWallet
@@ -121,13 +71,18 @@ const getMentorDashboard = async (req, res) => {
                 monthlySessions: monthlySessions.map((row) => ({ month: row._id, sessions: row.sessions, learners: row.learners.length })),
                 statusBreakdown: statusRows.reduce((result, row) => ({ ...result, [row._id]: row.total }), {}),
                 earnings: {
-                    totalEarnings: roundToTwo(totalEarnings),
+                    totalEarnings: earningsSummary.lifetimeRevenue,
+                    lifetimeRevenue: earningsSummary.lifetimeRevenue,
+                    settledPayouts: earningsSummary.settledPayouts,
                     walletBalance: roundToTwo(walletBalance),
                     earnedBalance: roundToTwo(earnedBalance),
                     topupBalance: roundToTwo(topupBalance),
-                    pendingSettlement: roundToTwo(pendingSettlement),
-                    thisMonthEarnings: roundToTwo(thisMonthEarnings),
-                    history
+                    pendingSettlement: earningsSummary.pendingSettlement,
+                    inEscrow: earningsSummary.inEscrow,
+                    thisMonthEarnings: earningsSummary.thisMonthEarnings,
+                    counts: earningsSummary.counts,
+                    payoutUpiId: user.payoutUpiId || "",
+                    history: earningsSummary.history
                 }
             }
         });

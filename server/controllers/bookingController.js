@@ -364,8 +364,23 @@ const createBooking = async (req, res) => {
         }
 
         if (mentorUser.role !== "mentor") {
-            mentorUser.hourlyRate = 0;
-            mentorUser.paymentQr = "";
+            return res.status(400).json({
+                message: "Sessions can only be booked with mentors"
+            });
+        }
+
+        const rawRate = mentorUser.hourlyRate;
+        const isRateValid =
+            rawRate !== undefined &&
+            rawRate !== null &&
+            rawRate !== "" &&
+            Number.isFinite(Number(rawRate)) &&
+            Number(rawRate) >= 0;
+
+        if (!isRateValid) {
+            return res.status(400).json({
+                message: "Mentor hourly rate is not configured. Bookings cannot be requested."
+            });
         }
 
         // Prevent booking a past date
@@ -420,10 +435,17 @@ const createBooking = async (req, res) => {
         const now = new Date();
         const actionExpiresAt = new Date(now.getTime() + FOUR_HOURS_MS);
 
+        const basePaise = Math.round((payment.baseSessionAmount || 0) * 100);
+        const mentorFeePaise = Math.round(basePaise * 0.03);
+        const mentorPayoutPaise = basePaise - mentorFeePaise;
+
         // Create booking
         const booking = await Booking.create({
             ...payment,
             ...platformPayment,
+            grossPaise: basePaise,
+            mentorFeePaise,
+            mentorPayoutPaise,
             duration: durationMins,
             mentor,
             learner: learnerId,
@@ -624,6 +646,17 @@ const updateBookingStatus = async (req, res) => {
                     message:
                         "Only accepted sessions can be completed"
                 });
+            }
+
+            const baseAmount = Number(booking.baseSessionAmount ?? booking.paymentAmount ?? 0);
+            const isFree = booking.paymentMethod === "free" || baseAmount === 0 || booking.paymentStatus === "not_required";
+            if (!isFree) {
+                const currentPaymentStatus = booking.paymentStatus || booking.payment?.status;
+                if (!["paid", "confirmed", "verified"].includes(currentPaymentStatus)) {
+                    return res.status(400).json({
+                        message: "Cannot mark session completed: Session payment has not been received."
+                    });
+                }
             }
         }
 

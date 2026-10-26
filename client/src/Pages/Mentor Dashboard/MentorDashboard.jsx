@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { ArrowUpRight, CheckCircle2, Clock, Search, Filter, ExternalLink } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Clock, Search, Filter, ExternalLink, AlertCircle, ShieldCheck } from "lucide-react";
 import "./MentorDashboard.css";
 
 const levelPercent = { Beginner: 25, Intermediate: 50, Advanced: 75, Expert: 100 };
@@ -10,8 +10,14 @@ function MentorDashboard({ token, onHome, onBookings }) {
     const [activeTab, setActiveTab] = useState("studio"); // "studio" | "earnings"
 
     // Earnings ledger filters
-    const [statusFilter, setStatusFilter] = useState("all"); // "all" | "credited" | "pending"
+    const [statusFilter, setStatusFilter] = useState("all"); // "all" | "settled" | "pending" | "in_escrow" | "not_payable"
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Payout UPI ID inline management
+    const [payoutUpi, setPayoutUpi] = useState("");
+    const [isEditingUpi, setIsEditingUpi] = useState(false);
+    const [savingUpi, setSavingUpi] = useState(false);
+    const [upiSavedMsg, setUpiSavedMsg] = useState("");
 
     async function loadDashboard() {
         try {
@@ -21,6 +27,9 @@ function MentorDashboard({ token, onHome, onBookings }) {
             const data = await response.json();
             if (!response.ok) throw new Error(data.message || "Unable to load mentor dashboard");
             setDashboard(data.dashboard);
+            if (data.dashboard?.earnings?.payoutUpiId) {
+                setPayoutUpi(data.dashboard.earnings.payoutUpiId);
+            }
         } catch (loadError) {
             setError(loadError.message);
         }
@@ -32,26 +41,64 @@ function MentorDashboard({ token, onHome, onBookings }) {
 
     const earnings = dashboard?.earnings || {
         totalEarnings: 0,
+        lifetimeRevenue: 0,
+        settledPayouts: 0,
         walletBalance: 0,
         pendingSettlement: 0,
+        inEscrow: 0,
         thisMonthEarnings: 0,
+        counts: { all: 0, settled: 0, pending: 0, in_escrow: 0, not_payable: 0 },
+        payoutUpiId: "",
         history: []
     };
+
+    async function handleSaveUpi(e) {
+        e.preventDefault();
+        const trimmed = payoutUpi.trim();
+        if (!trimmed) return;
+
+        try {
+            setSavingUpi(true);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/profile/update`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ payoutUpiId: trimmed })
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Unable to update UPI ID");
+
+            setUpiSavedMsg("Payout UPI ID saved successfully!");
+            setIsEditingUpi(false);
+            setTimeout(() => setUpiSavedMsg(""), 3500);
+            await loadDashboard();
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setSavingUpi(false);
+        }
+    }
 
     const filteredHistory = useMemo(() => {
         const list = earnings.history || [];
         return list.filter((item) => {
             const matchesStatus =
                 statusFilter === "all" ||
-                (statusFilter === "credited" && item.isCredited) ||
-                (statusFilter === "pending" && !item.isCredited);
+                (statusFilter === "settled" && item.state === "settled") ||
+                (statusFilter === "pending" && item.state === "pending_settlement") ||
+                (statusFilter === "in_escrow" && item.state === "in_escrow") ||
+                (statusFilter === "not_payable" && (item.state === "not_payable" || item.state === "refund_due"));
 
             const q = searchQuery.trim().toLowerCase();
             const matchesQuery =
                 !q ||
                 item.learnerName?.toLowerCase().includes(q) ||
                 item.learnerEmail?.toLowerCase().includes(q) ||
-                item.date?.toLowerCase().includes(q);
+                item.date?.toLowerCase().includes(q) ||
+                item.status?.toLowerCase().includes(q);
 
             return matchesStatus && matchesQuery;
         });
@@ -66,9 +113,13 @@ function MentorDashboard({ token, onHome, onBookings }) {
     const months = dashboard.monthlySessions || [];
     const maxSessions = Math.max(...months.map((item) => item.sessions), 1);
 
-    const historyAllCount = earnings.history?.length || 0;
-    const historyCreditedCount = earnings.history?.filter((i) => i.isCredited).length || 0;
-    const historyPendingCount = earnings.history?.filter((i) => !i.isCredited).length || 0;
+    const counts = earnings.counts || {
+        all: earnings.history?.length || 0,
+        settled: earnings.history?.filter((i) => i.state === "settled").length || 0,
+        pending: earnings.history?.filter((i) => i.state === "pending_settlement").length || 0,
+        in_escrow: earnings.history?.filter((i) => i.state === "in_escrow").length || 0,
+        not_payable: earnings.history?.filter((i) => i.state === "not_payable" || i.state === "refund_due").length || 0,
+    };
 
     return (
         <main className="mentor-studio">
@@ -86,7 +137,7 @@ function MentorDashboard({ token, onHome, onBookings }) {
                     <p className="mentor-lede">
                         {activeTab === "studio"
                             ? "A live view of your teaching practice, learner reach and mentoring rhythm."
-                            : "Track session earnings, monitor 3% platform deductions, and withdraw funds directly to your bank via UPI."}
+                            : "Track session earnings, monitor 3% platform deductions, and receive payouts directly to your registered UPI ID."}
                     </p>
 
                     {/* VIEW SWITCHER TABS */}
@@ -108,8 +159,8 @@ function MentorDashboard({ token, onHome, onBookings }) {
                             onClick={() => setActiveTab("earnings")}
                         >
                             Earnings & Payouts
-                            {earnings.walletBalance > 0 && (
-                                <span className="mentor-tab-badge">₹{earnings.walletBalance.toLocaleString("en-IN")}</span>
+                            {earnings.lifetimeRevenue > 0 && (
+                                <span className="mentor-tab-badge">₹{earnings.lifetimeRevenue.toLocaleString("en-IN")}</span>
                             )}
                         </button>
                     </div>
@@ -151,7 +202,7 @@ function MentorDashboard({ token, onHome, onBookings }) {
                             role="button"
                             tabIndex={0}
                         >
-                            <strong>₹{(earnings.totalEarnings || 0).toLocaleString("en-IN")}</strong>
+                            <strong>₹{(earnings.lifetimeRevenue ?? earnings.totalEarnings ?? 0).toLocaleString("en-IN")}</strong>
                             <span>Lifetime<br />Earnings ↗</span>
                         </div>
                     </section>
@@ -195,6 +246,64 @@ function MentorDashboard({ token, onHome, onBookings }) {
             {/* TAB 2: EARNINGS & PAYOUTS VIEW */}
             {activeTab === "earnings" && (
                 <div className="mentor-earnings-view">
+                    {/* UPI PROMPT / BANNER */}
+                    {upiSavedMsg && (
+                        <div className="mentor-upi-banner alert-success">
+                            <CheckCircle2 size={16} />
+                            <span>{upiSavedMsg}</span>
+                        </div>
+                    )}
+
+                    {!earnings.payoutUpiId ? (
+                        <div className="mentor-upi-banner alert">
+                            <div className="upi-banner-info">
+                                <AlertCircle size={18} />
+                                <div>
+                                    <strong>Payout UPI ID Missing:</strong> Add your Payout UPI ID in profile to receive automated disbursements.
+                                </div>
+                            </div>
+                            <form onSubmit={handleSaveUpi} className="upi-banner-form">
+                                <input
+                                    type="text"
+                                    placeholder="e.g. mentor@oksbi"
+                                    value={payoutUpi}
+                                    onChange={(e) => setPayoutUpi(e.target.value)}
+                                    required
+                                />
+                                <button type="submit" disabled={savingUpi}>
+                                    {savingUpi ? "Saving…" : "Save UPI ID"}
+                                </button>
+                            </form>
+                        </div>
+                    ) : (
+                        <div className="mentor-upi-banner configured">
+                            <div className="upi-banner-info">
+                                <CheckCircle2 size={18} />
+                                <div>
+                                    <strong>Registered Payout UPI ID:</strong> <code>{earnings.payoutUpiId}</code>
+                                </div>
+                            </div>
+                            <div className="upi-banner-actions">
+                                {isEditingUpi ? (
+                                    <form onSubmit={handleSaveUpi} className="upi-banner-form">
+                                        <input
+                                            type="text"
+                                            value={payoutUpi}
+                                            onChange={(e) => setPayoutUpi(e.target.value)}
+                                            required
+                                        />
+                                        <button type="submit" disabled={savingUpi}>{savingUpi ? "Saving…" : "Save"}</button>
+                                        <button type="button" className="btn-cancel-upi" onClick={() => setIsEditingUpi(false)}>Cancel</button>
+                                    </form>
+                                ) : (
+                                    <button type="button" className="btn-edit-upi" onClick={() => { setPayoutUpi(earnings.payoutUpiId); setIsEditingUpi(true); }}>
+                                        Change UPI ID
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {/* TOP SUMMARY CARDS */}
                     <section className="earnings-summary-grid">
                         <div className="earnings-stat-card primary">
@@ -202,17 +311,17 @@ function MentorDashboard({ token, onHome, onBookings }) {
                                 <span className="stat-kicker">LIFETIME REVENUE</span>
                                 <span className="stat-icon-wrap">₹</span>
                             </div>
-                            <strong className="stat-amount">₹{(earnings.totalEarnings || 0).toLocaleString("en-IN")}</strong>
-                            <p className="stat-subtext">Net credited income across all completed sessions.</p>
+                            <strong className="stat-amount">₹{(earnings.lifetimeRevenue ?? earnings.totalEarnings ?? 0).toLocaleString("en-IN")}</strong>
+                            <p className="stat-subtext">Net earnings from completed, paid sessions (settled + pending settlement).</p>
                         </div>
 
                         <div className="earnings-stat-card wallet-highlight">
                             <div className="stat-card-header">
                                 <span className="stat-kicker">SETTLED PAYOUTS</span>
-                                <span className="stat-live-badge">● Paytm UPI</span>
+                                <span className="stat-live-badge">● Disbursed</span>
                             </div>
-                            <strong className="stat-amount">₹{(earnings.totalEarnings || 0).toLocaleString("en-IN")}</strong>
-                            <p className="stat-subtext">Admin disburses earnings directly to your UPI upon session completion.</p>
+                            <strong className="stat-amount">₹{(earnings.settledPayouts || 0).toLocaleString("en-IN")}</strong>
+                            <p className="stat-subtext">Disbursed directly to your UPI ID by Skill Exchange admin.</p>
                         </div>
 
                         <div className="earnings-stat-card">
@@ -221,7 +330,10 @@ function MentorDashboard({ token, onHome, onBookings }) {
                                 <Clock size={16} color="#b45309" />
                             </div>
                             <strong className="stat-amount">₹{(earnings.pendingSettlement || 0).toLocaleString("en-IN")}</strong>
-                            <p className="stat-subtext">Awaiting payment verification or offline processing.</p>
+                            <p className="stat-subtext">Completed, paid sessions awaiting admin payout.</p>
+                            <div className="stat-escrow-subline">
+                                <span>In escrow:</span> <strong>₹{(earnings.inEscrow || 0).toLocaleString("en-IN")}</strong> <small>(paid, session not completed)</small>
+                            </div>
                         </div>
 
                         <div className="earnings-stat-card">
@@ -238,7 +350,7 @@ function MentorDashboard({ token, onHome, onBookings }) {
                     <div className="mentor-fee-policy-note">
                         <div className="policy-icon-box">i</div>
                         <div className="policy-text">
-                            <strong>Platform Fee Policy (3%):</strong> Skill Exchange deducts a transparent 3% mentor fee on verified completed sessions to maintain booking infrastructure, video security, and automated dispute resolution. Learner convenience fees (if any) are never deducted from your payout.
+                            <strong>Platform Fee Policy (3%):</strong> Skill Exchange deducts a transparent 3% platform fee on verified completed sessions to maintain infrastructure, video room security, and dispute resolution. 18% GST collected on learner fees is paid to the government and is never deducted from your payout.
                         </div>
                     </div>
 
@@ -256,7 +368,7 @@ function MentorDashboard({ token, onHome, onBookings }) {
                                     <Search size={15} />
                                     <input
                                         type="text"
-                                        placeholder="Search learner or date…"
+                                        placeholder="Search learner, date or status…"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
@@ -277,21 +389,35 @@ function MentorDashboard({ token, onHome, onBookings }) {
                                         className={`filter-pill ${statusFilter === "all" ? "active" : ""}`}
                                         onClick={() => setStatusFilter("all")}
                                     >
-                                        All ({historyAllCount})
+                                        All ({counts.all})
                                     </button>
                                     <button
                                         type="button"
-                                        className={`filter-pill ${statusFilter === "credited" ? "active" : ""}`}
-                                        onClick={() => setStatusFilter("credited")}
+                                        className={`filter-pill ${statusFilter === "settled" ? "active" : ""}`}
+                                        onClick={() => setStatusFilter("settled")}
                                     >
-                                        Credited ({historyCreditedCount})
+                                        Settled ({counts.settled})
                                     </button>
                                     <button
                                         type="button"
                                         className={`filter-pill ${statusFilter === "pending" ? "active" : ""}`}
                                         onClick={() => setStatusFilter("pending")}
                                     >
-                                        Pending ({historyPendingCount})
+                                        Pending ({counts.pending})
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`filter-pill ${statusFilter === "in_escrow" ? "active" : ""}`}
+                                        onClick={() => setStatusFilter("in_escrow")}
+                                    >
+                                        In Escrow ({counts.in_escrow})
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className={`filter-pill ${statusFilter === "not_payable" ? "active" : ""}`}
+                                        onClick={() => setStatusFilter("not_payable")}
+                                    >
+                                        Not Payable ({counts.not_payable})
                                     </button>
                                 </div>
                             </div>
@@ -311,8 +437,8 @@ function MentorDashboard({ token, onHome, onBookings }) {
                                             <th>Learner</th>
                                             <th>Gross Fee</th>
                                             <th>Mentor Fee (3%)</th>
-                                            <th>Net Credited</th>
-                                            <th>Status</th>
+                                            <th>Net Amount</th>
+                                            <th>Payout Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -340,10 +466,35 @@ function MentorDashboard({ token, onHome, onBookings }) {
                                                     <span className="fee-net">₹{row.netAmount.toLocaleString("en-IN")}</span>
                                                 </td>
                                                 <td>
-                                                    <span className={`ledger-status-pill ${row.isCredited ? "credited" : "pending"}`}>
-                                                        {row.isCredited ? <CheckCircle2 size={13} /> : <Clock size={13} />}
-                                                        {row.status}
-                                                    </span>
+                                                    {row.state === "settled" && (
+                                                        <span className="ledger-status-pill credited" title={row.payoutReference ? `Ref: ${row.payoutReference}` : "Settled"}>
+                                                            <CheckCircle2 size={13} />
+                                                            Settled
+                                                        </span>
+                                                    )}
+                                                    {row.state === "pending_settlement" && (
+                                                        <span className="ledger-status-pill pending">
+                                                            <Clock size={13} />
+                                                            Pending Settlement
+                                                            {row.isLegacy && <span className="ledger-legacy-tag">Legacy</span>}
+                                                        </span>
+                                                    )}
+                                                    {row.state === "in_escrow" && (
+                                                        <span className="ledger-status-pill escrow">
+                                                            <ShieldCheck size={13} />
+                                                            In Escrow
+                                                        </span>
+                                                    )}
+                                                    {row.state === "refund_due" && (
+                                                        <span className="ledger-status-pill refund">
+                                                            Refund Due
+                                                        </span>
+                                                    )}
+                                                    {row.state === "not_payable" && (
+                                                        <span className="ledger-status-pill neutral">
+                                                            {row.status}
+                                                        </span>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
@@ -359,4 +510,3 @@ function MentorDashboard({ token, onHome, onBookings }) {
 }
 
 export default MentorDashboard;
-

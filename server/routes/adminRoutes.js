@@ -16,9 +16,13 @@ const {
   getPendingPayments,
   verifyPayment,
   getPayouts,
+  settlePayouts,
+  getPayoutHistory,
+  getRefunds,
+  processRefund,
   markPaidOut,
   refundBooking,
-  exportLedger
+  exportLedger,
 } = require("../controllers/adminPaymentController");
 
 const router = express.Router();
@@ -38,6 +42,10 @@ router.get("/admin/payments", getAllPayments);
 router.get("/admin/payments/pending", getPendingPayments);
 router.post("/admin/payments/:id/verify", verifyPayment);
 router.get("/admin/payments/payouts", getPayouts);
+router.post("/admin/payouts/settle", settlePayouts);
+router.get("/admin/payouts/history", getPayoutHistory);
+router.get("/admin/refunds", getRefunds);
+router.post("/admin/refunds/:id", processRefund);
 router.post("/admin/payments/:id/payout", markPaidOut);
 router.post("/admin/payments/:id/refund", refundBooking);
 router.get("/admin/payments/ledger.csv", exportLedger);

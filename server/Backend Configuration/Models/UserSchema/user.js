@@ -110,6 +110,12 @@ const userSchema = new mongoose.Schema(
             min: 0,
         },
 
+        payoutUpiId: {
+            type: String,
+            default: "",
+            trim: true,
+        },
+
         // Profile picture
         avatarUrl: {
             type: String,

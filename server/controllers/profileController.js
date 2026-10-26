@@ -92,7 +92,8 @@ const updateProfile = async (req, res) => {
             availability,
             hourlyRate,
             avatarUrl,
-            coverImageUrl
+            coverImageUrl,
+            payoutUpiId
         } = req.body;
 
         // -------------------------
@@ -271,6 +272,15 @@ const updateProfile = async (req, res) => {
                 typeof avatarUrl === "string"
                     ? avatarUrl.trim()
                     : "";
+        }
+
+        
+        if (payoutUpiId !== undefined) {
+            const trimmedUpi = String(payoutUpiId || "").trim();
+            if (trimmedUpi && !/^[\w.-]+@[\w.-]+$/.test(trimmedUpi)) {
+                return res.status(400).json({ message: "Invalid UPI ID format. Expected format: username@bank" });
+            }
+            updates.payoutUpiId = trimmedUpi;
         }
 
         if (coverImageUrl !== undefined) {

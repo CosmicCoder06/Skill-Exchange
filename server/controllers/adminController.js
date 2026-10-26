@@ -7,7 +7,7 @@ const Review = require("../models/Review");
 const ActivityLog = require("../models/ActivityLog");
 const { escapeRegex, fillDailySeries } = require("../Utils/adminAnalytics");
 
-const SAFE_USER_FIELDS = "name email role isVerified isActive profileCompleted skillsToTeach skillsToLearn bio avatarUrl createdAt updatedAt";
+const SAFE_USER_FIELDS = "name email role isVerified isActive profileCompleted skillsToTeach skillsToLearn bio avatarUrl payoutUpiId createdAt updatedAt";
 const USER_ROLES = new Set(["learner", "mentor", "admin"]);
 
 async function getStats(req, res) {
@@ -20,7 +20,7 @@ async function getStats(req, res) {
       awaitingPayments,
       totalSessions,
       recentMembers,
-      pendingPayments,
+      recentPayments,
       recentSessions,
     ] = await Promise.all([
       User.countDocuments(),
@@ -28,10 +28,7 @@ async function getStats(req, res) {
       User.countDocuments({ role: "learner" }),
       User.countDocuments({ isVerified: { $ne: true } }),
       Booking.countDocuments({
-        $or: [
-          { paymentStatus: { $in: ["awaiting_payment", "payment_submitted", "unpaid", "pending_verification"] } },
-          { "payment.status": { $in: ["awaiting_payment", "payment_submitted"] } },
-        ],
+        paymentStatus: "awaiting_payment",
         status: { $nin: ["completed", "cancelled"] },
       }),
       Booking.countDocuments(),
@@ -42,14 +39,16 @@ async function getStats(req, res) {
         .lean(),
       Booking.find({
         $or: [
-          { paymentStatus: { $in: ["payment_submitted", "pending_verification"] } },
-          { "payment.status": "payment_submitted" },
+          { paymentStatus: { $in: ["paid", "confirmed", "awaiting_payment", "failed", "refunded", "paid_out"] } },
+          { razorpayPaymentId: { $exists: true, $ne: "" } },
+          { "payment.status": { $exists: true } },
+          { paymentAmount: { $gt: 0 } },
+          { "payment.amount": { $gt: 0 } },
         ],
-        status: { $nin: ["completed", "cancelled"] },
       })
         .populate("learner", "name email avatarUrl")
         .populate("mentor", "name email avatarUrl")
-        .sort({ updatedAt: -1 })
+        .sort({ paidAt: -1, updatedAt: -1, createdAt: -1 })
         .limit(5)
         .lean(),
       Booking.find()
@@ -70,7 +69,8 @@ async function getStats(req, res) {
         totalSessions,
       },
       recentMembers,
-      pendingPayments,
+      recentPayments,
+      pendingPayments: recentPayments,
       recentSessions,
     });
   } catch (error) {

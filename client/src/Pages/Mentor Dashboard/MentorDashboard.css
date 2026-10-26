@@ -125,3 +125,28 @@
     .mentor-lede { font-size:15px; }
 }
 
+
+
+/* ESCROW SUBLINE & UPI BANNER */
+.stat-escrow-subline { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #dcdedc; font-size: 11px; color: #526b60; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.stat-escrow-subline strong { font-weight: 800; color: #176b4e; }
+.stat-escrow-subline small { color: #738b80; }
+
+.mentor-upi-banner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 14px 18px; border-radius: 8px; font-size: 13px; margin-bottom: 2px; }
+.mentor-upi-banner.alert { background: #fffbeb; border: 1px solid #fde68a; border-left: 4px solid #f59e0b; color: #92400e; }
+.mentor-upi-banner.configured { background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; color: #166534; }
+.mentor-upi-banner.alert-success { background: #dcfce7; border: 1px solid #86efac; color: #15803d; }
+.upi-banner-info { display: flex; align-items: center; gap: 10px; }
+.upi-banner-info code { background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 13px; }
+.upi-banner-form { display: flex; align-items: center; gap: 8px; }
+.upi-banner-form input { padding: 7px 12px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; background: #fff; color: #1e293b; }
+.upi-banner-form button { padding: 7px 14px; background: #123d31; color: #fff; border: none; border-radius: 5px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.15s ease; }
+.upi-banner-form button:hover:not(:disabled) { background: #0b2921; }
+.upi-banner-form .btn-cancel-upi { background: transparent; color: #64748b; border: 1px solid #cbd5e1; }
+.btn-edit-upi { background: #ffffff; color: #166534; border: 1px solid #bbf7d0; padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-edit-upi:hover { background: #e8f7ee; }
+
+.ledger-status-pill.escrow { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.ledger-status-pill.refund { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.ledger-status-pill.neutral { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+.ledger-legacy-tag { display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; background: #fef3c7; color: #92400e; padding: 1px 5px; border-radius: 4px; margin-left: 5px; }

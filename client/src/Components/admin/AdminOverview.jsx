@@ -11,7 +11,6 @@ import {
     FileSpreadsheet,
     Shield,
     ExternalLink,
-    Clock,
     AlertCircle,
     CheckCircle,
     Calendar,
@@ -19,7 +18,6 @@ import {
 } from "lucide-react";
 import {
     getAdminStats,
-    getAdminPendingPayments,
     downloadPaymentLedger
 } from "../../services/adminService";
 
@@ -49,7 +47,7 @@ function StatCard({
                 </span>
             </div>
 
-            <strong>
+            <strong className="admin-stat-number">
                 {Number(value) || 0}
             </strong>
 
@@ -62,6 +60,7 @@ function StatCard({
 }
 
 export default function AdminOverview({
+    overview,
     token,
     onOpenUsers,
     onOpenReports,
@@ -104,9 +103,9 @@ export default function AdminOverview({
         }
     }
 
-    const stats = statsData?.stats || {};
-    const recentMembers = statsData?.recentMembers || [];
-    const pendingPayments = statsData?.pendingPayments || [];
+    const stats = statsData?.stats || overview?.stats || {};
+    const recentMembers = statsData?.recentMembers || overview?.recentUsers || [];
+    const recentPayments = statsData?.recentPayments || statsData?.pendingPayments || [];
     const recentSessions = statsData?.recentSessions || [];
 
     const totalUsers = stats.totalUsers || 0;
@@ -277,8 +276,8 @@ export default function AdminOverview({
                                         )}
                                     </div>
                                     <div className="mini-info">
-                                        <strong>{member.name}</strong>
-                                        <span>{member.email}</span>
+                                        <strong title={member.name}>{member.name}</strong>
+                                        <span title={member.email}>{member.email}</span>
                                     </div>
                                     <div className="mini-tag-group">
                                         <span className={`pill-role ${member.role}`}>{member.role}</span>
@@ -290,46 +289,70 @@ export default function AdminOverview({
                     </div>
                 </div>
 
-                {/* 2. Pending Payment Proofs to Review */}
+                {/* 2. Recent Payments */}
                 <div className="admin-overview-table-card">
                     <div className="table-card-head">
                         <div>
-                            <h4>Pending Payment Proofs</h4>
-                            <p>Submitted UTRs awaiting bank verification</p>
+                            <h4>Recent Payments</h4>
+                            <p>Latest Razorpay platform transactions</p>
                         </div>
                         <button type="button" className="card-head-action" onClick={onOpenPayments}>
-                            <span>Verify queue</span>
+                            <span>View all</span>
                             <ArrowRight size={13} />
                         </button>
                     </div>
 
                     <div className="admin-mini-list">
-                        {pendingPayments.length === 0 ? (
-                            <div className="mini-all-good">
-                                <CheckCircle size={22} color="#059669" />
-                                <p>All caught up! Zero payments awaiting verification.</p>
-                            </div>
+                        {recentPayments.length === 0 ? (
+                            <p className="mini-empty">No payments yet</p>
                         ) : (
-                            pendingPayments.map((booking) => (
-                                <div key={booking._id} className="mini-list-item">
-                                    <div className="mini-info">
-                                        <strong>{booking.learner?.name || "Learner"} → {booking.mentor?.name || "Mentor"}</strong>
-                                        <span>UTR: <code>{booking.payment?.utr || "Pending"}</code> • ₹{booking.payment?.amount || 0}</span>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="mini-action-btn verify"
+                            recentPayments.map((booking) => {
+                                const amount = Number(
+                                    booking.paymentAmount ??
+                                    booking.payment?.amount ??
+                                    booking.baseSessionAmount ??
+                                    0
+                                );
+                                const status = booking.payment?.status || booking.paymentStatus || "awaiting_payment";
+                                const isPaid = ["paid", "confirmed", "verified"].includes(status);
+                                const isAwaiting = ["awaiting_payment", "unpaid", "pending_verification"].includes(status);
+                                const isFailed = status === "failed";
+                                const learnerName = booking.learner?.name || "Learner";
+                                const mentorName = booking.mentor?.name || "Mentor";
+                                const dateDisplay = booking.paidAt
+                                    ? new Date(booking.paidAt).toLocaleDateString()
+                                    : (booking.date ? `${booking.date} ${booking.time || ""}`.trim() : "Recent");
+
+                                return (
+                                    <div
+                                        key={booking._id}
+                                        className="mini-list-item clickable"
                                         onClick={onOpenPayments}
                                     >
-                                        Review
-                                    </button>
-                                </div>
-                            ))
+                                        <div className="mini-avatar payment-avatar">
+                                            <span>₹</span>
+                                        </div>
+                                        <div className="mini-info">
+                                            <strong title={`${learnerName} → ${mentorName}`}>
+                                                {learnerName} → {mentorName}
+                                            </strong>
+                                            <span title={`₹${amount} • ${dateDisplay}`}>
+                                                ₹{amount.toLocaleString("en-IN")} • {dateDisplay}
+                                            </span>
+                                        </div>
+                                        <div className="mini-tag-group">
+                                            <span className={`pill-payment-status status-${isPaid ? "paid" : isAwaiting ? "awaiting" : isFailed ? "failed" : status}`}>
+                                                {isPaid ? "Paid" : isAwaiting ? "Awaiting" : isFailed ? "Failed" : status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                );
+                            })
                         )}
                     </div>
                 </div>
 
-                {/* 3. Recent Sessions */}
+                {/* 3. Recent Platform Sessions (Full Width Below) */}
                 <div className="admin-overview-table-card full-span">
                     <div className="table-card-head">
                         <div>
@@ -348,28 +371,86 @@ export default function AdminOverview({
                         {recentSessions.length === 0 ? (
                             <p className="mini-empty" style={{ padding: 24, textAlign: "center" }}>No recorded sessions yet.</p>
                         ) : (
-                            <table className="admin-users-table">
+                            <table className="admin-sessions-overview-table">
                                 <thead>
                                     <tr>
                                         <th>Mentor</th>
                                         <th>Learner</th>
                                         <th>Date & Time</th>
-                                        <th>Duration</th>
                                         <th>Status</th>
-                                        <th>Payment</th>
+                                        <th>Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {recentSessions.map((session) => (
-                                        <tr key={session._id}>
-                                            <td><strong>{session.mentor?.name || "Mentor"}</strong></td>
-                                            <td><strong>{session.learner?.name || "Learner"}</strong></td>
-                                            <td><Calendar size={12} style={{ verticalAlign: "middle", marginRight: 4 }} /> {session.date} {session.time}</td>
-                                            <td>{session.duration || 60}m</td>
-                                            <td><span className={`status-tag ${session.status}`}>{session.status}</span></td>
-                                            <td><span className="payment-tag">{session.paymentStatus || session.payment?.status || "—"}</span></td>
-                                        </tr>
-                                    ))}
+                                    {recentSessions.map((session) => {
+                                        const sameName = Boolean(
+                                            session.mentor?.name &&
+                                            session.learner?.name &&
+                                            session.mentor.name.trim().toLowerCase() === session.learner.name.trim().toLowerCase()
+                                        );
+                                        const amt = Number(
+                                            session.paymentAmount ??
+                                            session.payment?.amount ??
+                                            session.baseSessionAmount ??
+                                            0
+                                        );
+
+                                        return (
+                                            <tr key={session._id}>
+                                                <td>
+                                                    <div className="session-participant-cell">
+                                                        <strong className="participant-name" title={session.mentor?.name}>
+                                                            {session.mentor?.name || "Mentor"}
+                                                        </strong>
+                                                        <small className="participant-role">Mentor</small>
+                                                        {sameName && session.mentor?.email && (
+                                                            <span className="participant-email-muted" title={session.mentor.email}>
+                                                                {session.mentor.email}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="session-participant-cell">
+                                                        <strong className="participant-name" title={session.learner?.name}>
+                                                            {session.learner?.name || "Learner"}
+                                                        </strong>
+                                                        <small className="participant-role">Learner</small>
+                                                        {sameName && session.learner?.email && (
+                                                            <span className="participant-email-muted" title={session.learner.email}>
+                                                                {session.learner.email}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="session-datetime-cell">
+                                                        <span className="session-date-val">
+                                                            <Calendar size={13} style={{ verticalAlign: "middle", marginRight: 5, color: "#176b4e" }} />
+                                                            {session.date}
+                                                        </span>
+                                                        <small className="session-time-val">
+                                                            {session.time} ({session.duration || 60}m)
+                                                        </small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span className={`pill-status status-${session.status}`}>
+                                                        {session.status}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    {amt > 0 ? (
+                                                        <strong className="session-fee-val">
+                                                            ₹{amt.toLocaleString("en-IN")}
+                                                        </strong>
+                                                    ) : (
+                                                        <span className="session-fee-free">Free</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         )}
@@ -386,7 +467,7 @@ export default function AdminOverview({
                         </div>
                         <div>
                             <h3>Payment & Escrow Safeguards</h3>
-                            <p>Platform Paytm Business QR custody & escrow rules</p>
+                            <p>Razorpay platform escrow rules & automated security</p>
                         </div>
                     </div>
 
@@ -394,24 +475,24 @@ export default function AdminOverview({
                         <div className="compliance-row">
                             <CheckCircle size={15} className="compliance-check" />
                             <div className="compliance-info">
-                                <strong>Platform-Only QR Code</strong>
-                                <span>Mentors never exchange bank or UPI details directly</span>
+                                <strong>Payments via Razorpay</strong>
+                                <span>Mentors and learners transact securely through integrated Razorpay platform checkout</span>
                             </div>
                         </div>
 
                         <div className="compliance-row">
                             <CheckCircle size={15} className="compliance-check" />
                             <div className="compliance-info">
-                                <strong>Mandatory 12-Digit UTR Bank Match</strong>
-                                <span>Admins must verify bank statement before unlocking session</span>
+                                <strong>Payment verified automatically on the server (signature check)</strong>
+                                <span>Cryptographic HMAC-SHA256 signature check verifies authentic transactions in real time</span>
                             </div>
                         </div>
 
                         <div className="compliance-row">
                             <CheckCircle size={15} className="compliance-check" />
                             <div className="compliance-info">
-                                <strong>Escrow Settlement Protection</strong>
-                                <span>Mentor payout happens after session completion</span>
+                                <strong>Booking confirmed only after successful payment</strong>
+                                <span>Time slots and encrypted session meeting links unlock automatically upon payment capture</span>
                             </div>
                         </div>
                     </div>
@@ -422,7 +503,7 @@ export default function AdminOverview({
                             className="admin-link-button"
                             onClick={onOpenPayments}
                         >
-                            <span>Open Payment Verification Center</span>
+                            <span>Open Payments & Ledger</span>
                             <ArrowUpRight size={14} />
                         </button>
                     </div>

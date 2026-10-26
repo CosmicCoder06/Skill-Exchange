@@ -16,7 +16,7 @@ export default function TermsPage({ onClose }) {
                 <p>Welcome to SkillExchange. By registering, browsing, or using our services, you agree to be bound by these Terms and Conditions. If you are under 18 years of age, you are not authorized to use the platform.</p>
 
                 <h3>2. Platform Role & Manual Payments</h3>
-                <p>SkillExchange acts as an intermediary platform connecting learners and mentors. All session payments are routed through the official platform Paytm Business UPI QR. Users must never send funds directly to mentor accounts. Payments submitted with valid 12-digit UTRs and screenshot proofs are verified by platform administrators.</p>
+                <p>SkillExchange acts as an intermediary platform connecting learners and mentors. All session payments are routed through the official platform Razorpay gateway. Users must never send funds directly to mentor accounts. Bookings are automatically confirmed on the server upon successful checkout and digital signature verification.</p>
 
                 <h3>3. Session Bookings and Conduct</h3>
                 <p>Mentors and learners agree to conduct all scheduled video sessions respectfully and professionally. Any harassing, offensive, or abusive conduct may result in immediate suspension or permanent termination.</p>
