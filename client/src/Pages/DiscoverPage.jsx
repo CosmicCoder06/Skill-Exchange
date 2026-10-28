@@ -1,3 +1,4 @@
+import { resolveImageUrl } from '../utils/imageUrl';
 import { useEffect, useMemo, useState } from "react";
 import "./HomePage.css";
 import "./Discover.css";
@@ -264,7 +265,7 @@ function DiscoverPage({
                                 <div className="person-avatar">
                                     {person.avatarUrl ? (
                                         <img
-                                            src={person.avatarUrl}
+                                            src={resolveImageUrl(person.avatarUrl)}
                                             alt=""
                                         />
                                     ) : (

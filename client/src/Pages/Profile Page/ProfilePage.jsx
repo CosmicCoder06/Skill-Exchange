@@ -1,3 +1,4 @@
+import { resolveImageUrl } from '../../utils/imageUrl';
 import { useEffect, useState } from "react";
 import "./ProfilePage.css";
 
@@ -271,7 +272,7 @@ function ProfilePage({
                         profile.coverImageUrl
                             ? {
                                   backgroundImage:
-                                      `url("${profile.coverImageUrl}")`
+                                      `url("${resolveImageUrl(profile.coverImageUrl)}")`
                               }
                             : {}
                     }
@@ -331,7 +332,7 @@ function ProfilePage({
                         {profile.avatarUrl ? (
                             <img
                                 className="profile-photo"
-                                src={profile.avatarUrl}
+                                src={resolveImageUrl(profile.avatarUrl)}
                                 alt={`${profile.name}'s profile`}
                                 onError={(event) => {
                                     event.currentTarget.style.display =

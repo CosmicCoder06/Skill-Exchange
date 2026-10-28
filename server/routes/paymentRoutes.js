@@ -13,13 +13,4 @@ router.post('/payments/webhook', handleWebhook);
 router.post('/payments/create-order', auth, createOrder);
 router.post('/payments/verify', auth, verifyPayment);
 
-// Compatibility route: Platform handles all payments centrally via Razorpay
-router.get('/payment-settings', auth, async (req, res) => {
-    res.json({
-        role: req.user?.role || 'learner',
-        platformPayment: true,
-        message: 'Payments are centrally managed via Razorpay.'
-    });
-});
-
 module.exports = router;

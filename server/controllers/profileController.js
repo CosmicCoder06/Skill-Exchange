@@ -1,3 +1,4 @@
+const { sanitizeUserMedia } = require('../Utils/mediaUrlHelper');
 const User = require("../Backend Configuration/Models/UserSchema/user");
 const { recordActivity } = require("../Utils/activityLogger");
 const { invalidateMatcherCache } = require("../services/matcherService");
@@ -66,7 +67,7 @@ const getMyProfile = async (req, res) => {
 
         console.timeEnd("getMyProfile");
         res.status(200).json({
-            profile: user,
+            profile: sanitizeUserMedia(user),
             profileComplete
         });
 
@@ -301,7 +302,7 @@ const updateProfile = async (req, res) => {
 
         res.status(200).json({
             message: "Profile updated successfully",
-            profile: user,
+            profile: sanitizeUserMedia(user),
             profileComplete:
                 user.profileCompleted
         });
@@ -333,7 +334,8 @@ const updateProfile = async (req, res) => {
 const getUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.params.id)
-            .select("-password -refreshToken");
+            .select("-password -refreshToken")
+            .lean();
 
         if (!user) {
             return res.status(404).json({

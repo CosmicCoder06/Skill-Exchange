@@ -58,7 +58,7 @@ test('mentor cancellation of accepted paid session flags learner refund due', ()
     isMentor: true,
     status: 'accepted',
     paymentAmount: 500,
-    paymentMethod: 'qr'
+    paymentMethod: 'razorpay'
   }), true);
 
   // Mentor cancels free session
@@ -74,7 +74,7 @@ test('mentor cancellation of accepted paid session flags learner refund due', ()
     isMentor: false,
     status: 'accepted',
     paymentAmount: 500,
-    paymentMethod: 'qr'
+    paymentMethod: 'razorpay'
   }), false);
 
   // Mentor cancels pending request
@@ -82,6 +82,6 @@ test('mentor cancellation of accepted paid session flags learner refund due', ()
     isMentor: true,
     status: 'pending',
     paymentAmount: 500,
-    paymentMethod: 'qr'
+    paymentMethod: 'razorpay'
   }), false);
 });

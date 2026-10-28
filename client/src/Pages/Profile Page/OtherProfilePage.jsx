@@ -1,3 +1,4 @@
+import { resolveImageUrl } from '../../utils/imageUrl';
 import { useEffect, useState } from "react";
 import "./OtherProfilePage.css";
 
@@ -140,7 +141,7 @@ function OtherProfilePage({
                 >
                     {profile.avatarUrl ? (
                         <img
-                            src={profile.avatarUrl}
+                            src={resolveImageUrl(profile.avatarUrl)}
                             alt={`${profile.name}'s profile`}
                         />
                     ) : (
@@ -479,7 +480,7 @@ function OtherProfilePage({
                     >
                         <img
                             className="profile-photo-lightbox-image"
-                            src={profile.avatarUrl}
+                            src={resolveImageUrl(profile.avatarUrl)}
                             alt={`${profile.name}'s profile`}
                         />
                         <div className="profile-photo-caption">

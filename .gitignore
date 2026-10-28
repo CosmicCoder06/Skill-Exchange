@@ -8,3 +8,6 @@ coverage/
 .vscode/
 .idea/
 .vercel
+demo_issues.txt
+recordings_raw/
+*.mp4

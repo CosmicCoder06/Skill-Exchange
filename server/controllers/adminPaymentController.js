@@ -38,6 +38,7 @@ async function getAllPayments(req, res) {
     }
 
     let bookings = await Booking.find(query)
+      .select("-payment.screenshot -payment.logs")
       .populate("learner", "name email avatarUrl")
       .populate("mentor", "name email avatarUrl")
       .sort({ createdAt: -1 })
@@ -91,42 +92,6 @@ async function getAllPayments(req, res) {
 }
 
 /**
- * Get pending payments (legacy backward compatibility)
- */
-async function getPendingPayments(req, res) {
-  try {
-    const bookings = await Booking.find({
-      $or: [
-        { "payment.status": "payment_submitted" },
-        { paymentStatus: "payment_submitted" },
-      ],
-    })
-      .populate("learner", "name email avatarUrl")
-      .populate("mentor", "name email avatarUrl")
-      .sort({ updatedAt: -1 });
-
-    res.json({
-      success: true,
-      count: bookings.length,
-      bookings,
-    });
-  } catch (error) {
-    console.error("getPendingPayments error:", error);
-    res.status(500).json({ message: error.message || "Failed to fetch pending payments" });
-  }
-}
-
-/**
- * Admin verifies payment (DEPRECATED: 410 Gone)
- */
-async function verifyPayment(req, res) {
-  return res.status(410).json({
-    success: false,
-    message: "Manual payment verification is deprecated. Payments are automatically verified via Razorpay checkout.",
-  });
-}
-
-/**
  * List completed sessions pending mentor payout (grouped by mentor)
  */
 async function getPayouts(req, res) {
@@ -162,7 +127,11 @@ async function settlePayouts(req, res) {
       adminId,
     });
 
-    return res.json(result);
+    return res.json({
+      success: true,
+      message: `Successfully settled ${result.settledCount} session payout(s).`,
+      result,
+    });
   } catch (error) {
     console.error("settlePayouts error:", error);
     return res.status(error.statusCode || 500).json({ message: error.message || "Failed to settle payouts" });
@@ -170,12 +139,18 @@ async function settlePayouts(req, res) {
 }
 
 /**
- * Get history of settled payouts
+ * View payout history log
  */
 async function getPayoutHistory(req, res) {
   try {
-    const result = await payoutService.getPayoutHistory(req.query);
-    return res.json({ success: true, ...result });
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 50, 1), 200);
+    const history = await payoutService.getPayoutHistory(limit);
+
+    return res.json({
+      success: true,
+      count: history.length,
+      history,
+    });
   } catch (error) {
     console.error("getPayoutHistory error:", error);
     return res.status(500).json({ message: error.message || "Failed to fetch payout history" });
@@ -183,34 +158,44 @@ async function getPayoutHistory(req, res) {
 }
 
 /**
- * Get list of bookings due for refund or already refunded
+ * List sessions eligible for or pending refunds
  */
 async function getRefunds(req, res) {
   try {
-    const refunds = await payoutService.getRefundsList();
-    return res.json({ success: true, refunds });
+    const refunds = await payoutService.getRefundEligibleBookings();
+
+    return res.json({
+      success: true,
+      count: refunds.length,
+      refunds,
+    });
   } catch (error) {
     console.error("getRefunds error:", error);
-    return res.status(500).json({ message: error.message || "Failed to fetch refunds" });
+    return res.status(500).json({ message: error.message || "Failed to fetch refund candidates" });
   }
 }
 
 /**
- * Process Razorpay refund or manual refund
+ * Process a refund (via Razorpay API for online payments, or ledger note for legacy)
  */
 async function processRefund(req, res) {
   try {
     const adminId = req.user?._id || req.user?.id;
     const bookingId = req.params.id;
-    const { note } = req.body;
+    const { amount, reason } = req.body;
 
-    const result = await payoutService.processRazorpayRefund({
+    const result = await payoutService.processRefund({
       bookingId,
+      amount,
+      reason,
       adminId,
-      note,
     });
 
-    return res.json(result);
+    return res.json({
+      success: true,
+      message: "Refund processed successfully.",
+      result,
+    });
   } catch (error) {
     console.error("processRefund error:", error);
     return res.status(error.statusCode || 500).json({ message: error.message || "Failed to process refund" });
@@ -218,52 +203,49 @@ async function processRefund(req, res) {
 }
 
 /**
- * Admin marks a payout as paid out to the mentor (single booking legacy)
+ * Mark mentor payout manually for a single booking
  */
 async function markPaidOut(req, res) {
   try {
-    const bookingId = req.params.id;
-    const adminId = req.user._id || req.user.id;
+    const adminId = req.user?._id || req.user?.id;
+    const { id } = req.params;
     const { payoutRef, note } = req.body;
 
-    const result = await payoutService.settleMentorPayouts({
-      bookingIds: [bookingId],
-      reference: payoutRef,
-      note,
-      adminId,
+    const booking = await paymentService.markPaidOut(id, adminId, { payoutRef, note });
+    res.json({
+      success: true,
+      message: "Mentor payout marked as completed",
+      booking,
     });
-
-    res.json(result);
   } catch (error) {
     console.error("markPaidOut error:", error);
-    res.status(error.statusCode || 500).json({ message: error.message || "Failed to mark payout" });
+    res.status(error.statusCode || 500).json({ message: error.message || "Failed to mark paid out" });
   }
 }
 
 /**
- * Admin marks a booking as refunded (legacy route)
+ * Refund a single booking directly
  */
 async function refundBooking(req, res) {
   try {
-    const bookingId = req.params.id;
-    const adminId = req.user._id || req.user.id;
-    const { reason } = req.body;
+    const adminId = req.user?._id || req.user?.id;
+    const { id } = req.params;
+    const { reason, ruleKey } = req.body;
 
-    const result = await payoutService.processRazorpayRefund({
-      bookingId,
-      adminId,
-      note: reason,
+    const booking = await paymentService.refund(id, adminId, { reason, ruleKey });
+    res.json({
+      success: true,
+      message: "Session refunded successfully",
+      booking,
     });
-
-    res.json(result);
   } catch (error) {
     console.error("refundBooking error:", error);
-    res.status(error.statusCode || 500).json({ message: error.message || "Failed to process refund" });
+    res.status(error.statusCode || 500).json({ message: error.message || "Failed to refund session" });
   }
 }
 
 /**
- * Export payment ledger as CSV
+ * Export complete payment ledger to CSV
  */
 async function exportLedger(req, res) {
   try {
@@ -279,8 +261,6 @@ async function exportLedger(req, res) {
 
 module.exports = {
   getAllPayments,
-  getPendingPayments,
-  verifyPayment,
   getPayouts,
   settlePayouts,
   getPayoutHistory,

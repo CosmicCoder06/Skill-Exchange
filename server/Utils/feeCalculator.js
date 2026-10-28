@@ -32,7 +32,7 @@ function calculateFees(amount, paymentMethod) {
   // Net payout = Full Fee (with GST) - Mentor Platform Fee
   const mentorEarnings = roundToTwo(grossAmountWithGst - mentorPlatformFee);
 
-  // Learner convenience fee: 0 for wallet or free, 3% of full fee (with GST) for UPI/Card/QR/Direct
+  // Learner convenience fee: 0 for wallet or free, 3% of full fee (with GST) for online methods
   const learnerConvenienceFee = (paymentMethod === 'wallet' || paymentMethod === 'free')
     ? 0
     : roundToTwo(grossAmountWithGst * 0.03);
@@ -49,12 +49,15 @@ function calculateFees(amount, paymentMethod) {
   };
 }
 
-function paymentDetails(mentor, body, duration = 60) {
+function calculatePaymentDetails(mentor, body, duration = 60) {
   const durationMins = Number(body?.duration || duration) || 60;
   const baseAmount = calculateSessionAmount(mentor?.hourlyRate, durationMins);
   const fees = calculateFees(baseAmount, body?.paymentMethod || 'pay_later');
 
-  // Existing booking clients or requests created before payment step
+  if (body.paymentMethod === 'qr') {
+    throw new Error('Manual QR payment method has been discontinued. Please use Razorpay checkout.');
+  }
+
   if (body.quotedAmount === undefined && body.paymentMethod === undefined && body.paymentReference === undefined) {
     const isRequest = body.isRequest === true;
     return {
@@ -104,30 +107,6 @@ function paymentDetails(mentor, body, duration = 60) {
     };
   }
 
-  // For QR payments, verify that the quoted amount matches the mentor's actual dynamic rate
-  if (body.paymentMethod === 'qr') {
-    if (
-      Number(body.quotedAmount) !== baseAmount &&
-      Number(body.quotedAmount) !== fees.grossAmountWithGst &&
-      Number(body.quotedAmount) !== fees.totalAmountPaid
-    ) {
-      throw new Error('Mentor pricing changed. Refresh and review the amount before booking.');
-    }
-    if (!mentor?.paymentQr) {
-      throw new Error('Mentor payment QR is not available.');
-    }
-    const reference = typeof body.paymentReference === 'string' ? body.paymentReference.trim() : '';
-    if (!/^[A-Za-z0-9-]{6,64}$/.test(reference)) throw new Error('Enter a valid transaction reference (6–64 letters or numbers).');
-    const qrFees = calculateFees(baseAmount, 'qr');
-    return {
-      paymentAmount: baseAmount,
-      paymentMethod: 'qr',
-      paymentStatus: 'pending_verification',
-      paymentReference: reference,
-      ...qrFees
-    };
-  }
-
   if (baseAmount === 0) return {
     paymentAmount: 0,
     paymentMethod: 'free',
@@ -151,5 +130,9 @@ function paymentDetails(mentor, body, duration = 60) {
   };
 }
 
-module.exports = { paymentDetails, calculateSessionAmount, calculateFees, roundToTwo };
-
+module.exports = {
+  calculatePaymentDetails,
+  calculateSessionAmount,
+  calculateFees,
+  roundToTwo
+};
