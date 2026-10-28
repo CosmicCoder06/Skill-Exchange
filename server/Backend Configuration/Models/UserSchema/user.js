@@ -3,9 +3,11 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
     {
+        // @deprecated: Legacy mentor payment QR image. Preserved for schema compatibility until Part B cleanup.
         paymentQr: {
             type: mongoose.Schema.Types.Mixed,
             default: "",
+            select: false,
         },
         // =========================
         // AUTH FIELDS

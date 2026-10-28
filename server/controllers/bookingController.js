@@ -1,3 +1,4 @@
+const { sanitizeUserMedia } = require('../Utils/mediaUrlHelper');
 // const Booking = require("../models/Booking");
 
 // const createBooking = async (req, res) => {
@@ -189,7 +190,7 @@ const Wallet = require("../models/Wallet");
 const WalletTransaction = require("../models/WalletTransaction");
 const { getOrCreateReconciledWallet } = require("../Utils/walletHelper");
 const { withMeeting, normalizeMeetUrl } = require('../Utils/bookingMeeting');
-const { paymentDetails } = require('../Utils/manualPayment');
+const { calculatePaymentDetails } = require('../Utils/feeCalculator');
 const { recordActivity } = require("../Utils/activityLogger");
 const User = require(
     "../Backend Configuration/Models/UserSchema/user"
@@ -250,11 +251,16 @@ const maybeExpireStaleBookings = () => {
 };
 
 // Periodic background cleanup interval (every 5 minutes)
-setInterval(() => {
-    expireStaleBookings().catch((err) =>
-        console.error("Periodic expireStaleBookings error:", err)
-    );
-}, 5 * 60 * 1000);
+if (process.env.NODE_ENV !== "test") {
+    const staleInterval = setInterval(() => {
+        expireStaleBookings().catch((err) =>
+            console.error("Periodic expireStaleBookings error:", err)
+        );
+    }, 5 * 60 * 1000);
+    if (staleInterval && typeof staleInterval.unref === "function") {
+        staleInterval.unref();
+    }
+}
 
 // =====================================================
 // CHECK AVAILABILITY
@@ -361,7 +367,7 @@ const createBooking = async (req, res) => {
 
         // Verify mentor/peer exists
         const mentorUser = await User.findById(mentor)
-            .select("_id name role isActive hourlyRate +paymentQr");
+            .select("_id name role isActive hourlyRate");
 
         if (!mentorUser) {
             return res.status(404).json({
@@ -445,7 +451,7 @@ const createBooking = async (req, res) => {
         }
 
         let payment;
-        try { payment = paymentDetails(mentorUser, { ...req.body, isRequest: true }, durationMins); }
+        try { payment = calculatePaymentDetails(mentorUser, { ...req.body, isRequest: true }, durationMins); }
         catch (error) { return res.status(400).json({ message: error.message }); }
 
         const platformPayment = paymentService.createPayment(mentorUser.hourlyRate, durationMins);
@@ -511,23 +517,29 @@ const createBooking = async (req, res) => {
 // GET MY BOOKINGS
 // =====================================================
 
+const listProjection = "_id date time duration status paymentStatus paymentAmount baseSessionAmount grossAmountWithGst learnerConvenienceFee mentorPlatformFee mentorEarnings totalAmountPaid topic notes meetingUrl cancellationReason createdAt updatedAt actionExpiresAt lastActionAt suggestedSlots razorpayOrderId razorpayPaymentId payoutStatus payoutReference payment.status payment.amount payment.platformFeePercent payment.platformFee payment.mentorPayout payment.razorpayOrderId payment.razorpayPaymentId payment.payoutRef payment.rejectReason payment.refundReason mentor learner";
+
 const getBookings = async (req, res) => {
     try {
         console.time("getBookings");
         maybeExpireStaleBookings();
         const userId = getCurrentUserId(req);
 
-        const bookings = await Booking.find({
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = req.query.limit ? Math.min(50, Math.max(1, parseInt(req.query.limit, 10))) : (req.query.page ? 20 : 0);
+        const isPaginated = req.query.page !== undefined || req.query.limit !== undefined;
+
+        const query = {
             $or: [
                 { learner: userId },
                 { mentor: userId }
             ]
-        })
-            .select("-payment.screenshot -payment.logs")
-            .populate(
-                "mentor learner",
-                "name email role avatarUrl"
-            )
+        };
+
+        const findQuery = Booking.find(query)
+            .select(listProjection)
+            .populate("mentor", "name email role avatarUrl")
+            .populate("learner", "name email role avatarUrl")
             .sort({
                 date: -1,
                 time: -1,
@@ -535,8 +547,42 @@ const getBookings = async (req, res) => {
             })
             .lean();
 
+        if (isPaginated && limit > 0) {
+            const [rawBookings, count] = await Promise.all([
+                findQuery.skip((page - 1) * limit).limit(limit),
+                Booking.countDocuments(query)
+            ]);
+            const mapped = rawBookings.map(b => {
+                const withM = withMeeting(b);
+                if (withM.mentor) withM.mentor = sanitizeUserMedia(withM.mentor);
+                if (withM.learner) withM.learner = sanitizeUserMedia(withM.learner);
+                return withM;
+            });
+
+            console.timeEnd("getBookings");
+            return res.json({
+                success: true,
+                bookings: mapped,
+                pagination: {
+                    total: count,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(count / limit)
+                }
+            });
+        }
+
+        const bookings = await findQuery;
+        const mapped = bookings.map(b => {
+            const withM = withMeeting(b);
+            if (withM.mentor) withM.mentor = sanitizeUserMedia(withM.mentor);
+            if (withM.learner) withM.learner = sanitizeUserMedia(withM.learner);
+            return withM;
+        });
+
+        res.setHeader("X-Total-Count", mapped.length);
         console.timeEnd("getBookings");
-        return res.json(bookings.map(booking => withMeeting(booking)));
+        return res.json(mapped);
 
     } catch (error) {
         console.error(
@@ -559,15 +605,18 @@ const getMentorRequests = async (req, res) => {
         maybeExpireStaleBookings();
         const userId = getCurrentUserId(req);
 
-        const requests = await Booking.find({
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = req.query.limit ? Math.min(50, Math.max(1, parseInt(req.query.limit, 10))) : (req.query.page ? 20 : 0);
+        const isPaginated = req.query.page !== undefined || req.query.limit !== undefined;
+
+        const query = {
             mentor: userId,
             status: "pending"
-        })
-            .select("-payment.screenshot -payment.logs")
-            .populate(
-                "learner",
-                "name email role avatarUrl"
-            )
+        };
+
+        const findQuery = Booking.find(query)
+            .select(listProjection)
+            .populate("learner", "name email role avatarUrl")
             .sort({
                 date: -1,
                 time: -1,
@@ -575,7 +624,34 @@ const getMentorRequests = async (req, res) => {
             })
             .lean();
 
-        return res.json(requests);
+        if (isPaginated && limit > 0) {
+            const [rawRequests, count] = await Promise.all([
+                findQuery.skip((page - 1) * limit).limit(limit),
+                Booking.countDocuments(query)
+            ]);
+            const mapped = rawRequests.map(r => {
+                if (r.learner) r.learner = sanitizeUserMedia(r.learner);
+                return r;
+            });
+            return res.json({
+                success: true,
+                requests: mapped,
+                pagination: {
+                    total: count,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(count / limit)
+                }
+            });
+        }
+
+        const requests = await findQuery;
+        const mapped = requests.map(r => {
+            if (r.learner) r.learner = sanitizeUserMedia(r.learner);
+            return r;
+        });
+        res.setHeader("X-Total-Count", mapped.length);
+        return res.json(mapped);
 
     } catch (error) {
         console.error(
@@ -784,14 +860,14 @@ const completeBookingPayment = async (req, res) => {
             return res.status(400).json({ message: "Payment can only be completed after mentor approves the time slot" });
         }
 
-        const mentorUser = await User.findById(booking.mentor).select("_id name role isActive hourlyRate +paymentQr");
+        const mentorUser = await User.findById(booking.mentor).select("_id name role isActive hourlyRate");
         if (!mentorUser) {
             return res.status(404).json({ message: "Mentor not found" });
         }
 
         let payment;
         try {
-            payment = paymentDetails(mentorUser, req.body, booking.duration || 60);
+            payment = calculatePaymentDetails(mentorUser, req.body, booking.duration || 60);
         } catch (err) {
             return res.status(400).json({ message: err.message });
         }
@@ -1218,56 +1294,6 @@ const updateMeeting = async (req, res) => {
     }
 };
 
-const getBookingPaymentQR = async (req, res) => {
-    return res.status(410).json({
-        message: "Manual QR payment flow is deprecated. Please use Razorpay checkout."
-    });
-};
-
-const submitBookingPayment = async (req, res) => {
-    return res.status(410).json({
-        message: "Manual payment proof submission is deprecated. Please use Razorpay checkout."
-    });
-};
-
-const getPaymentProof = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const userId = getCurrentUserId(req);
-
-        const booking = await Booking.findById(id)
-            .select("payment.screenshot payment.logs learner mentor")
-            .lean();
-
-        if (!booking) {
-            return res.status(404).json({
-                message: "Booking not found"
-            });
-        }
-
-        const learnerId = (booking.learner?._id || booking.learner)?.toString();
-        const mentorId = (booking.mentor?._id || booking.mentor)?.toString();
-        const currentId = userId?.toString();
-        const isParty = learnerId === currentId || mentorId === currentId || req.user?.role === "admin";
-
-        if (!isParty) {
-            return res.status(403).json({
-                message: "You are not authorized to view this payment proof"
-            });
-        }
-
-        return res.json({
-            screenshot: booking.payment?.screenshot || null,
-            logs: booking.payment?.logs || []
-        });
-    } catch (error) {
-        console.error("Get payment proof error:", error);
-        return res.status(500).json({
-            message: "Unable to load payment proof"
-        });
-    }
-};
-
 module.exports = {
     checkAvailability,
     completeBookingPayment,
@@ -1278,9 +1304,6 @@ module.exports = {
     getBookings,
     getMentorRequests,
     updateBookingStatus,
-    cancelBooking,
-    getBookingPaymentQR,
-    submitBookingPayment,
-    getPaymentProof
+    cancelBooking
 };
 // @teamcosmiccoders

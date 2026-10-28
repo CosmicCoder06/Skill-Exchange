@@ -12,26 +12,18 @@ const {
     getMentorRequests,
     updateBookingStatus,
     cancelBooking,
-    updateMeeting,
-    getBookingPaymentQR,
-    submitBookingPayment,
-    getPaymentProof
+    updateMeeting
 } = require("../controllers/bookingController");
-
 
 // Authentication middleware
 const authMiddleware =
     require("../Backend Configuration/Configuration Folders/Middleware Configuration/authMiddleware");
 
 router.get('/bookings/check-availability', authMiddleware, checkAvailability);
-router.get('/bookings/:id/payment-proof', authMiddleware, getPaymentProof);
 router.put('/bookings/:id/pay', authMiddleware, completeBookingPayment);
-router.get('/bookings/:id/payment-qr', authMiddleware, getBookingPaymentQR);
-router.post('/bookings/:id/submit-payment', authMiddleware, submitBookingPayment);
 router.put('/bookings/:id/suggest-slots', authMiddleware, suggestSlots);
 router.put('/bookings/:id/choose-slot', authMiddleware, chooseSlot);
 router.put('/bookings/:id/meeting', authMiddleware, updateMeeting);
-
 
 // ========================================
 // CREATE BOOKING
@@ -44,7 +36,6 @@ router.post(
     createBooking
 );
 
-
 // ========================================
 // GET MY BOOKINGS
 // GET /api/bookings
@@ -55,7 +46,6 @@ router.get(
     authMiddleware,
     getBookings
 );
-
 
 // ========================================
 // GET MENTOR REQUESTS
@@ -68,7 +58,6 @@ router.get(
     getMentorRequests
 );
 
-
 // ========================================
 // UPDATE BOOKING STATUS
 // PUT /api/bookings/:id
@@ -80,7 +69,6 @@ router.put(
     updateBookingStatus
 );
 
-
 // ========================================
 // CANCEL BOOKING
 // DELETE /api/bookings/:id
@@ -91,7 +79,6 @@ router.delete(
     authMiddleware,
     cancelBooking
 );
-
 
 module.exports = router;
 // @teamcosmiccoders

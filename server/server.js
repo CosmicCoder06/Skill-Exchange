@@ -1,3 +1,4 @@
+const compression = require("compression");
 require("dotenv").config();
 
 const express = require("express");
@@ -93,6 +94,8 @@ const activityLogRoutes = require("./routes/activityLogRoutes");
 // =========================
 // Middleware
 // =========================
+
+app.use(compression());
 
 app.use(express.json({
     limit: '400kb',

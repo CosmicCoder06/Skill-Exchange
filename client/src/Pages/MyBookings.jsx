@@ -241,7 +241,7 @@ function MyBookings({
                 setBookings(
                     Array.isArray(data)
                         ? data
-                        : []
+                        : (data.bookings || [])
                 );
 
                 // Populate reviewed bookings map in one batch query
@@ -346,7 +346,7 @@ function MyBookings({
                 setRequests(
                     Array.isArray(data)
                         ? data
-                        : []
+                        : (data.requests || data.bookings || [])
                 );
             } catch (error) {
                 console.error(
@@ -786,8 +786,40 @@ function MyBookings({
                 </div>
 
                 <div className="booking-grid">
-                    {items.map((booking) => renderBookingCard(booking))}
+                    {(() => {
+                        const pageSize = 10;
+                        const page = sectionPages[id] || 1;
+                        return items.slice((page - 1) * pageSize, page * pageSize).map((booking) => renderBookingCard(booking));
+                    })()}
                 </div>
+                {items.length > 10 && (() => {
+                    const pageSize = 10;
+                    const page = sectionPages[id] || 1;
+                    const totalPages = Math.ceil(items.length / pageSize);
+                    return (
+                        <div className="section-pagination-bar" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "12px", marginTop: "16px" }}>
+                            <button
+                                type="button"
+                                disabled={page <= 1}
+                                onClick={() => setSectionPages((p) => ({ ...p, [id]: Math.max(1, page - 1) }))}
+                                style={{ padding: "6px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: page <= 1 ? "not-allowed" : "pointer", opacity: page <= 1 ? 0.5 : 1 }}
+                            >
+                                Previous
+                            </button>
+                            <span style={{ fontSize: "13px", fontWeight: "600", color: "#475569" }}>
+                                Page {page} of {totalPages}
+                            </span>
+                            <button
+                                type="button"
+                                disabled={page >= totalPages}
+                                onClick={() => setSectionPages((p) => ({ ...p, [id]: Math.min(totalPages, page + 1) }))}
+                                style={{ padding: "6px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: page >= totalPages ? "not-allowed" : "pointer", opacity: page >= totalPages ? 0.5 : 1 }}
+                            >
+                                Next
+                            </button>
+                        </div>
+                    );
+                })()}
             </div>
         );
     }

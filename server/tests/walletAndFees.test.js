@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { calculateFees, calculateSessionAmount } = require('../Utils/manualPayment');
+const { calculateFees, calculateSessionAmount } = require('../Utils/feeCalculator');
 
 test('calculateFees accurately includes 18% GST and calculates 3% mentor fee on GST-inclusive amount', () => {
   // Case 1: The user's exact example: Base fee ₹10
@@ -23,8 +23,8 @@ test('calculateFees accurately includes 18% GST and calculates 3% mentor fee on 
   assert.equal(walletFees.mentorEarnings, 1144.6);     // Net credited to mentor
   assert.equal(walletFees.totalAmountPaid, 1180);      // Learner pays GST-inclusive fee
 
-  // Case 3: Base fee ₹1,000 paid via Direct UPI / Card / QR
-  const upiFees = calculateFees(1000, 'qr');
+  // Case 3: Base fee ₹1,000 paid via Direct UPI / Card
+  const upiFees = calculateFees(1000, 'upi');
   assert.equal(upiFees.baseSessionAmount, 1000);
   assert.equal(upiFees.gstAmount, 180);
   assert.equal(upiFees.grossAmountWithGst, 1180);

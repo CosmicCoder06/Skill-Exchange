@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { calculateSessionAmount, paymentDetails } = require("../Utils/manualPayment");
+const { calculateSessionAmount, calculatePaymentDetails: paymentDetails } = require("../Utils/feeCalculator");
 
 test("booking fee calculation for paid mentor at rate 500 for 30, 60, and 90 mins", () => {
   const mentorRate = 500;

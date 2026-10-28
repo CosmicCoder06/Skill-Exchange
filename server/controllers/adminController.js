@@ -154,6 +154,7 @@ async function listSessions(req, res) {
 
     const [sessions, total] = await Promise.all([
       Booking.find(query)
+        .select("-payment.screenshot -payment.logs")
         .populate("learner", "name email avatarUrl")
         .populate("mentor", "name email avatarUrl")
         .sort({ createdAt: -1 })

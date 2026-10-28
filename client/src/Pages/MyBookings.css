@@ -883,17 +883,6 @@ body .bookings-page .booking-card:hover {
     border-color: #10b981;
 }
 
-.unlock-qr-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 12px;
-    background: #f8fafc;
-    border-radius: 12px;
-    border: 1px dashed #cbd5e1;
-}
-
 /* DUAL PAYMENT MODES: WALLET VS DIRECT UPI/CARD */
 .payment-modes-wrapper {
     display: flex;
@@ -1079,20 +1068,6 @@ body .bookings-page .booking-card:hover {
     margin: 6px 0 0 0;
     font-style: italic;
     line-height: 1.45;
-}
-
-.receipt-payment-qr {
-    max-width: 180px;
-    max-height: 180px;
-    border-radius: 10px;
-    border: 1px solid #dce8e1;
-}
-
-.qr-hint {
-    font-size: 12px;
-    color: #475569;
-    text-align: center;
-    margin: 0;
 }
 
 .unlock-confirm-btn {

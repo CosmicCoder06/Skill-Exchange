@@ -7,6 +7,7 @@ const bookingSchema = new mongoose.Schema(
         baseSessionAmount: { type: Number, default: 0, min: 0 },
         gstAmount: { type: Number, default: 0, min: 0 },
         grossAmountWithGst: { type: Number, default: 0, min: 0 },
+        // paymentMethod: 'qr' is deprecated (retained only for legacy historical bookings)
         paymentMethod: { type: String, enum: ['free', 'pay_later', 'qr', 'wallet', 'upi', 'card', 'upi_card', 'razorpay'] },
         paymentStatus: {
             type: String,

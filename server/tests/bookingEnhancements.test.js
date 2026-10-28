@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { calculateSessionAmount, paymentDetails } = require('../Utils/manualPayment');
+const { calculateSessionAmount, calculatePaymentDetails: paymentDetails } = require('../Utils/feeCalculator');
 
 test('duration calculates session payment amount dynamically', () => {
   assert.equal(calculateSessionAmount(500, 30), 250);
@@ -11,22 +11,32 @@ test('duration calculates session payment amount dynamically', () => {
   assert.equal(calculateSessionAmount(0, 60), 0);
 });
 
-test('paymentDetails accurately incorporates duration', () => {
-  const mentor = { hourlyRate: 600, paymentQr: 'sample_qr' };
+test('paymentDetails accurately incorporates duration and rejects discontinued QR', () => {
+  const mentor = { hourlyRate: 600 };
   
   // Request mode (before approval)
   const reqDetails = paymentDetails(mentor, { isRequest: true }, 45);
   assert.equal(reqDetails.paymentAmount, 450);
   assert.equal(reqDetails.paymentStatus, 'awaiting_approval');
 
-  // Complete payment via QR after approval
+  // QR method is discontinued and throws error
+  assert.throws(
+    () => paymentDetails(mentor, {
+      quotedAmount: 450,
+      paymentMethod: 'qr',
+      paymentReference: 'TXN12345678'
+    }, 45),
+    /discontinued/
+  );
+
+  // Valid payment method (wallet) succeeds
   const payDetails = paymentDetails(mentor, {
     quotedAmount: 450,
-    paymentMethod: 'qr',
+    paymentMethod: 'wallet',
     paymentReference: 'TXN12345678'
   }, 45);
   assert.equal(payDetails.paymentAmount, 450);
-  assert.equal(payDetails.paymentStatus, 'pending_verification');
+  assert.equal(payDetails.paymentStatus, 'verified');
   assert.equal(payDetails.paymentReference, 'TXN12345678');
 });
 

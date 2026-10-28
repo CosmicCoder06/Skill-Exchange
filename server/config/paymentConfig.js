@@ -7,9 +7,6 @@ module.exports = {
   // Platform fee percentage deducted from session price
   platformFeePercent: Number(process.env.PLATFORM_FEE_PERCENT) || 10,
 
-  // Platform details
-  getPlatformName: () => process.env.PLATFORM_NAME || "Skill Exchange",
-
   // Refund policies & rules
   refundRules: {
     mentor_no_show: {
