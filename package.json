@@ -1,4 +1,16 @@
 {
+  "name": "skill-exchange",
+  "version": "1.0.0",
+  "description": "Skill Exchange MERN Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "npm install --prefix server",
+    "postinstall": "npm install --prefix server",
+    "server": "npm start --prefix server",
+    "client": "npm run dev --prefix client",
+    "test": "npm test --prefix server && npm test --prefix client"
+  },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "qrcode": "^1.5.4"

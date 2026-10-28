@@ -202,9 +202,9 @@ initializeChatSocket(io);
 const port =
     process.env.PORT || 5000;
 
-server.listen(port, () => {
+server.listen(port, "0.0.0.0", () => {
     console.log(
-        `Your Server is running at port ${port}`
+        `Your Server is running at port ${port} on 0.0.0.0`
     );
 });
 // @teamcosmiccoders
