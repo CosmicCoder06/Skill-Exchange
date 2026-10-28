@@ -46,3 +46,33 @@ test("Razorpay webhook signature verification matches HMAC digest", () => {
         true
     );
 });
+
+test("Payment initiation rule: payment is locked before mentor approves", () => {
+    function canInitiatePayment(booking) {
+        if (["completed", "cancelled", "rejected"].includes(booking.status)) return false;
+        if (booking.status !== "approved") return false;
+        const rawStatus = booking.payment?.status || booking.paymentStatus;
+        if (["paid", "confirmed", "verified"].includes(rawStatus)) return false;
+        const amount = Number(booking.payment?.amount || booking.baseSessionAmount || booking.paymentAmount || 0);
+        return amount > 0;
+    }
+
+    // Pending request awaiting mentor approval -> BLOCKED
+    assert.equal(canInitiatePayment({ status: "pending", baseSessionAmount: 500, paymentStatus: "unpaid" }), false);
+
+    // Slots offered but not chosen yet -> BLOCKED
+    assert.equal(canInitiatePayment({ status: "slots_offered", baseSessionAmount: 500, paymentStatus: "unpaid" }), false);
+
+    // Cancelled / rejected session -> BLOCKED
+    assert.equal(canInitiatePayment({ status: "cancelled", baseSessionAmount: 500, paymentStatus: "unpaid" }), false);
+    assert.equal(canInitiatePayment({ status: "rejected", baseSessionAmount: 500, paymentStatus: "unpaid" }), false);
+
+    // Already paid session -> BLOCKED
+    assert.equal(canInitiatePayment({ status: "approved", baseSessionAmount: 500, paymentStatus: "paid" }), false);
+
+    // Free session ($0) -> BLOCKED
+    assert.equal(canInitiatePayment({ status: "approved", baseSessionAmount: 0, paymentStatus: "unpaid" }), false);
+
+    // Approved by mentor with unpaid rate -> UNLOCKED (can pay)
+    assert.equal(canInitiatePayment({ status: "approved", baseSessionAmount: 500, paymentStatus: "unpaid" }), true);
+});

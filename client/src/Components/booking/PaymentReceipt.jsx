@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, ShieldCheck, AlertCircle, XCircle } from "lucide-react";
+import { CheckCircle2, ShieldCheck, AlertCircle, XCircle, Clock, CalendarClock } from "lucide-react";
 
 function formatCurrency(num) {
     const val = Number(num) || 0;
@@ -56,11 +56,14 @@ export default function PaymentReceipt({
     const currentPaymentStatus = bookingData.payment?.status || bookingData.paymentStatus || status || "awaiting_payment";
     const isPaid = ["paid", "confirmed", "verified"].includes(currentPaymentStatus);
 
-    // Can pay only when learner, session active, awaiting payment, and amount > 0
+    const isApproved = bookingStatus === "approved" || bookingData.status === "approved";
+
+    // Can pay ONLY when learner, session approved by mentor, awaiting payment, and amount > 0
     const canPay =
         isLearner &&
         !isTerminal &&
         !isPaid &&
+        isApproved &&
         sessionAmount > 0 &&
         ["awaiting_payment", "unpaid", "awaiting_approval", "failed", "rejected"].includes(currentPaymentStatus);
 
@@ -179,13 +182,27 @@ export default function PaymentReceipt({
 
     function renderStatusBadge(st) {
         const key = st || currentPaymentStatus;
+
+        if (!isTerminal && !isPaid) {
+            const bStatus = bookingStatus || bookingData.status;
+            if (bStatus === "pending") {
+                return <span className="payment-pill badge-status-pending">Awaiting Approval</span>;
+            }
+            if (bStatus === "slots_offered") {
+                return <span className="payment-pill badge-status-pending">Slot Choice Needed</span>;
+            }
+            if (bStatus === "approved") {
+                return <span className="payment-pill badge-status-unpaid">Payment Due</span>;
+            }
+        }
+
         const config = {
             paid: { label: "Paid", cls: "badge-status-verified" },
             confirmed: { label: "Paid", cls: "badge-status-verified" },
             verified: { label: "Paid", cls: "badge-status-verified" },
             awaiting_payment: { label: "Awaiting Payment", cls: "badge-status-unpaid" },
             unpaid: { label: "Awaiting Payment", cls: "badge-status-unpaid" },
-            awaiting_approval: { label: "Awaiting Payment", cls: "badge-status-pending" },
+            awaiting_approval: { label: "Awaiting Approval", cls: "badge-status-pending" },
             payment_submitted: { label: "Payment Submitted", cls: "badge-status-verify" },
             failed: { label: "Payment Failed", cls: "badge-status-declined" },
             rejected: { label: "Payment Failed", cls: "badge-status-declined" },
@@ -311,9 +328,74 @@ export default function PaymentReceipt({
                         </div>
                     )}
 
-                    {/* RAZORPAY INSTANT CHECKOUT BUTTON */}
+                    {/* AWAITING MENTOR APPROVAL NOTICE (Payment locked until mentor approves) */}
+                    {!isPaid && !isTerminal && (bookingStatus === "pending" || bookingData.status === "pending") && (
+                        <div style={{
+                            background: "#fffbeb",
+                            border: "1px solid #fde68a",
+                            color: "#92400e",
+                            padding: "12px 14px",
+                            borderRadius: "8px",
+                            marginTop: "16px",
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "10px"
+                        }}>
+                            <Clock size={18} style={{ flexShrink: 0, marginTop: "2px", color: "#b45309" }} />
+                            <div>
+                                <div style={{ fontWeight: "700", fontSize: "14px" }}>
+                                    Awaiting Mentor Approval
+                                </div>
+                                <p style={{ margin: "4px 0 0 0", fontSize: "12.5px", lineHeight: "1.5", color: "#78350f" }}>
+                                    Your session request has been submitted to ${mentorName}. Payment will unlock as soon as the mentor approves this time slot. You will not be charged before approval.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* SLOTS OFFERED NOTICE */}
+                    {!isPaid && !isTerminal && (bookingStatus === "slots_offered" || bookingData.status === "slots_offered") && (
+                        <div style={{
+                            background: "#eff6ff",
+                            border: "1px solid #bfdbfe",
+                            color: "#1e40af",
+                            padding: "12px 14px",
+                            borderRadius: "8px",
+                            marginTop: "16px",
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "10px"
+                        }}>
+                            <CalendarClock size={18} style={{ flexShrink: 0, marginTop: "2px", color: "#2563eb" }} />
+                            <div>
+                                <div style={{ fontWeight: "700", fontSize: "14px" }}>
+                                    Alternate Slots Proposed
+                                </div>
+                                <p style={{ margin: "4px 0 0 0", fontSize: "12.5px", lineHeight: "1.5", color: "#1e3a8a" }}>
+                                    ${mentorName} suggested alternative time slots. Please select a proposed slot below to proceed to payment.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* RAZORPAY INSTANT CHECKOUT BUTTON (ONLY WHEN APPROVED) */}
                     {canPay && (
                         <div className="receipt-razorpay-action-box" style={{ marginTop: "16px" }}>
+                            <div style={{
+                                background: "#ecfdf5",
+                                border: "1px solid #a7f3d0",
+                                color: "#065f46",
+                                padding: "10px 14px",
+                                borderRadius: "8px",
+                                marginBottom: "12px",
+                                fontSize: "13px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px"
+                            }}>
+                                <CheckCircle2 size={16} color="#15803d" />
+                                <span><strong>Time Slot Approved!</strong> Complete payment below to confirm and finalize your session.</span>
+                            </div>
                             <button
                                 type="button"
                                 className="unlock-confirm-btn razorpay-pay-btn"

@@ -49,6 +49,23 @@ async function createOrder(req, res) {
             });
         }
 
+        // Payment can only be initiated after the mentor approves the time slot
+        if (booking.status !== "approved") {
+            if (booking.status === "pending") {
+                return res.status(400).json({
+                    message: "Payment can only be initiated after the mentor approves your requested time slot."
+                });
+            }
+            if (booking.status === "slots_offered") {
+                return res.status(400).json({
+                    message: "Please choose one of the alternate time slots proposed by the mentor before completing payment."
+                });
+            }
+            return res.status(400).json({
+                message: `Payment is not available for a session with status '${booking.status}'.`
+            });
+        }
+
         // Check if already paid
         const currentPaymentStatus = booking.payment?.status || booking.paymentStatus;
         if (["paid", "confirmed", "verified"].includes(currentPaymentStatus)) {
@@ -154,6 +171,13 @@ async function verifyPayment(req, res) {
                 success: true,
                 message: "Payment already verified.",
                 booking
+            });
+        }
+
+        // Only approved sessions can have payment verified
+        if (booking.status !== "approved") {
+            return res.status(400).json({
+                message: "Cannot verify payment for a session that has not been approved by the mentor."
             });
         }
 
