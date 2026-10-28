@@ -242,18 +242,11 @@ html[data-theme="dark"] .modal-backdrop {
 }
 
 /* Headings and Texts in Dark Mode */
-html[data-theme="dark"] h1,
-html[data-theme="dark"] h2,
-html[data-theme="dark"] h3,
-html[data-theme="dark"] h4,
-html[data-theme="dark"] h5,
-html[data-theme="dark"] strong {
-  color: #f0fdf4 !important;
+html[data-theme="dark"] :is(h1, h2, h3, h4, h5) {
+  color: #f0fdf4;
 }
 
-html[data-theme="dark"] p,
-html[data-theme="dark"] span,
-html[data-theme="dark"] label {
+html[data-theme="dark"] :is(p, label) {
   color: #c7ded6;
 }
 

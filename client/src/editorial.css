@@ -149,3 +149,403 @@ body .calendar-details { border-radius:0; box-shadow:none; background:transparen
 @media (prefers-reduced-motion: reduce) {
   .premium-account .header-ai-matcher, .public-nav-actions .header-ai-matcher { animation: none; }
 }
+
+
+/* ========================================================
+   EDITORIAL DARK MODE SYSTEM
+   ======================================================== */
+:root[data-theme="dark"],
+html.dark,
+body.dark {
+  --premium-bg: #0c1411;
+  --premium-ink: #f0fdf4;
+  --premium-green: #34d399;
+  --premium-muted: #94a3b8;
+  --premium-line: #1c3329;
+
+  --profile-bg: #0c1411;
+  --profile-green: #34d399;
+  --profile-text: #f0fdf4;
+  --profile-line: #1c3329;
+  --profile-muted: #94a3b8;
+
+  --chat-bg: #0c1411;
+  --chat-green: #34d399;
+  --chat-text: #f0fdf4;
+  --chat-line: #1c3329;
+}
+
+html[data-theme="dark"] body,
+html.dark body {
+  background: #0c1411 !important;
+  color: #f0fdf4 !important;
+}
+
+/* 1. TOP NAVIGATION IN DARK MODE */
+html[data-theme="dark"] .premium-nav,
+html.dark .premium-nav {
+  background: rgba(12, 20, 17, 0.96) !important;
+  border-bottom: 1px solid #1c3329 !important;
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .premium-nav-inner,
+html.dark .premium-nav-inner {
+  border-bottom-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .premium-brand,
+html.dark .premium-brand {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .premium-brand .brand-light,
+html.dark .premium-brand .brand-light {
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .premium-links button,
+html.dark .premium-links button {
+  color: #94a3b8 !important;
+  background: transparent;
+}
+
+html[data-theme="dark"] .premium-links button:hover,
+html.dark .premium-links button:hover {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .premium-links button[aria-current],
+html.dark .premium-links button[aria-current] {
+  background: #173327 !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .premium-account button,
+html.dark .premium-account button {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .premium-account button:hover,
+html.dark .premium-account button:hover {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .header-ai-matcher,
+html[data-theme="dark"] .premium-account .header-ai-matcher,
+html[data-theme="dark"] .public-nav-actions .header-ai-matcher,
+html.dark .header-ai-matcher {
+  background: #173327 !important;
+  color: #34d399 !important;
+  border: 1px solid #234d3c !important;
+}
+
+html[data-theme="dark"] .premium-menu-toggle,
+html.dark .premium-menu-toggle {
+  color: #f0fdf4 !important;
+  border-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .premium-links.is-open,
+html.dark .premium-links.is-open {
+  background: #13221b !important;
+  border: 1px solid #1c3329 !important;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6) !important;
+}
+
+html[data-theme="dark"] .premium-links.is-open button,
+html.dark .premium-links.is-open button {
+  color: #e2e8f0 !important;
+}
+
+/* 2. HOME PAGE HERO IN DARK MODE */
+html[data-theme="dark"] .home-page .hero-copy h1,
+html.dark .home-page .hero-copy h1 {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .home-page .hero-copy h1 em,
+html.dark .home-page .hero-copy h1 em {
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .home-page .home-lead,
+html.dark .home-page .home-lead {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .home-page .home-kicker,
+html.dark .home-page .home-kicker {
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .home-page .home-text-button,
+html.dark .home-page .home-text-button {
+  color: #e2e8f0 !important;
+  opacity: 0.9;
+}
+
+html[data-theme="dark"] .home-page .home-text-button:hover,
+html.dark .home-page .home-text-button:hover {
+  color: #34d399 !important;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .hero-trust span,
+html.dark .hero-trust span {
+  background: #173327 !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .hero-trust p,
+html.dark .hero-trust p {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .hero-trust b,
+html.dark .hero-trust b {
+  color: #f0fdf4 !important;
+}
+
+/* 3. HERO EDITORIAL CARD (ELEGANT DARK EMERALD SHAPE) */
+html[data-theme="dark"] .hero-editorial::before,
+html.dark .hero-editorial::before {
+  background: linear-gradient(145deg, #132b21, #0c1a15) !important;
+  border: 1px solid #1f4236 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+html[data-theme="dark"] .hero-editorial,
+html.dark .hero-editorial {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .hero-editorial strong,
+html.dark .hero-editorial strong {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .hero-editorial strong em,
+html.dark .hero-editorial strong em {
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .hero-editorial span,
+html.dark .hero-editorial span {
+  color: #34d399 !important;
+  font-weight: 700;
+}
+
+html[data-theme="dark"] .hero-editorial > div,
+html.dark .hero-editorial > div {
+  border-color: #1e3f32 !important;
+}
+
+html[data-theme="dark"] .hero-editorial > p:last-child,
+html.dark .hero-editorial > p:last-child {
+  color: #8ea89d !important;
+}
+
+/* 4. HOME SECTIONS (STRIP, PATH, CTA) */
+html[data-theme="dark"] .home-page .home-strip,
+html.dark .home-page .home-strip {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .home-page .home-strip p,
+html[data-theme="dark"] .home-page .home-strip i,
+html.dark .home-page .home-strip p,
+html.dark .home-page .home-strip i {
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .home-page .home-path h2,
+html.dark .home-page .home-path h2 {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .path-grid article,
+html.dark .path-grid article {
+  border-top-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .path-grid article h3,
+html.dark .path-grid article h3 {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .path-grid article p,
+html.dark .path-grid article p {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .path-grid article b,
+html.dark .path-grid article b {
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .home-cta,
+html.dark .home-cta {
+  background: #13221b !important;
+  border: 1px solid #1c3329 !important;
+  color: #f0fdf4 !important;
+  border-radius: 20px;
+}
+
+html[data-theme="dark"] .home-cta h2,
+html.dark .home-cta h2 {
+  color: #f0fdf4 !important;
+}
+
+/* 5. DISCOVER PAGE & MENTOR CARDS IN DARK MODE */
+html[data-theme="dark"] .mentor-card,
+html.dark .mentor-card {
+  background: #13221b !important;
+  border-color: #1c3329 !important;
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .mentor-card h2,
+html.dark .mentor-card h2 {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .mentor-bio,
+html.dark .mentor-bio {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .mentor-initial,
+html.dark .mentor-initial {
+  background: #173327 !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .mentor-tags span,
+html.dark .mentor-tags span {
+  background: #173327 !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .mentor-card-head span,
+html.dark .mentor-card-head span {
+  color: #8ea89d !important;
+}
+
+html[data-theme="dark"] .mentor-card button,
+html.dark .mentor-card button {
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .discover-search,
+html.dark .discover-search {
+  border-bottom-color: #234d3c !important;
+}
+
+html[data-theme="dark"] .discover-search input,
+html.dark .discover-search input {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .results-label,
+html.dark .results-label {
+  border-top-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .results-label span,
+html.dark .results-label span {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .results-label p,
+html.dark .results-label p {
+  color: #94a3b8 !important;
+}
+
+/* 6. SESSIONS / MY BOOKINGS & PROFILE IN DARK MODE */
+html[data-theme="dark"] .session-tab-pill,
+html.dark .session-tab-pill {
+  background: #13221b !important;
+  border: 1px solid #1c3329 !important;
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .session-tab-pill.active,
+html.dark .session-tab-pill.active {
+  background: #173327 !important;
+  border-color: #34d399 !important;
+  color: #34d399 !important;
+}
+
+html[data-theme="dark"] .session-group-section,
+html.dark .session-group-section {
+  background: #13221b !important;
+  border-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .session-group-section h3,
+html.dark .session-group-section h3 {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .session-group-subtext,
+html.dark .session-group-subtext {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .booking-card,
+html.dark .booking-card {
+  background: #13221b !important;
+  border-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .card-top-bar,
+html.dark .card-top-bar {
+  border-bottom-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .payment-summary-box,
+html.dark .payment-summary-box {
+  background: #0f1c17 !important;
+  border-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .session-status-card,
+html.dark .session-status-card {
+  background: #0f1c17 !important;
+  border-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .session-status-card .status-card-heading,
+html.dark .session-status-card .status-card-heading {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .session-status-card .status-card-desc,
+html.dark .session-status-card .status-card-desc {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .profile-photo-wrapper,
+html.dark .profile-photo-wrapper {
+  border-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .other-profile-hero,
+html.dark .other-profile-hero {
+  background: #13221b !important;
+  border-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .other-profile-section,
+html.dark .other-profile-section {
+  background: #13221b !important;
+  border-color: #1c3329 !important;
+}
+
+html[data-theme="dark"] .section-pagination-bar button,
+html.dark .section-pagination-bar button {
+  background: #173327 !important;
+  border-color: #234d3c !important;
+  color: #f0fdf4 !important;
+}
