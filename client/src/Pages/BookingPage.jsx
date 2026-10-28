@@ -360,7 +360,7 @@ function BookingPage({
     if (success) {
         return (
             <main className="booking-page booking-success-page">
-                <section className="booking-success-card">
+                <section className="booking-success-content">
                     <div className="receipt-animation">
                         <div className="receipt-icon">✓</div>
                         <div className="receipt-line line-one"></div>
@@ -396,56 +396,71 @@ function BookingPage({
 
     return (
         <main className="booking-page">
-            <header className="booking-top-bar">
-                {onBack && (
-                    <button
-                        type="button"
-                        className="booking-back-btn"
-                        onClick={onBack}
-                        disabled={loading}
-                    >
-                        ← Back
-                    </button>
-                )}
-                <div className="booking-breadcrumbs">
-                    <span>Mentors</span>
-                    <span className="crumb-sep">/</span>
-                    <span className="crumb-active">{displayName}</span>
-                    <span className="crumb-sep">/</span>
-                    <span className="crumb-step">Schedule 1-on-1</span>
-                </div>
-            </header>
+            <div className="booking-canvas">
+                {/* TOP BREADCRUMB & CONTEXT */}
+                <header className="booking-top-bar">
+                    {onBack && (
+                        <button
+                            type="button"
+                            className="booking-back-btn"
+                            onClick={onBack}
+                            disabled={loading}
+                        >
+                            ← Back
+                        </button>
+                    )}
+                    <div className="booking-breadcrumbs">
+                        <span>Mentors</span>
+                        <span className="crumb-sep">/</span>
+                        <span className="crumb-active">{displayName}</span>
+                        <span className="crumb-sep">/</span>
+                        <span className="crumb-step">Schedule Session</span>
+                    </div>
+                </header>
 
-            <div className="booking-container">
-                {/* LEFT SIDEBAR: MENTOR INFO & ESCROW SUMMARY */}
-                <aside className="booking-sidebar">
-                    <div className="mentor-profile-card">
-                        <div className="mentor-avatar-badge">
-                            <div className="mentor-avatar">{avatarInitial}</div>
-                            <span className="mentor-online-dot" title="Active Mentor"></span>
-                        </div>
-
-                        <div className="mentor-info">
-                            <h2>{displayName}</h2>
-                            <p className="mentor-role-headline">
-                                {mentor?.headline || mentor?.title || "Skill Exchange Verified Mentor"}
-                            </p>
-
-                            <div className="mentor-badges-row">
-                                <span className="rate-badge-pill">{rateDisplay}</span>
-                                {ratingVal ? (
-                                    <span className="rating-pill">★ {ratingVal}</span>
+                <div className="booking-layout-grid">
+                    {/* LEFT OPEN COLUMN: MENTOR & DETAILS (NON-BOXY, SEAMLESS) */}
+                    <aside className="booking-aside-column">
+                        <div className="mentor-identity-block">
+                            <div className="mentor-avatar-badge">
+                                {mentor?.avatarUrl ? (
+                                    <img src={mentor.avatarUrl} alt={displayName} className="mentor-avatar-img" />
                                 ) : (
-                                    <span className="rating-pill new-badge">★ New Mentor</span>
+                                    <div className="mentor-avatar">{avatarInitial}</div>
                                 )}
+                                <span className="mentor-online-dot" title="Verified Mentor"></span>
+                            </div>
+
+                            <div className="mentor-identity-text">
+                                <h2>{displayName}</h2>
+                                <p className="mentor-role-headline">
+                                    {mentor?.headline || mentor?.title || "Skill Exchange Verified Mentor"}
+                                </p>
+
+                                <div className="mentor-badges-row">
+                                    <span className="rate-badge-pill">{rateDisplay}</span>
+                                    {ratingVal ? (
+                                        <span className="rating-pill">★ {ratingVal}</span>
+                                    ) : (
+                                        <span className="rating-pill new-badge">★ New Mentor</span>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
+                        {mentor?.bio && (
+                            <p className="mentor-bio-text">
+                                {mentor.bio.length > 160
+                                    ? `${mentor.bio.substring(0, 160)}...`
+                                    : mentor.bio}
+                            </p>
+                        )}
+
                         {skillsList.length > 0 && (
-                            <div className="mentor-skills-section">
-                                <label>Teaches:</label>
+                            <div className="mentor-skills-block">
+                                <span className="aside-subheading">AREAS OF EXPERTISE</span>
                                 <div className="skills-pill-group">
-                                    {skillsList.slice(0, 5).map((skill, idx) => (
+                                    {skillsList.slice(0, 6).map((skill, idx) => (
                                         <span key={idx} className="skill-mini-pill">
                                             {skill}
                                         </span>
@@ -454,324 +469,294 @@ function BookingPage({
                             </div>
                         )}
 
-                        {mentor?.bio && (
-                            <p className="mentor-bio-preview">
-                                {mentor.bio.length > 140
-                                    ? `${mentor.bio.substring(0, 140)}...`
-                                    : mentor.bio}
-                            </p>
-                        )}
-                    </div>
+                        <div className="aside-divider" />
 
-                    {/* ESCROW GUARANTEE CARD */}
-                    <div className="escrow-guarantee-card">
-                        <div className="escrow-header">
-                            <span className="escrow-icon">🛡️</span>
-                            <strong>100% Escrow Protection</strong>
-                        </div>
-                        <p>
-                            Learner payments are held safely in escrow and disbursed to the mentor only after the session completes. Full refund guaranteed if cancelled.
-                        </p>
-                    </div>
-
-                    {/* LIVE PRICING CALCULATION */}
-                    <div className="pricing-calculation-card">
-                        <div className="pricing-calc-row">
-                            <span>Base Hourly Rate:</span>
-                            <strong>{rateDisplay}</strong>
-                        </div>
-                        <div className="pricing-calc-row">
-                            <span>Selected Length:</span>
-                            <strong>{duration} minutes</strong>
-                        </div>
-                        <div className="pricing-calc-divider" />
-                        <div className="pricing-calc-total">
-                            <span>Total Fee:</span>
-                            <strong className="calc-amount">{feeDisplay}</strong>
-                        </div>
-
-                        {!mentorLoading && !isRateConfigured && (
-                            <div className="pricing-warning-alert" role="alert">
-                                ⚠️ <strong>Rate not set:</strong> This mentor has not configured their hourly rate. Bookings cannot be requested until a rate is set in their profile.
+                        {/* MINIMAL INVOICE-STYLE PRICING SUMMARY (NON-BOXY) */}
+                        <div className="pricing-summary-block">
+                            <span className="aside-subheading">SESSION ESTIMATE</span>
+                            <div className="pricing-calc-row">
+                                <span>Mentor hourly rate</span>
+                                <strong>{rateDisplay}</strong>
                             </div>
-                        )}
-
-                        <p className="pricing-payment-note">
-                            💡 <em>No payment required right now. Payment unlocks only after mentor approval.</em>
-                        </p>
-                    </div>
-
-                    {/* 3-STEP PROCESS CARD */}
-                    <div className="booking-steps-card">
-                        <div className="step-item step-active">
-                            <span className="step-number">1</span>
-                            <div>
-                                <strong>Request Time Slot</strong>
-                                <small>Pick date, time &amp; agenda</small>
+                            <div className="pricing-calc-row">
+                                <span>Session duration</span>
+                                <strong>{duration} minutes</strong>
                             </div>
-                        </div>
-                        <div className="step-item">
-                            <span className="step-number">2</span>
-                            <div>
-                                <strong>Mentor Reviews</strong>
-                                <small>Slot is confirmed or adjusted</small>
+                            <div className="pricing-total-row">
+                                <span>Total payable</span>
+                                <span className="calc-amount">{feeDisplay}</span>
                             </div>
-                        </div>
-                        <div className="step-item">
-                            <span className="step-number">3</span>
-                            <div>
-                                <strong>Pay &amp; Join</strong>
-                                <small>Secure payment &amp; meet link</small>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
 
-                {/* RIGHT MAIN WORKSPACE: INTERACTIVE DATE & TIME SELECTOR */}
-                <section className="booking-main-panel">
-                    <div className="booking-main-header">
-                        <p className="booking-eyebrow">STEP 1 OF 3</p>
-                        <h1>Select Date &amp; Time Slot</h1>
-                        <p className="booking-panel-subtitle">
-                            Choose your preferred session duration, day, and time to connect with <strong>{displayName}</strong>.
-                        </p>
-                    </div>
-
-                    {mentorError && (
-                        <div className="mentor-error-banner" role="alert">
-                            ⚠️ {mentorError}
-                        </div>
-                    )}
-
-                    {/* 1. DURATION SELECTOR */}
-                    <div className="booking-form-section">
-                        <div className="section-label-row">
-                            <label className="section-heading">
-                                1. Session Duration
-                            </label>
-                            <span className="section-selected-value">{duration} minutes selected</span>
-                        </div>
-
-                        <div className="duration-pill-group">
-                            {[30, 45, 60, 90, 120].map((mins) => (
-                                <button
-                                    key={mins}
-                                    type="button"
-                                    className={`duration-pill-card ${duration === mins ? "active" : ""}`}
-                                    onClick={() => setDuration(mins)}
-                                    disabled={loading || mentorLoading}
-                                >
-                                    <span className="pill-mins">
-                                        {mins >= 60 ? (mins === 60 ? "1 hr" : `${mins / 60} hrs`) : `${mins} mins`}
-                                    </span>
-                                    <span className="pill-sub">
-                                        {mins === 30 ? "Quick intro" : mins === 60 ? "Standard deep-dive" : "Comprehensive"}
-                                    </span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* 2. INTERACTIVE DATE SELECTOR */}
-                    <div className="booking-form-section">
-                        <div className="section-label-row">
-                            <label className="section-heading">
-                                2. Select Date
-                            </label>
-                            {date ? (
-                                <span className="section-selected-value date-highlight">
-                                    🗓️ {date}
-                                </span>
-                            ) : (
-                                <span className="section-hint">Choose an upcoming date</span>
-                            )}
-                        </div>
-
-                        {/* Quick 14-day interactive selector */}
-                        <div className="date-chips-grid">
-                            {upcomingDays.map((d) => (
-                                <button
-                                    key={d.iso}
-                                    type="button"
-                                    className={`date-chip ${date === d.iso ? "active" : ""}`}
-                                    onClick={() => {
-                                        setDate(d.iso);
-                                        setShowCustomDate(false);
-                                    }}
-                                    disabled={loading || mentorLoading}
-                                >
-                                    <span className="date-chip-day">{d.dayLabel}</span>
-                                    <span className="date-chip-num">{d.dayNumber}</span>
-                                    <span className="date-chip-month">{d.monthLabel}</span>
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="custom-toggle-row">
-                            <button
-                                type="button"
-                                className="custom-toggle-btn"
-                                onClick={() => setShowCustomDate(!showCustomDate)}
-                            >
-                                {showCustomDate ? "▲ Hide calendar picker" : "▼ Pick a custom future date"}
-                            </button>
-                        </div>
-
-                        {showCustomDate && (
-                            <div className="custom-date-container">
-                                <label htmlFor="custom-date-input">Calendar Date:</label>
-                                <input
-                                    id="custom-date-input"
-                                    type="date"
-                                    value={date}
-                                    min={new Date().toISOString().split("T")[0]}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    disabled={loading || mentorLoading}
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    {/* 3. INTERACTIVE TIME SLOT SELECTOR */}
-                    <div className="booking-form-section">
-                        <div className="section-label-row">
-                            <label className="section-heading">
-                                3. Select Time Slot
-                            </label>
-                            {time ? (
-                                <span className="section-selected-value time-highlight">
-                                    ⏰ {formatTimeDisplay(time)} (IST)
-                                </span>
-                            ) : (
-                                <span className="section-hint">Select a time period below</span>
-                            )}
-                        </div>
-
-                        <div className="time-groups-wrapper">
-                            {timeSlotGroups.map((group) => (
-                                <div key={group.groupName} className="time-group-block">
-                                    <div className="time-group-header">
-                                        <span className="time-group-icon">{group.icon}</span>
-                                        <span className="time-group-title">{group.groupName}</span>
-                                    </div>
-
-                                    <div className="time-slots-grid">
-                                        {group.slots.map((s) => {
-                                            const isSelected = time === s.value;
-                                            const isPast = isSlotInPast(s.value);
-
-                                            return (
-                                                <button
-                                                    key={s.value}
-                                                    type="button"
-                                                    className={`time-slot-pill ${isSelected ? "active" : ""} ${isPast ? "slot-past" : ""}`}
-                                                    onClick={() => {
-                                                        setTime(s.value);
-                                                        setShowCustomTime(false);
-                                                    }}
-                                                    disabled={loading || mentorLoading || isPast}
-                                                    title={isPast ? "This slot has already passed today" : s.label}
-                                                >
-                                                    <span className="time-slot-text">{s.label}</span>
-                                                    {isPast && <span className="past-tag">Passed</span>}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
+                            {!mentorLoading && !isRateConfigured && (
+                                <div className="pricing-warning-inline" role="alert">
+                                    ⚠️ <strong>Rate not set:</strong> This mentor has not configured an hourly rate yet.
                                 </div>
-                            ))}
+                            )}
+
+                            <p className="pricing-subnote">
+                                🔒 <strong>Zero advance charge:</strong> Payment unlocks only after your mentor reviews and approves this time slot.
+                            </p>
                         </div>
 
-                        <div className="custom-toggle-row">
-                            <button
-                                type="button"
-                                className="custom-toggle-btn"
-                                onClick={() => setShowCustomTime(!showCustomTime)}
-                            >
-                                {showCustomTime ? "▲ Hide custom time input" : "▼ Enter custom time"}
-                            </button>
+                        <div className="aside-divider" />
+
+                        {/* ESCROW GUARANTEE CALLOUT */}
+                        <div className="escrow-inline-callout">
+                            <span className="escrow-badge-icon">🛡️</span>
+                            <div>
+                                <strong>100% Escrow Protection</strong>
+                                <p>
+                                    Your money remains in escrow until your 1-on-1 session is successfully held.
+                                </p>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* RIGHT OPEN CANVAS: SCHEDULING WORKSPACE (NON-BOXY) */}
+                    <section className="booking-main-canvas">
+                        <div className="booking-canvas-header">
+                            <span className="canvas-step-badge">STEP 1 OF 3 • SCHEDULE</span>
+                            <h1>Select date &amp; time slot</h1>
+                            <p className="canvas-lead">
+                                Choose duration, pick an open date, and choose your preferred time to connect.
+                            </p>
                         </div>
 
-                        {showCustomTime && (
-                            <div className="custom-time-container">
-                                <label htmlFor="custom-time-input">Specify exact time:</label>
-                                <input
-                                    id="custom-time-input"
-                                    type="time"
-                                    value={time}
-                                    onChange={(e) => setTime(e.target.value)}
-                                    disabled={loading || mentorLoading}
-                                />
+                        {mentorError && (
+                            <div className="mentor-error-inline" role="alert">
+                                ⚠️ {mentorError}
                             </div>
                         )}
 
-                        {/* LIVE AVAILABILITY FEEDBACK */}
-                        {date && time && (
-                            <div
-                                className={`slot-availability-banner ${
-                                    availability.checking
-                                        ? "checking"
-                                        : availability.available
-                                        ? "available"
-                                        : "unavailable"
-                                }`}
-                            >
-                                {availability.checking ? (
-                                    <span>⏳ Checking schedule availability with mentor...</span>
-                                ) : availability.available ? (
-                                    <span>✓ Slot is available! <strong>{date}</strong> at <strong>{formatTimeDisplay(time)}</strong> for {duration} mins.</span>
+                        {/* 1. DURATION SELECTOR (NON-BOXY PILLS) */}
+                        <div className="booking-section-open">
+                            <div className="section-title-row">
+                                <label className="section-title">
+                                    1. Session Duration
+                                </label>
+                                <span className="section-current-value">{duration} minutes selected</span>
+                            </div>
+
+                            <div className="duration-pill-group">
+                                {[30, 45, 60, 90, 120].map((mins) => (
+                                    <button
+                                        key={mins}
+                                        type="button"
+                                        className={`duration-pill-clean ${duration === mins ? "active" : ""}`}
+                                        onClick={() => setDuration(mins)}
+                                        disabled={loading || mentorLoading}
+                                    >
+                                        <span className="pill-mins">
+                                            {mins >= 60 ? (mins === 60 ? "1 hr" : `${mins / 60} hrs`) : `${mins} mins`}
+                                        </span>
+                                        <span className="pill-sub">
+                                            {mins === 30 ? "Intro" : mins === 60 ? "Standard" : "Deep-dive"}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 2. UPCOMING DATES CHIPS (NON-BOXY) */}
+                        <div className="booking-section-open">
+                            <div className="section-title-row">
+                                <label className="section-title">
+                                    2. Select Date
+                                </label>
+                                {date ? (
+                                    <span className="section-current-value highlight">
+                                        🗓️ {date}
+                                    </span>
                                 ) : (
-                                    <span>⚠️ {availability.message || "Slot conflict: This time is already booked. Please pick another slot."}</span>
+                                    <span className="section-hint">Select an upcoming day</span>
                                 )}
                             </div>
-                        )}
-                    </div>
 
-                    {/* 4. DISCUSSION TOPICS / MESSAGE */}
-                    <div className="booking-form-section">
-                        <label className="section-heading" htmlFor="booking-message-input">
-                            4. Topics &amp; Goals (Optional)
-                        </label>
-                        <p className="field-subtext">
-                            Help your mentor prepare by describing what you want to learn or discuss.
-                        </p>
-                        <textarea
-                            id="booking-message-input"
-                            className="booking-textarea"
-                            placeholder="e.g. I would like help troubleshooting a React state issue and learning best practices for system architecture."
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            disabled={loading || mentorLoading}
-                        />
-                    </div>
+                            <div className="date-chips-scroller">
+                                {upcomingDays.map((d) => (
+                                    <button
+                                        key={d.iso}
+                                        type="button"
+                                        className={`date-pill-clean ${date === d.iso ? "active" : ""}`}
+                                        onClick={() => {
+                                            setDate(d.iso);
+                                            setShowCustomDate(false);
+                                        }}
+                                        disabled={loading || mentorLoading}
+                                    >
+                                        <span className="date-pill-day">{d.dayLabel}</span>
+                                        <span className="date-pill-num">{d.dayNumber}</span>
+                                        <span className="date-pill-month">{d.monthLabel}</span>
+                                    </button>
+                                ))}
+                            </div>
 
-                    {/* 5. SUBMIT ACTION */}
-                    <div className="booking-action-footer">
-                        <button
-                            className="request-booking-btn"
-                            onClick={createBooking}
-                            disabled={!canSubmit}
-                        >
-                            {loading
-                                ? "Submitting Request..."
-                                : mentorLoading
-                                ? "Loading Mentor Profile..."
-                                : !isRateConfigured
-                                ? "Rate Not Configured — Cannot Book"
-                                : !date
-                                ? "Select a Date to Continue"
-                                : !time
-                                ? "Select a Time Slot to Continue"
-                                : availability.available === false
-                                ? "Select an Available Time Slot"
-                                : "Request Time Slot for Approval →"}
-                        </button>
+                            <div className="custom-link-row">
+                                <button
+                                    type="button"
+                                    className="custom-link-btn"
+                                    onClick={() => setShowCustomDate(!showCustomDate)}
+                                >
+                                    {showCustomDate ? "▲ Hide calendar picker" : "▼ Pick a specific date from calendar"}
+                                </button>
+                            </div>
 
-                        <p className="booking-submit-disclaimer">
-                            🔒 <strong>No payment charged today.</strong> You only pay after your mentor confirms and approves this request.
-                        </p>
-                    </div>
-                </section>
+                            {showCustomDate && (
+                                <div className="custom-input-box">
+                                    <label htmlFor="custom-date-field">Choose date:</label>
+                                    <input
+                                        id="custom-date-field"
+                                        type="date"
+                                        value={date}
+                                        min={new Date().toISOString().split("T")[0]}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        disabled={loading || mentorLoading}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 3. TIME SLOTS (OPEN PRESENTATION, NO BOXES) */}
+                        <div className="booking-section-open">
+                            <div className="section-title-row">
+                                <label className="section-title">
+                                    3. Select Time Slot
+                                </label>
+                                {time ? (
+                                    <span className="section-current-value highlight">
+                                        ⏰ {formatTimeDisplay(time)} (IST)
+                                    </span>
+                                ) : (
+                                    <span className="section-hint">Choose morning, afternoon, or evening</span>
+                                )}
+                            </div>
+
+                            <div className="time-periods-list">
+                                {timeSlotGroups.map((group) => (
+                                    <div key={group.groupName} className="time-period-row">
+                                        <div className="period-label">
+                                            <span>{group.icon}</span>
+                                            <span>{group.groupName}</span>
+                                        </div>
+
+                                        <div className="period-slots-list">
+                                            {group.slots.map((s) => {
+                                                const isSelected = time === s.value;
+                                                const isPast = isSlotInPast(s.value);
+
+                                                return (
+                                                    <button
+                                                        key={s.value}
+                                                        type="button"
+                                                        className={`time-pill-clean ${isSelected ? "active" : ""} ${isPast ? "is-past" : ""}`}
+                                                        onClick={() => {
+                                                            setTime(s.value);
+                                                            setShowCustomTime(false);
+                                                        }}
+                                                        disabled={loading || mentorLoading || isPast}
+                                                        title={isPast ? "Slot passed today" : s.label}
+                                                    >
+                                                        <span>{s.label}</span>
+                                                        {isPast && <small className="past-indicator">Passed</small>}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="custom-link-row">
+                                <button
+                                    type="button"
+                                    className="custom-link-btn"
+                                    onClick={() => setShowCustomTime(!showCustomTime)}
+                                >
+                                    {showCustomTime ? "▲ Hide custom time input" : "▼ Enter custom specific time"}
+                                </button>
+                            </div>
+
+                            {showCustomTime && (
+                                <div className="custom-input-box">
+                                    <label htmlFor="custom-time-field">Enter time:</label>
+                                    <input
+                                        id="custom-time-field"
+                                        type="time"
+                                        value={time}
+                                        onChange={(e) => setTime(e.target.value)}
+                                        disabled={loading || mentorLoading}
+                                    />
+                                </div>
+                            )}
+
+                            {/* AVAILABILITY FEEDBACK */}
+                            {date && time && (
+                                <div
+                                    className={`slot-status-inline ${
+                                        availability.checking
+                                            ? "checking"
+                                            : availability.available
+                                            ? "available"
+                                            : "unavailable"
+                                    }`}
+                                >
+                                    {availability.checking ? (
+                                        <span>⏳ Checking slot availability with mentor...</span>
+                                    ) : availability.available ? (
+                                        <span>✓ <strong>{date}</strong> at <strong>{formatTimeDisplay(time)}</strong> is open &amp; available!</span>
+                                    ) : (
+                                        <span>⚠️ {availability.message || "This slot is already booked. Please choose another slot."}</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 4. AGENDA / GOALS (MINIMAL PROSE FIELD) */}
+                        <div className="booking-section-open">
+                            <label className="section-title" htmlFor="session-agenda-textarea">
+                                4. Topics or Goals (Optional)
+                            </label>
+                            <p className="agenda-subtext">
+                                What would you like to focus on during this 1-on-1 session?
+                            </p>
+                            <textarea
+                                id="session-agenda-textarea"
+                                className="agenda-textarea-clean"
+                                placeholder="e.g. Code review for my project, system design architecture, and career guidance."
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                disabled={loading || mentorLoading}
+                            />
+                        </div>
+
+                        {/* 5. PRIMARY CTA */}
+                        <div className="booking-submit-area">
+                            <button
+                                className="booking-primary-btn"
+                                onClick={createBooking}
+                                disabled={!canSubmit}
+                            >
+                                {loading
+                                    ? "Submitting Request..."
+                                    : mentorLoading
+                                    ? "Loading Mentor..."
+                                    : !isRateConfigured
+                                    ? "Rate Not Configured — Cannot Book"
+                                    : !date
+                                    ? "Select Date to Continue"
+                                    : !time
+                                    ? "Select Time Slot to Continue"
+                                    : availability.available === false
+                                    ? "Choose an Available Slot"
+                                    : "Request Time Slot for Approval →"}
+                            </button>
+
+                            <p className="booking-footnote">
+                                🔒 <strong>No immediate payment required.</strong> Payment is unlocked only after {displayName} confirms this slot.
+                            </p>
+                        </div>
+                    </section>
+                </div>
             </div>
         </main>
     );

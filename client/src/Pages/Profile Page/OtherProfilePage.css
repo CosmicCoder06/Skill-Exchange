@@ -909,3 +909,114 @@
         gap: 7px;
     }
 }
+
+/* =========================================================
+   CIRCULAR PROFILE PHOTO LIGHTBOX FOR OTHER PROFILE
+   ========================================================= */
+.other-profile-avatar.clickable {
+    cursor: pointer;
+}
+
+.other-profile-avatar:not(.clickable)::after {
+    display: none;
+}
+
+.profile-photo-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: grid;
+    place-items: center;
+
+    padding: 28px;
+
+    background: rgba(8, 24, 18, .86);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.profile-photo-lightbox-circle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    animation: profilePhotoPop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes profilePhotoPop {
+    from {
+        opacity: 0;
+        transform: scale(0.82);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.profile-photo-lightbox-image {
+    display: block;
+
+    width: min(78vw, 380px);
+    height: min(78vw, 380px);
+
+    object-fit: cover;
+    object-position: center;
+
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+
+    background: #176b4e;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.profile-photo-caption {
+    text-align: center;
+    color: #ffffff;
+}
+
+.profile-photo-caption strong {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    margin-bottom: 2px;
+}
+
+.profile-photo-caption span {
+    font-size: 13px;
+    font-weight: 700;
+    color: #bbf7d0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.profile-photo-lightbox-close {
+    position: fixed;
+    top: 24px;
+    right: 28px;
+
+    width: 44px;
+    height: 44px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.15);
+    color: #fff;
+
+    font-size: 26px;
+    line-height: 1;
+
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.profile-photo-lightbox-close:hover {
+    background: rgba(255,255,255,.3);
+    transform: scale(1.08);
+}

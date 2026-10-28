@@ -11,6 +11,7 @@ function OtherProfilePage({
     const [ratingData, setRatingData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [ratingLoading, setRatingLoading] = useState(true);
+    const [showPhoto, setShowPhoto] = useState(false);
 
     useEffect(() => {
         async function fetchProfile() {
@@ -120,7 +121,23 @@ function OtherProfilePage({
             </header>
 
             <section className="other-profile-hero">
-                <div className="other-profile-avatar">
+                <div
+                    className={`other-profile-avatar ${profile.avatarUrl ? "clickable" : ""}`}
+                    onClick={() => {
+                        if (profile.avatarUrl) {
+                            setShowPhoto(true);
+                        }
+                    }}
+                    role={profile.avatarUrl ? "button" : undefined}
+                    tabIndex={profile.avatarUrl ? 0 : undefined}
+                    onKeyDown={(event) => {
+                        if (profile.avatarUrl && (event.key === "Enter" || event.key === " ")) {
+                            event.preventDefault();
+                            setShowPhoto(true);
+                        }
+                    }}
+                    title={profile.avatarUrl ? "Click to view profile picture" : ""}
+                >
                     {profile.avatarUrl ? (
                         <img
                             src={profile.avatarUrl}
@@ -435,6 +452,43 @@ function OtherProfilePage({
                     )}
                 </section>
             </section>
+
+            {showPhoto && profile.avatarUrl && (
+                <div
+                    className="profile-photo-lightbox"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Profile photo viewer"
+                    onClick={() => setShowPhoto(false)}
+                >
+                    <button
+                        type="button"
+                        className="profile-photo-lightbox-close"
+                        aria-label="Close profile photo"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            setShowPhoto(false);
+                        }}
+                    >
+                        ×
+                    </button>
+
+                    <div
+                        className="profile-photo-lightbox-circle-wrapper"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <img
+                            className="profile-photo-lightbox-image"
+                            src={profile.avatarUrl}
+                            alt={`${profile.name}'s profile`}
+                        />
+                        <div className="profile-photo-caption">
+                            <strong>{profile.name}</strong>
+                            <span>{profile.role || "Member"}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

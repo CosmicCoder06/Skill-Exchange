@@ -880,14 +880,20 @@ function ProfilePage({
                             ×
                         </button>
 
-                        <img
-                            className="profile-photo-lightbox-image"
-                            src={profile.avatarUrl}
-                            alt={`${profile.name}'s profile`}
-                            onClick={(event) =>
-                                event.stopPropagation()
-                            }
-                        />
+                        <div
+                            className="profile-photo-lightbox-circle-wrapper"
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            <img
+                                className="profile-photo-lightbox-image"
+                                src={profile.avatarUrl}
+                                alt={`${profile.name}'s profile`}
+                            />
+                            <div className="profile-photo-caption">
+                                <strong>{profile.name}</strong>
+                                <span>{profile.role || "Member"}</span>
+                            </div>
+                        </div>
                     </div>
                 )}
 
