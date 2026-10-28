@@ -4,6 +4,7 @@ const router = express.Router();
 const {
     createReview,
     getMyReviews,
+    getMyReviewedBookings,
     getUserReviews,
     getBookingReview
 } = require("../controllers/reviewController");
@@ -16,6 +17,12 @@ router.post(
     "/reviews",
     authMiddleware,
     createReview
+);
+
+router.get(
+    "/reviews/my-reviewed-bookings",
+    authMiddleware,
+    getMyReviewedBookings
 );
 
 router.get(

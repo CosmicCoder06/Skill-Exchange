@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import styles from "./registrationComponent.module.css";
+import { LogoMark } from "../common/Logo";
 
 function Register({ onBackToLogin, onRegistered }) {
     const [user, setUser] = useState({
@@ -78,7 +79,7 @@ function Register({ onBackToLogin, onRegistered }) {
             {/* LEFT SHOWCASE */}
             <aside className={styles.showcase}>
                 <div className={styles.brand}>
-                    <div className={styles.brandMark}>S</div>
+                    <LogoMark size={36} />
                     <span className={styles.brandName}>
                         Skill<span>Exchange</span>
                     </span>

@@ -146,6 +146,7 @@ function App() {
     const [pageHistory, setPageHistory] = useState([]);
 
     const [profileStatus, setProfileStatus] = useState(null);
+    const [currentUserProfile, setCurrentUserProfile] = useState(null);
     const [viewingUserId, setViewingUserId] = useState(initialRoute.viewingUserId || null);
     const [bookingMentorId, setBookingMentorId] = useState(initialRoute.bookingMentorId || null);
     const [bookingMentorName, setBookingMentorName] = useState("");
@@ -274,6 +275,7 @@ function App() {
                 }
 
                 const data = await response.json();
+                setCurrentUserProfile(data.profile || null);
 
                 const complete =
                     data.profileComplete === true ||
@@ -336,6 +338,7 @@ function App() {
         setChatTargetUserId(null);
         setChatReturnPage("home");
         setProfileStatus(null);
+        setCurrentUserProfile(null);
     }
 
     function openNormalChat(returnPage = "home") {
@@ -553,6 +556,8 @@ function App() {
                 <ProfilePage
                     token={token}
                     profileStatus={profileStatus}
+                    initialProfile={currentUserProfile}
+                    onProfileUpdated={(updated) => setCurrentUserProfile(updated)}
                     onHome={() => goBack("home")}
                     onDashboard={() =>
                         navigateTo(

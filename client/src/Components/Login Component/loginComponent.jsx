@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "./loginComponent.css";
+import { LogoMark } from "../common/Logo";
 
 function LoginComponent({ onLogin, onCreateAccount }) {
     const [user, setUser] = useState({
@@ -80,9 +81,7 @@ function LoginComponent({ onLogin, onCreateAccount }) {
             <section className="login-showcase">
 
                 <div className="brand">
-                    <div className="brand-mark">
-                        S
-                    </div>
+                    <LogoMark size={36} />
 
                     <span>
                         Skill<span>Exchange</span>
@@ -194,9 +193,7 @@ function LoginComponent({ onLogin, onCreateAccount }) {
                     {/* Mobile branding */}
                     <div className="mobile-brand">
 
-                        <div className="brand-mark">
-                            S
-                        </div>
+                        <LogoMark size={34} />
 
                         <span>
                             Skill<span>Exchange</span>

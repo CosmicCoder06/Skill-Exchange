@@ -42,8 +42,10 @@ const calculateProfileComplete = (profile) => {
 
 const getMyProfile = async (req, res) => {
     try {
+        console.time("getMyProfile");
         const user = await User.findById(req.user.id)
-            .select("-password -refreshToken");
+            .select("-password -refreshToken")
+            .lean();
 
         if (!user) {
             return res.status(404).json({
@@ -62,6 +64,7 @@ const getMyProfile = async (req, res) => {
             user.profileCompleted ||
             calculateProfileComplete(user);
 
+        console.timeEnd("getMyProfile");
         res.status(200).json({
             profile: user,
             profileComplete

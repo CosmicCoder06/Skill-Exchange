@@ -99,6 +99,16 @@ reviewSchema.index(
     }
 );
 
+reviewSchema.index({
+    reviewee: 1,
+    createdAt: -1
+});
+
+reviewSchema.index({
+    reviewer: 1,
+    booking: 1
+});
+
 module.exports =
     mongoose.models.Review ||
     mongoose.model(

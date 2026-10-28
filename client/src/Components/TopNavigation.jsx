@@ -1,7 +1,8 @@
 import ThemeToggle from './ThemeToggle';
 import { AIExtension } from '../AIExtension';
 import { useState } from 'react';
-import { Menu, X, ArrowUpRight, LogOut, UserRound, Settings } from 'lucide-react';
+import { Menu, X, LogOut, UserRound, Settings } from 'lucide-react';
+import { LogoMark } from './common/Logo';
 
 export default function TopNavigation({
   activePage,
@@ -34,7 +35,7 @@ export default function TopNavigation({
       <header className="premium-nav">
         <div className="premium-nav-inner">
           <button className="premium-brand" onClick={() => go(onHome)} aria-label="Skill Exchange home">
-            <span className="premium-brand-mark"><ArrowUpRight size={23} /></span>
+            <LogoMark size={32} />
             <span>Skill<span className="brand-light">Exchange</span></span>
           </button>
           <button className="premium-menu-toggle" aria-label={expanded ? 'Close navigation' : 'Open navigation'} aria-expanded={expanded} aria-controls="primary-navigation" onClick={() => setExpanded(!expanded)}>

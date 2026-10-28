@@ -238,6 +238,24 @@ const expireStaleBookings = async () => {
     }
 };
 
+let lastExpireRun = 0;
+const maybeExpireStaleBookings = () => {
+    const now = Date.now();
+    if (now - lastExpireRun > 5 * 60 * 1000) {
+        lastExpireRun = now;
+        expireStaleBookings().catch((err) =>
+            console.error("Error expiring stale bookings:", err)
+        );
+    }
+};
+
+// Periodic background cleanup interval (every 5 minutes)
+setInterval(() => {
+    expireStaleBookings().catch((err) =>
+        console.error("Periodic expireStaleBookings error:", err)
+    );
+}, 5 * 60 * 1000);
+
 // =====================================================
 // CHECK AVAILABILITY
 // =====================================================
@@ -495,7 +513,8 @@ const createBooking = async (req, res) => {
 
 const getBookings = async (req, res) => {
     try {
-        await expireStaleBookings();
+        console.time("getBookings");
+        maybeExpireStaleBookings();
         const userId = getCurrentUserId(req);
 
         const bookings = await Booking.find({
@@ -504,6 +523,7 @@ const getBookings = async (req, res) => {
                 { mentor: userId }
             ]
         })
+            .select("-payment.screenshot -payment.logs")
             .populate(
                 "mentor learner",
                 "name email role avatarUrl"
@@ -512,8 +532,10 @@ const getBookings = async (req, res) => {
                 date: -1,
                 time: -1,
                 createdAt: -1
-            });
+            })
+            .lean();
 
+        console.timeEnd("getBookings");
         return res.json(bookings.map(booking => withMeeting(booking)));
 
     } catch (error) {
@@ -534,13 +556,14 @@ const getBookings = async (req, res) => {
 
 const getMentorRequests = async (req, res) => {
     try {
-        await expireStaleBookings();
+        maybeExpireStaleBookings();
         const userId = getCurrentUserId(req);
 
         const requests = await Booking.find({
             mentor: userId,
             status: "pending"
         })
+            .select("-payment.screenshot -payment.logs")
             .populate(
                 "learner",
                 "name email role avatarUrl"
@@ -549,7 +572,8 @@ const getMentorRequests = async (req, res) => {
                 date: -1,
                 time: -1,
                 createdAt: -1
-            });
+            })
+            .lean();
 
         return res.json(requests);
 
@@ -1206,6 +1230,44 @@ const submitBookingPayment = async (req, res) => {
     });
 };
 
+const getPaymentProof = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = getCurrentUserId(req);
+
+        const booking = await Booking.findById(id)
+            .select("payment.screenshot payment.logs learner mentor")
+            .lean();
+
+        if (!booking) {
+            return res.status(404).json({
+                message: "Booking not found"
+            });
+        }
+
+        const learnerId = (booking.learner?._id || booking.learner)?.toString();
+        const mentorId = (booking.mentor?._id || booking.mentor)?.toString();
+        const currentId = userId?.toString();
+        const isParty = learnerId === currentId || mentorId === currentId || req.user?.role === "admin";
+
+        if (!isParty) {
+            return res.status(403).json({
+                message: "You are not authorized to view this payment proof"
+            });
+        }
+
+        return res.json({
+            screenshot: booking.payment?.screenshot || null,
+            logs: booking.payment?.logs || []
+        });
+    } catch (error) {
+        console.error("Get payment proof error:", error);
+        return res.status(500).json({
+            message: "Unable to load payment proof"
+        });
+    }
+};
+
 module.exports = {
     checkAvailability,
     completeBookingPayment,
@@ -1218,6 +1280,7 @@ module.exports = {
     updateBookingStatus,
     cancelBooking,
     getBookingPaymentQR,
-    submitBookingPayment
+    submitBookingPayment,
+    getPaymentProof
 };
 // @teamcosmiccoders

@@ -125,16 +125,26 @@ body .calendar-details { border-radius:0; box-shadow:none; background:transparen
   50% { box-shadow: 0 0 0 5px #39bb8110, 0 0 22px #39bb8160; }
 }
 .premium-account .theme-toggle { position: relative; width: 36px; height: 36px; box-shadow: none; }
-@media (max-width: 1100px) {
+@media (max-width: 1100px) and (min-width: 821px) {
   .premium-nav-inner { flex-wrap: wrap; gap: 12px; padding: 14px 20px; }
   .premium-links { order: 3; width: 100%; }
   .premium-account { margin-left: auto; }
 }
+@media (max-width: 820px) {
+  .premium-nav-inner { min-height: 64px; padding: 10px 16px; flex-wrap: wrap; }
+  .premium-menu-toggle { display: grid !important; place-items: center; margin-left: auto; width: 44px; height: 44px; min-width: 44px; min-height: 44px; background: none; border: 1px solid var(--premium-line); border-radius: 10px; cursor: pointer; color: var(--premium-ink); }
+  .premium-links:not(.is-open) { display: none !important; }
+  .premium-links.is-open { display: flex !important; flex-direction: column; width: 100%; order: 10; margin-top: 10px; padding: 10px; background: #ffffff; border: 1px solid #dce8e0; border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.06); gap: 4px; }
+  .premium-links.is-open button { width: 100%; text-align: left; min-height: 44px; padding: 10px 16px; font-size: 15px; border-radius: 8px; }
+  .premium-account { gap: 6px; }
+  .premium-account button { min-width: 38px; min-height: 40px; }
+}
 @media (max-width: 600px) {
-  .premium-account { width: 100%; justify-content: flex-end; }
-  .premium-account .header-ai-matcher { margin-right: auto; }
-  .public-nav-actions { flex-wrap: wrap; gap: 10px; }
-  body .home-page .app-nav { flex-wrap: wrap; gap: 16px; }
+  .premium-nav-inner { padding: 10px 14px; }
+  .premium-account { margin-left: 0; }
+  .premium-account .header-ai-matcher { max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+  .public-nav-actions { flex-wrap: wrap; gap: 8px; }
+  body .home-page .app-nav { flex-wrap: wrap; gap: 12px; padding: 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .premium-account .header-ai-matcher, .public-nav-actions .header-ai-matcher { animation: none; }

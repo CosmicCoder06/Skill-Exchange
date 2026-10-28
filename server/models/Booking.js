@@ -198,6 +198,31 @@ bookingSchema.index({
     time: 1
 });
 
+bookingSchema.index({
+    learner: 1,
+    date: -1,
+    time: -1,
+    createdAt: -1
+});
+
+bookingSchema.index({
+    mentor: 1,
+    date: -1,
+    time: -1,
+    createdAt: -1
+});
+
+bookingSchema.index({
+    mentor: 1,
+    status: 1,
+    createdAt: -1
+});
+
+bookingSchema.index({
+    status: 1,
+    actionExpiresAt: 1
+});
+
 module.exports =
     mongoose.models.Booking ||
     mongoose.model("Booking", bookingSchema);

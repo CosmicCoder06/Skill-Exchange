@@ -7,6 +7,7 @@ import {
     User,
     Shield
 } from "lucide-react";
+import { LogoMark } from "../common/Logo";
 
 export default function AdminSidebar({
     activeSection,
@@ -28,7 +29,9 @@ export default function AdminSidebar({
                 className="admin-brand"
                 onClick={() => onSectionChange("overview")}
             >
-                <div className="admin-brand-mark">↗</div>
+                <div className="admin-brand-mark" style={{ background: "transparent", border: 0, padding: 0 }}>
+                    <LogoMark size={34} />
+                </div>
                 <div className="admin-brand-copy">
                     <strong>SkillExchange</strong>
                     <small>ADMIN CONSOLE</small>

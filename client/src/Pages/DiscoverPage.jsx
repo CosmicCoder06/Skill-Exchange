@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./HomePage.css";
 import "./Discover.css";
+import { LogoMark } from "../Components/common/Logo";
 
 function DiscoverPage({
     token,
@@ -144,8 +145,9 @@ function DiscoverPage({
                 <button
                     className="app-logo"
                     onClick={onHome}
+                    aria-label="Skill Exchange home"
                 >
-                    <span className="logo-mark">↗</span>
+                    <LogoMark size={28} />
                     SkillExchange
                 </button>
 

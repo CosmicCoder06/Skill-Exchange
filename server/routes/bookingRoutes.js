@@ -14,7 +14,8 @@ const {
     cancelBooking,
     updateMeeting,
     getBookingPaymentQR,
-    submitBookingPayment
+    submitBookingPayment,
+    getPaymentProof
 } = require("../controllers/bookingController");
 
 
@@ -23,6 +24,7 @@ const authMiddleware =
     require("../Backend Configuration/Configuration Folders/Middleware Configuration/authMiddleware");
 
 router.get('/bookings/check-availability', authMiddleware, checkAvailability);
+router.get('/bookings/:id/payment-proof', authMiddleware, getPaymentProof);
 router.put('/bookings/:id/pay', authMiddleware, completeBookingPayment);
 router.get('/bookings/:id/payment-qr', authMiddleware, getBookingPaymentQR);
 router.post('/bookings/:id/submit-payment', authMiddleware, submitBookingPayment);
