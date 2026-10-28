@@ -680,9 +680,44 @@ const getBookingReview = async (
     }
 };
 
+// =====================================================
+// GET BOOKING IDS REVIEWED BY CURRENT USER
+// =====================================================
+
+const getMyReviewedBookings = async (req, res) => {
+    try {
+        const currentUserId = getCurrentUserId(req);
+
+        const reviews = await Review.find({
+            reviewer: currentUserId
+        })
+            .select("booking")
+            .lean();
+
+        const bookingIds = reviews
+            .map((r) => r.booking?.toString())
+            .filter(Boolean);
+
+        return res.json({
+            bookingIds
+        });
+    } catch (error) {
+        console.error(
+            "Get my reviewed bookings error:",
+            error
+        );
+
+        return res.status(500).json({
+            message: "Unable to load reviewed bookings",
+            bookingIds: []
+        });
+    }
+};
+
 module.exports = {
     createReview,
     getMyReviews,
+    getMyReviewedBookings,
     getUserReviews,
     getBookingReview
 };

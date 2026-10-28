@@ -1999,13 +1999,17 @@
 
     .admin-navigation {
         flex-direction: row;
-
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 8px;
     }
 
     .admin-nav-item {
-        min-width: 130px;
+        min-width: 120px;
+        min-height: 44px;
         white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .admin-sidebar-bottom {

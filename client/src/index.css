@@ -16,32 +16,53 @@ body {
   color: #10251d;
 }
 
-html, body, #root { max-width: 100%; overflow-x: hidden; }
-
-button { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease; }
-button:hover:not(:disabled) { transform: translateY(-2px); }
-button:active:not(:disabled) { transform: translateY(0); }
-
-html[data-theme="dark"] {
-  background: #0d1511;
+html, body, #root {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-html[data-theme="dark"] body {
-  background: #0d1511;
-}
-
-html[data-theme="dark"] #root {
-  filter: invert(1) hue-rotate(180deg);
-}
-
-html[data-theme="dark"] #root img,
-html[data-theme="dark"] #root video {
-  filter: invert(1) hue-rotate(180deg);
+img, video {
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
 }
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
+}
+
+/* Prevent auto-zoom on mobile inputs */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Accessible tap targets on mobile */
+@media (max-width: 480px) {
+  button,
+  a[role="button"],
+  .btn,
+  .action-btn {
+    min-height: 44px;
+  }
+}
+
+/* Ultra-wide container bounds */
+@media (min-width: 1920px) {
+  .app-premium-shell,
+  .home-page,
+  .discover-page,
+  .admin-page,
+  .bookings-page {
+    max-width: 1680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 /* @teamcosmiccoders */

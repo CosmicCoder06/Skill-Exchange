@@ -13,6 +13,7 @@ import {
     UserCheck
 } from "lucide-react";
 import "./LearnerDashboard.css";
+import { LogoMark } from "../../Components/common/Logo";
 
 function LearnerDashboard({
     token,
@@ -651,9 +652,12 @@ function LearnerDashboard({
 
             {/* FOOTER */}
             <footer className="learner-footer">
-                <div className="learner-footer-brand">
-                    <strong>Skill Exchange</strong>
-                    <span>Peer-to-peer knowledge network</span>
+                <div className="learner-footer-brand" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <LogoMark size={32} />
+                    <div>
+                        <strong>Skill Exchange</strong>
+                        <span>Peer-to-peer knowledge network</span>
+                    </div>
                 </div>
                 <div className="learner-footer-links">
                     <button type="button" onClick={onHome}>

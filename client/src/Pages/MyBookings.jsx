@@ -244,17 +244,16 @@ function MyBookings({
                         : []
                 );
 
-                // Populate reviewed bookings map
+                // Populate reviewed bookings map in one batch query
                 try {
-                    const revRes = await fetch(`${API}/reviews`, {
+                    const revRes = await fetch(`${API}/reviews/my-reviewed-bookings`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     if (revRes.ok) {
                         const revData = await revRes.json();
-                        if (Array.isArray(revData)) {
+                        if (Array.isArray(revData.bookingIds)) {
                             const revMap = {};
-                            revData.forEach((r) => {
-                                const bId = r.booking?._id || r.booking;
+                            revData.bookingIds.forEach((bId) => {
                                 if (bId) revMap[bId] = true;
                             });
                             setReviewedBookings((prev) => ({ ...prev, ...revMap }));
@@ -421,25 +420,7 @@ function MyBookings({
             [API, token]
         );
 
-    useEffect(() => {
-        const completedBookings =
-            bookings.filter(
-                (booking) =>
-                    booking.status ===
-                    "completed"
-            );
 
-        completedBookings.forEach(
-            (booking) => {
-                checkReviewStatus(
-                    booking._id
-                );
-            }
-        );
-    }, [
-        bookings,
-        checkReviewStatus
-    ]);
 
     async function updateBooking(
         bookingId,

@@ -2,7 +2,7 @@
 .mentor-state { display:grid; place-content:center; text-align:center; }
 .mentor-hero { display:flex; justify-content:space-between; gap:32px; padding-bottom:58px; border-bottom:1px solid #b9c9bd; }
 .mentor-kicker,.mentor-section-heading p { margin:0 0 12px; color:#23755b; font-size:11px; font-weight:900; letter-spacing:.16em; }
-.mentor-hero h1 { margin:0; max-width:720px; font-family:Georgia,serif; font-size:clamp(48px,7vw,94px); line-height:.9; font-weight:500; letter-spacing:-.075em; }
+.mentor-hero h1 { margin:0; max-width:720px; font-family:Georgia,serif; font-size:clamp(32px,7vw,94px); line-height:.95; font-weight:500; letter-spacing:-.05em; word-break:break-word; }
 .mentor-hero h1 em { color:#2b9c76; font-weight:400; }
 .mentor-lede { max-width:500px; margin:24px 0 0; color:#587067; font-size:17px; line-height:1.6; }
 .mentor-hero-actions { display:flex; align-items:flex-end; gap:15px; white-space:nowrap; }
@@ -77,7 +77,7 @@
 .filter-pill.active { background:#123d31; color:#ffffff; border-color:#123d31; }
 
 /* LEDGER TABLE */
-.ledger-table-container { overflow-x:auto; }
+.ledger-table-container { overflow-x:auto; -webkit-overflow-scrolling:touch; width:100%; max-width:100%; }
 .ledger-table { width:100%; border-collapse:collapse; text-align:left; font-size:13px; min-width:680px; }
 .ledger-table th { padding:12px 16px; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#486256; border-bottom:2px solid #d4dfd7; background:#fafbfa; }
 .ledger-table td { padding:14px 16px; border-bottom:1px solid #ebf1ec; color:#213a30; vertical-align:middle; }

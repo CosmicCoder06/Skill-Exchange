@@ -1221,13 +1221,17 @@
     transform: none;
 }
 
+.chat-mobile-back {
+    display: none;
+}
+
 @media (max-width: 900px) {
     .chat-main {
         padding: 18px;
     }
 
     .chat-workspace {
-        grid-template-columns: 320px minmax(0, 1fr);
+        grid-template-columns: 300px minmax(0, 1fr);
     }
 
     .new-chat-users {
@@ -1235,36 +1239,98 @@
     }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
+    .chat-mobile-back {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+        margin-right: 8px;
+        background: #eef3ef;
+        border: 1px solid #d4dfd7;
+        border-radius: 50%;
+        color: #123d31;
+        font-size: 18px;
+        font-weight: 800;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .chat-mobile-back:hover {
+        background: #e2ede5;
+    }
+
+    .chat-page {
+        min-height: 100dvh;
+        height: 100dvh;
+        overflow: hidden;
+    }
+
     .chat-nav {
-        width: 62px;
-    }
-
-    .chat-main {
-        width: calc(100% - 62px);
-        margin-left: 62px;
-        padding: 12px;
-    }
-
-    .chat-workspace {
-        grid-template-columns: 1fr;
-        height: calc(100vh - 115px);
-    }
-
-    .chat-sidebar {
         display: none;
     }
 
-    .chat-topbar h1 {
-        font-size: 2rem;
+    .chat-main {
+        width: 100%;
+        margin-left: 0;
+        padding: 10px 12px 14px;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
     }
 
-    .chat-topbar-right {
-        gap: 10px;
+    .chat-topbar {
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+        flex-shrink: 0;
+    }
+
+    .chat-topbar h1 {
+        font-size: 1.6rem;
+    }
+
+    .chat-workspace {
+        flex: 1 1 0;
+        min-height: 0;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .chat-workspace.no-selected .chat-thread {
+        display: none !important;
+    }
+
+    .chat-workspace.no-selected .chat-sidebar {
+        display: flex !important;
+        width: 100%;
+        flex: 1 1 0;
+        min-height: 0;
+        height: 100%;
+    }
+
+    .chat-workspace.has-selected .chat-sidebar {
+        display: none !important;
+    }
+
+    .chat-workspace.has-selected .chat-thread {
+        display: flex !important;
+        width: 100%;
+        flex: 1 1 0;
+        min-height: 0;
+        height: 100%;
     }
 
     .message-bubble {
-        max-width: 82%;
+        max-width: 86%;
+    }
+
+    .chat-sidebar {
+        width: 100%;
     }
 }
 /* @teamcosmiccoders */

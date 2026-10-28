@@ -2,11 +2,12 @@ import ThemeToggle from '../Components/ThemeToggle';
 import { AIExtension } from '../AIExtension';
 import "./HomePage.css";
 import "./Landing.css";
+import { LogoMark } from '../Components/common/Logo';
 
 function HomePage({ onDiscover, onProfile, onMessages, publicMode = false, onLogin, onRegister }) {
     return <main className="home-page">
         <nav className="app-nav">
-            <button className="app-logo" onClick={onDiscover}><span>↗</span> SkillExchange</button>
+            <button className="app-logo" onClick={onDiscover} aria-label="Skill Exchange home"><LogoMark size={32} /> SkillExchange</button>
             {
             publicMode ? <div className="public-nav-actions"><AIExtension onRequireLogin={onLogin} /><ThemeToggle />
                 <button className="home-text-button" onClick={onLogin}>Log in</button>

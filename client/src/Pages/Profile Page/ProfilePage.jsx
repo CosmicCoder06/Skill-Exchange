@@ -4,6 +4,8 @@ import "./ProfilePage.css";
 function ProfilePage({
     token,
     profileStatus,
+    initialProfile,
+    onProfileUpdated,
     onHome,
     onDashboard,
     onLogout,
@@ -11,8 +13,10 @@ function ProfilePage({
     onBookings,
     onCompleteProfile
 }) {
-    const [profile, setProfile] = useState(null);
-    const [profileComplete, setProfileComplete] = useState(false);
+    const [profile, setProfile] = useState(initialProfile || null);
+    const [profileComplete, setProfileComplete] = useState(
+        profileStatus === true || Boolean(initialProfile?.bio)
+    );
 
     const [reviewsData, setReviewsData] = useState({
         stats: {
@@ -35,85 +39,77 @@ function ProfilePage({
     const [showPhoto, setShowPhoto] = useState(false);
 
     useEffect(() => {
-        async function fetchProfile() {
-            try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/profile/me`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.message || "Unable to load profile"
-                    );
-                }
-
-                setProfile(data.profile);
-                setProfileComplete(
-                    data.profileComplete === true
-                );
-            } catch (error) {
-                console.error("Profile fetch error:", error);
-            }
+        if (initialProfile) {
+            setProfile(initialProfile);
+            setProfileComplete(
+                profileStatus === true || Boolean(initialProfile?.bio)
+            );
         }
-
-        if (token) fetchProfile();
-    }, [token]);
+    }, [initialProfile, profileStatus]);
 
     useEffect(() => {
-        async function fetchReviews() {
+        if (!token) return;
+
+        let isMounted = true;
+        async function loadProfileAndReviews() {
+            setReviewsLoading(true);
+
+            const profilePromise = !initialProfile
+                ? fetch(`${import.meta.env.VITE_API_URL}/profile/me`, {
+                      headers: { Authorization: `Bearer ${token}` }
+                  }).then((res) => (res.ok ? res.json() : null))
+                : Promise.resolve(null);
+
+            const reviewsPromise = fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then((res) => (res.ok ? res.json() : null));
+
             try {
-                setReviewsLoading(true);
+                const [profData, revData] = await Promise.all([
+                    profilePromise,
+                    reviewsPromise
+                ]);
 
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/reviews`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.message || "Unable to load reviews"
-                    );
+                if (isMounted && profData?.profile) {
+                    setProfile(profData.profile);
+                    setProfileComplete(profData.profileComplete === true);
+                    if (onProfileUpdated) onProfileUpdated(profData.profile);
                 }
 
-                setReviewsData({
-                    stats: data.stats || {
-                        average: 0,
-                        totalReceived: 0,
-                        totalGiven: 0,
-                        distribution: {
-                            5: 0,
-                            4: 0,
-                            3: 0,
-                            2: 0,
-                            1: 0
-                        }
-                    },
-                    reviews: Array.isArray(data.reviews)
-                        ? data.reviews
-                        : []
-                });
+                if (isMounted && revData) {
+                    setReviewsData({
+                        stats: revData.stats || {
+                            average: 0,
+                            totalReceived: 0,
+                            totalGiven: 0,
+                            distribution: {
+                                5: 0,
+                                4: 0,
+                                3: 0,
+                                2: 0,
+                                1: 0
+                            }
+                        },
+                        reviews: Array.isArray(revData.reviews)
+                            ? revData.reviews
+                            : []
+                    });
+                }
             } catch (error) {
-                console.error("Reviews fetch error:", error);
+                console.error("Profile/Reviews load error:", error);
             } finally {
-                setReviewsLoading(false);
+                if (isMounted) {
+                    setReviewsLoading(false);
+                }
             }
         }
 
-        if (token) fetchReviews();
-    }, [token]);
+        loadProfileAndReviews();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [token, initialProfile]);
 
     if (!profile) {
         return (

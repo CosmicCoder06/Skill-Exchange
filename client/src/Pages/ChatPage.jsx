@@ -726,7 +726,7 @@ export default function ChatPage({
                     </div>
                 ) : null}
 
-                <section className="chat-workspace">
+                <section className={`chat-workspace ${selectedConversation ? "has-selected" : "no-selected"}`}>
                     <section className="chat-sidebar" aria-label="Conversations">
                         <div className="sidebar-title-row">
                             <div>
@@ -909,6 +909,15 @@ export default function ChatPage({
                         ) : selectedConversation ? (
                             <>
                                 <header className="thread-header">
+                                    <button
+                                        type="button"
+                                        className="chat-mobile-back"
+                                        onClick={() => setSelectedId(null)}
+                                        aria-label="Back to conversations"
+                                        title="Back to conversations"
+                                    >
+                                        ←
+                                    </button>
                                     {showMessageSearch ? (
                                         <div className="thread-inline-search">
                                             <span
