@@ -97,18 +97,15 @@ const updateProfile = async (req, res) => {
         } = req.body;
 
         // -------------------------
-        // Validate bio
+        // Validate bio (allows partial/short bio without blocking)
         // -------------------------
 
         if (
             bio !== undefined &&
-            (
-                typeof bio !== "string" ||
-                !bio.trim()
-            )
+            typeof bio !== "string"
         ) {
             return res.status(400).json({
-                message: "Bio cannot be empty."
+                message: "Bio must be a string."
             });
         }
 
@@ -156,30 +153,8 @@ const updateProfile = async (req, res) => {
                 ? cleanStringList(skillsToLearn)
                 : undefined;
 
-        // -------------------------
-        // Profile completion rules
-        // -------------------------
-
-        if (
-            req.user.role !== "admin" &&
-            skillsToTeach !== undefined &&
-            cleanedSkillsToTeach.length === 0
-        ) {
-            return res.status(400).json({
-                message: "Add at least one skill you can teach."
-            });
-        }
-
-        if (
-            req.user.role !== "mentor" &&
-            req.user.role !== "admin" &&
-            skillsToLearn !== undefined &&
-            cleanedSkillsToLearn.length === 0
-        ) {
-            return res.status(400).json({
-                message: "Add at least one skill you want to learn."
-            });
-        }
+        // Partial updates are allowed: users can save changes incrementally.
+        // calculateProfileComplete below will track whether profile is 100% complete without blocking save.
 
         // -------------------------
         // Validate availability
@@ -203,7 +178,7 @@ const updateProfile = async (req, res) => {
         // Validate hourly rate
         // -------------------------
 
-        if (hourlyRate !== undefined) {
+        if (hourlyRate !== undefined && hourlyRate !== null && hourlyRate !== "") {
             const numericRate = Number(hourlyRate);
 
             if (

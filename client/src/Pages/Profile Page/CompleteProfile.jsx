@@ -114,99 +114,69 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
             .map((item) => item.trim())
             .filter(Boolean);
     }
-       function validateProfile() {
-    const bio = formData.bio.trim();
-
-    const skillsToTeach = [
-        ...new Set(
-            asList(formData.skillsToTeach).map((skill) =>
-                skill.toLowerCase()
+    function validateProfile() {
+        // Allow partial updates: only validate format errors when values are entered
+        if (
+            formData.hourlyRate !== "" &&
+            formData.hourlyRate !== null &&
+            formData.hourlyRate !== undefined &&
+            (
+                !Number.isFinite(Number(formData.hourlyRate)) ||
+                Number(formData.hourlyRate) < 0
             )
-        )
-    ];
-
-    const skillsToLearn = [
-        ...new Set(
-            asList(formData.skillsToLearn).map((skill) =>
-                skill.toLowerCase()
-            )
-        )
-    ];
-
-    if (role === "admin") {
-        if (bio.length > 0 && bio.length < 5) {
-            return "Bio should contain at least 5 characters.";
-        }
-    } else {
-        if (bio.length < 10) {
-            return "Bio must contain at least 10 characters.";
+        ) {
+            return "Hourly rate must be a valid non-negative number (use 0 for free sessions).";
         }
 
-        if (skillsToTeach.length === 0) {
-            return "Add at least one skill you can teach.";
+        if (formData.payoutUpiId && formData.payoutUpiId.trim()) {
+            const trimmedUpi = formData.payoutUpiId.trim();
+            if (!/^[\w.-]+@[\w.-]+$/.test(trimmedUpi)) {
+                return "Invalid UPI ID format. Expected format: username@bank";
+            }
         }
 
-        if (role !== "mentor" && skillsToLearn.length === 0) {
-            return "Add at least one skill you want to learn.";
-        }
-    }
-
-    if (role === "mentor" && (formData.hourlyRate === "" || formData.hourlyRate === null || formData.hourlyRate === undefined)) {
-        return "Please set your hourly rate (enter 0 for free sessions).";
-    }
-
-    if (
-        formData.hourlyRate !== "" &&
-        (
-            !Number.isFinite(Number(formData.hourlyRate)) ||
-            Number(formData.hourlyRate) < 0
-        )
-    ) {
-        return "Hourly rate must be a valid non-negative number (use 0 for free sessions).";
-    }
-
-    const validateUrl = (value, fieldName) => {
-        if (!value || !value.trim()) {
-            return null;
-        }
-
-        if (value.startsWith("data:image/")) {
-            return null;
-        }
-
-        try {
-            const url = new URL(value.trim());
-
-            if (url.protocol !== "http:" && url.protocol !== "https:") {
-                return `${fieldName} must use http or https.`;
+        const validateUrl = (value, fieldName) => {
+            if (!value || !value.trim()) {
+                return null;
             }
 
-            return null;
-        } catch {
-            return `${fieldName} must be a valid URL.`;
+            if (value.startsWith("data:image/")) {
+                return null;
+            }
+
+            try {
+                const url = new URL(value.trim());
+
+                if (url.protocol !== "http:" && url.protocol !== "https:") {
+                    return `${fieldName} must use http or https.`;
+                }
+
+                return null;
+            } catch {
+                return `${fieldName} must be a valid URL.`;
+            }
+        };
+
+        const avatarError = validateUrl(
+            formData.avatarUrl,
+            "Profile image URL"
+        );
+
+        if (avatarError) {
+            return avatarError;
         }
-    };
 
-    const avatarError = validateUrl(
-        formData.avatarUrl,
-        "Profile image URL"
-    );
+        const coverError = validateUrl(
+            formData.coverImageUrl,
+            "Cover image URL"
+        );
 
-    if (avatarError) {
-        return avatarError;
+        if (coverError) {
+            return coverError;
+        }
+
+        return "";
     }
-
-    const coverError = validateUrl(
-        formData.coverImageUrl,
-        "Cover image URL"
-    );
-
-    if (coverError) {
-        return coverError;
-    }
-
-    return "";
-}
 
 
 
@@ -276,8 +246,9 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
             );
 
             if (!response.ok) {
+                const errData = await response.json().catch(() => null);
                 throw new Error(
-                    "Could not save profile"
+                    errData?.message || "Could not save profile"
                 );
             }
 
@@ -347,7 +318,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                         <p>
                             {role === "admin"
                                 ? "Update your administrator details, photo, and bio."
-                                : "Fields marked * are required."}
+                                : "Update any information at any time. You can save changes whenever you like."}
                         </p>
 
                     </div>
@@ -356,7 +327,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                     {/* FULL NAME */}
 
                     <label>
-                        Full Name {role !== "admin" && <b>*</b>}
+                        Full Name
 
                         <input
                             name="name"
@@ -444,7 +415,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                     {/* BIO */}
 
                     <label>
-                        About you {role !== "admin" && <b>*</b>}
+                        About you
 
                         <textarea
                             name="bio"
@@ -461,7 +432,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
                         <div className="form-grid">
 
                             <label>
-                                Skills you can teach <b>*</b>
+                                Skills you can teach
 
                                 <input
                                     name="skillsToTeach"
@@ -475,7 +446,7 @@ function CompleteProfile({ token, role, onComplete, onLater }) {
 
 
                             {role !== "mentor" && <label>
-                                Skills you want to learn <b>*</b>
+                                Skills you want to learn
 
                                 <input
                                     name="skillsToLearn"

@@ -467,7 +467,7 @@ function App() {
                         setProfileStatus(true);
 
                         resetNavigation(
-                            dashboardPageForRole()
+                            page === "profile" ? "profile" : dashboardPageForRole()
                         );
                     }}
                     onLater={() => {
@@ -479,7 +479,7 @@ function App() {
                         setProfileStatus("skipped");
 
                         resetNavigation(
-                            dashboardPageForRole()
+                            page === "profile" ? "profile" : dashboardPageForRole()
                         );
                     }}
                 />
