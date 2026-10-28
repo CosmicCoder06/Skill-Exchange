@@ -298,8 +298,13 @@ async function updateUser(req, res) {
 
     const updates = {};
     if (req.body.role !== undefined) {
-      if (!USER_ROLES.has(req.body.role)) {
-        return res.status(400).json({ message: "Invalid role. Role must be learner, mentor, or admin." });
+      if (req.body.role === "admin") {
+        return res.status(403).json({
+          message: "Privilege escalation blocked: Administrators cannot promote other users to the admin role.",
+        });
+      }
+      if (!["learner", "mentor"].includes(req.body.role)) {
+        return res.status(400).json({ message: "Invalid role. Role must be learner or mentor." });
       }
       updates.role = req.body.role;
     }

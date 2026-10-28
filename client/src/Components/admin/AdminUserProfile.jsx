@@ -214,12 +214,14 @@ export default function AdminUserProfile({
                         <select
                             id="admin-change-role-select"
                             value={userData.role || "learner"}
-                            disabled={actionBusy}
+                            disabled={actionBusy || userData.role === "admin"}
                             onChange={(e) => handleRoleChange(e.target.value)}
                         >
                             <option value="learner">Learner</option>
                             <option value="mentor">Mentor</option>
-                            <option value="admin">Admin</option>
+                            {userData.role === "admin" && (
+                                <option value="admin" disabled>Admin</option>
+                            )}
                         </select>
                     </div>
 

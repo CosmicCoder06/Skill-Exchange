@@ -283,7 +283,8 @@ export default function AdminUserTable({
                                             }
                                             disabled={
                                                 busy ||
-                                                isSelf
+                                                isSelf ||
+                                                user.role === "admin"
                                             }
                                             onChange={(e) =>
                                                 handleRoleChange(
@@ -300,9 +301,11 @@ export default function AdminUserTable({
                                                 Mentor
                                             </option>
 
-                                            <option value="admin">
-                                                Admin
-                                            </option>
+                                            {user.role === "admin" && (
+                                                <option value="admin" disabled>
+                                                    Admin
+                                                </option>
+                                            )}
                                         </select>
                                     </td>
 

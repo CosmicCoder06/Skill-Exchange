@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./BookingPage.css";
 
 function BookingPage({
@@ -18,6 +18,9 @@ function BookingPage({
     const [message, setMessage] = useState("");
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showCustomDate, setShowCustomDate] = useState(false);
+    const [showCustomTime, setShowCustomTime] = useState(false);
+
     const [availability, setAvailability] = useState({
         checking: false,
         available: null,
@@ -47,7 +50,7 @@ function BookingPage({
                 try {
                     data = text ? JSON.parse(text) : null;
                 } catch {
-                    // Non-JSON response (e.g. 404 HTML during rolling deployment)
+                    // Non-JSON response
                 }
 
                 if (res.ok && data?.mentor) {
@@ -197,9 +200,92 @@ function BookingPage({
         !availability.checking &&
         availability.available !== false;
 
+    // Generate upcoming 14 days list for the interactive date selector
+    const upcomingDays = useMemo(() => {
+        const days = [];
+        const today = new Date();
+        for (let i = 0; i < 14; i++) {
+            const d = new Date(today);
+            d.setDate(today.getDate() + i);
+            const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+            let dayLabel;
+            if (i === 0) dayLabel = "Today";
+            else if (i === 1) dayLabel = "Tomorrow";
+            else dayLabel = d.toLocaleDateString("en-US", { weekday: "short" });
+
+            const dayNumber = d.getDate();
+            const monthLabel = d.toLocaleDateString("en-US", { month: "short" });
+
+            days.push({
+                iso,
+                dayLabel,
+                dayNumber,
+                monthLabel
+            });
+        }
+        return days;
+    }, []);
+
+    // Time slot options grouped by time of day
+    const timeSlotGroups = [
+        {
+            groupName: "Morning",
+            icon: "🌅",
+            slots: [
+                { label: "09:00 AM", value: "09:00" },
+                { label: "10:00 AM", value: "10:00" },
+                { label: "11:00 AM", value: "11:00" }
+            ]
+        },
+        {
+            groupName: "Afternoon",
+            icon: "☀️",
+            slots: [
+                { label: "12:00 PM", value: "12:00" },
+                { label: "01:00 PM", value: "13:00" },
+                { label: "02:00 PM", value: "14:00" },
+                { label: "03:00 PM", value: "15:00" },
+                { label: "04:00 PM", value: "16:00" }
+            ]
+        },
+        {
+            groupName: "Evening",
+            icon: "🌆",
+            slots: [
+                { label: "05:00 PM", value: "17:00" },
+                { label: "06:00 PM", value: "18:00" },
+                { label: "07:00 PM", value: "19:00" },
+                { label: "08:00 PM", value: "20:00" },
+                { label: "09:00 PM", value: "21:00" }
+            ]
+        }
+    ];
+
+    // Helper to format chosen time for display
+    function formatTimeDisplay(timeStr) {
+        if (!timeStr) return "";
+        const [h, m] = timeStr.split(":").map(Number);
+        if (Number.isNaN(h)) return timeStr;
+        const period = h >= 12 ? "PM" : "AM";
+        const standardHour = h % 12 === 0 ? 12 : h % 12;
+        return `${String(standardHour).padStart(2, "0")}:${String(m || 0).padStart(2, "0")} ${period}`;
+    }
+
+    // Helper to check if a slot on today's date has already passed
+    function isSlotInPast(slotValue) {
+        const todayIso = new Date().toISOString().split("T")[0];
+        if (date !== todayIso) return false;
+        const [slotH, slotM] = slotValue.split(":").map(Number);
+        const now = new Date();
+        const currentH = now.getHours();
+        const currentM = now.getMinutes();
+        return slotH < currentH || (slotH === currentH && slotM <= currentM);
+    }
+
     async function createBooking() {
         if (!date || !time) {
-            alert("Please select date and time.");
+            alert("Please select a date and a time slot.");
             return;
         }
 
@@ -257,6 +343,19 @@ function BookingPage({
     }
 
     const displayName = mentor?.name || mentorName || "Mentor";
+    const avatarInitial = displayName.charAt(0).toUpperCase();
+
+    const skillsList = Array.isArray(mentor?.skillsToTeach)
+        ? mentor.skillsToTeach
+        : typeof mentor?.skillsToTeach === "string"
+        ? mentor.skillsToTeach.split(",").map((s) => s.trim()).filter(Boolean)
+        : Array.isArray(mentor?.skills)
+        ? mentor.skills
+        : [];
+
+    const ratingVal = typeof mentor?.averageRating === "number" && mentor.averageRating > 0
+        ? mentor.averageRating.toFixed(1)
+        : null;
 
     if (success) {
         return (
@@ -269,24 +368,20 @@ function BookingPage({
                         <div className="receipt-line line-three"></div>
                     </div>
 
-                    <p className="success-eyebrow">
-                        TIME SLOT REQUESTED
-                    </p>
-
+                    <p className="success-eyebrow">TIME SLOT REQUESTED</p>
                     <h1>Request submitted</h1>
 
                     <p className="success-main-text">
-                        Your session request with{" "}
-                        <strong>{displayName}</strong> for <strong>{duration} minutes</strong> has been sent.
+                        Your session request with <strong>{displayName}</strong> for <strong>{duration} minutes</strong> on{" "}
+                        <strong>{date}</strong> at <strong>{formatTimeDisplay(time)}</strong> has been sent.
                     </p>
 
                     <div className="pending-notice">
                         <span className="pending-dot"></span>
-
                         <div>
                             <strong>Step 1 Complete: Waiting for mentor approval</strong>
                             <p>
-                                Once your mentor approves the time slot, payment options will become available in My Sessions to confirm your booking.
+                                Once your mentor approves this time slot, payment options will become available in My Sessions to confirm your booking.
                             </p>
                         </div>
                     </div>
@@ -301,175 +396,383 @@ function BookingPage({
 
     return (
         <main className="booking-page">
-            {onBack && (
-                <button
-                    type="button"
-                    className="booking-back"
-                    onClick={onBack}
-                    disabled={loading}
-                >
-                    ← Back
-                </button>
-            )}
-
-            <section className="booking-card">
-                <p className="booking-eyebrow">
-                    SESSION BOOKING
-                </p>
-
-                <h1>Book Session</h1>
-
-                <p className="booking-with">
-                    With {displayName}
-                </p>
-
-                {mentorError && (
-                    <div
-                        role="alert"
-                        style={{
-                            padding: "10px 14px",
-                            marginBottom: "16px",
-                            borderRadius: "6px",
-                            background: "#fef3f2",
-                            border: "1px solid #fee4e2",
-                            color: "#b42318",
-                            fontSize: "13px"
-                        }}
+            <header className="booking-top-bar">
+                {onBack && (
+                    <button
+                        type="button"
+                        className="booking-back-btn"
+                        onClick={onBack}
+                        disabled={loading}
                     >
-                        ⚠️ {mentorError}
-                    </div>
+                        ← Back
+                    </button>
                 )}
-
-                <div className="booking-approval-steps-card">
-                    <div className="approval-step-item">
-                        <span className="step-num active">1</span>
-                        <div>
-                            <strong>Pick Time & Duration</strong>
-                            <small>Check slot availability</small>
-                        </div>
-                    </div>
-                    <div className="approval-step-item">
-                        <span className="step-num">2</span>
-                        <div>
-                            <strong>Mentor Approval</strong>
-                            <small>Mentor approves slot</small>
-                        </div>
-                    </div>
-                    <div className="approval-step-item">
-                        <span className="step-num">3</span>
-                        <div>
-                            <strong>Pay & Confirm</strong>
-                            <small>Confirm with payment</small>
-                        </div>
-                    </div>
+                <div className="booking-breadcrumbs">
+                    <span>Mentors</span>
+                    <span className="crumb-sep">/</span>
+                    <span className="crumb-active">{displayName}</span>
+                    <span className="crumb-sep">/</span>
+                    <span className="crumb-step">Schedule 1-on-1</span>
                 </div>
+            </header>
 
-                <label>Session Duration</label>
-                <div className="duration-pill-group">
-                    {[30, 45, 60, 90, 120].map((mins) => (
-                        <button
-                            key={mins}
-                            type="button"
-                            className={`duration-pill ${duration === mins ? "active" : ""}`}
-                            onClick={() => setDuration(mins)}
-                            disabled={loading || mentorLoading}
-                        >
-                            {mins >= 60 ? (mins === 60 ? "1 hr" : `${mins / 60} hrs`) : `${mins} mins`}
-                        </button>
-                    ))}
-                </div>
+            <div className="booking-container">
+                {/* LEFT SIDEBAR: MENTOR INFO & ESCROW SUMMARY */}
+                <aside className="booking-sidebar">
+                    <div className="mentor-profile-card">
+                        <div className="mentor-avatar-badge">
+                            <div className="mentor-avatar">{avatarInitial}</div>
+                            <span className="mentor-online-dot" title="Active Mentor"></span>
+                        </div>
 
-                <label>Select Date</label>
-                <input
-                    type="date"
-                    value={date}
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={(e) => setDate(e.target.value)}
-                    disabled={loading || mentorLoading}
-                />
+                        <div className="mentor-info">
+                            <h2>{displayName}</h2>
+                            <p className="mentor-role-headline">
+                                {mentor?.headline || mentor?.title || "Skill Exchange Verified Mentor"}
+                            </p>
 
-                <label>Select Time</label>
-                <input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    disabled={loading || mentorLoading}
-                />
+                            <div className="mentor-badges-row">
+                                <span className="rate-badge-pill">{rateDisplay}</span>
+                                {ratingVal ? (
+                                    <span className="rating-pill">★ {ratingVal}</span>
+                                ) : (
+                                    <span className="rating-pill new-badge">★ New Mentor</span>
+                                )}
+                            </div>
+                        </div>
 
-                {date && time && (
-                    <div className={`slot-availability-badge ${availability.checking ? "checking" : availability.available ? "available" : "unavailable"}`}>
-                        {availability.checking ? (
-                            <span>⏳ Checking slot availability…</span>
-                        ) : availability.available ? (
-                            <span>✓ Time slot is available for {duration} mins</span>
-                        ) : (
-                            <span>⚠️ {availability.message || "Time slot is unavailable. Please choose another time."}</span>
+                        {skillsList.length > 0 && (
+                            <div className="mentor-skills-section">
+                                <label>Teaches:</label>
+                                <div className="skills-pill-group">
+                                    {skillsList.slice(0, 5).map((skill, idx) => (
+                                        <span key={idx} className="skill-mini-pill">
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {mentor?.bio && (
+                            <p className="mentor-bio-preview">
+                                {mentor.bio.length > 140
+                                    ? `${mentor.bio.substring(0, 140)}...`
+                                    : mentor.bio}
+                            </p>
                         )}
                     </div>
-                )}
 
-                <label>Message (Optional)</label>
-                <textarea
-                    placeholder="Tell mentor about your goals or topics you want to cover"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    disabled={loading || mentorLoading}
-                />
-
-                <div className="pricing-calculation-card">
-                    <div className="pricing-calc-row">
-                        <span>Mentor Rate:</span>
-                        <strong>{rateDisplay}</strong>
-                    </div>
-                    <div className="pricing-calc-row">
-                        <span>Selected Duration:</span>
-                        <strong>{duration} minutes</strong>
-                    </div>
-                    <div className="pricing-calc-divider" />
-                    <div className="pricing-calc-total">
-                        <span>Calculated Fee:</span>
-                        <strong className="calc-amount">
-                            {feeDisplay}
-                        </strong>
+                    {/* ESCROW GUARANTEE CARD */}
+                    <div className="escrow-guarantee-card">
+                        <div className="escrow-header">
+                            <span className="escrow-icon">🛡️</span>
+                            <strong>100% Escrow Protection</strong>
+                        </div>
+                        <p>
+                            Learner payments are held safely in escrow and disbursed to the mentor only after the session completes. Full refund guaranteed if cancelled.
+                        </p>
                     </div>
 
-                    {!mentorLoading && !isRateConfigured && (
-                        <div
-                            role="alert"
-                            style={{
-                                padding: "8px 12px",
-                                marginTop: "12px",
-                                borderRadius: "6px",
-                                background: "#fef3f2",
-                                border: "1px solid #fee4e2",
-                                color: "#b42318",
-                                fontSize: "12px",
-                                lineHeight: 1.4
-                            }}
-                        >
-                            ⚠️ <strong>Rate not set:</strong> This mentor has not configured their hourly rate. Bookings cannot be requested until a rate is set in their profile.
+                    {/* LIVE PRICING CALCULATION */}
+                    <div className="pricing-calculation-card">
+                        <div className="pricing-calc-row">
+                            <span>Base Hourly Rate:</span>
+                            <strong>{rateDisplay}</strong>
+                        </div>
+                        <div className="pricing-calc-row">
+                            <span>Selected Length:</span>
+                            <strong>{duration} minutes</strong>
+                        </div>
+                        <div className="pricing-calc-divider" />
+                        <div className="pricing-calc-total">
+                            <span>Total Fee:</span>
+                            <strong className="calc-amount">{feeDisplay}</strong>
+                        </div>
+
+                        {!mentorLoading && !isRateConfigured && (
+                            <div className="pricing-warning-alert" role="alert">
+                                ⚠️ <strong>Rate not set:</strong> This mentor has not configured their hourly rate. Bookings cannot be requested until a rate is set in their profile.
+                            </div>
+                        )}
+
+                        <p className="pricing-payment-note">
+                            💡 <em>No payment required right now. Payment unlocks only after mentor approval.</em>
+                        </p>
+                    </div>
+
+                    {/* 3-STEP PROCESS CARD */}
+                    <div className="booking-steps-card">
+                        <div className="step-item step-active">
+                            <span className="step-number">1</span>
+                            <div>
+                                <strong>Request Time Slot</strong>
+                                <small>Pick date, time &amp; agenda</small>
+                            </div>
+                        </div>
+                        <div className="step-item">
+                            <span className="step-number">2</span>
+                            <div>
+                                <strong>Mentor Reviews</strong>
+                                <small>Slot is confirmed or adjusted</small>
+                            </div>
+                        </div>
+                        <div className="step-item">
+                            <span className="step-number">3</span>
+                            <div>
+                                <strong>Pay &amp; Join</strong>
+                                <small>Secure payment &amp; meet link</small>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                {/* RIGHT MAIN WORKSPACE: INTERACTIVE DATE & TIME SELECTOR */}
+                <section className="booking-main-panel">
+                    <div className="booking-main-header">
+                        <p className="booking-eyebrow">STEP 1 OF 3</p>
+                        <h1>Select Date &amp; Time Slot</h1>
+                        <p className="booking-panel-subtitle">
+                            Choose your preferred session duration, day, and time to connect with <strong>{displayName}</strong>.
+                        </p>
+                    </div>
+
+                    {mentorError && (
+                        <div className="mentor-error-banner" role="alert">
+                            ⚠️ {mentorError}
                         </div>
                     )}
 
-                    <p className="pricing-payment-note">
-                        💡 <em>Payment is unlocked after the mentor approves this time slot.</em>
-                    </p>
-                </div>
+                    {/* 1. DURATION SELECTOR */}
+                    <div className="booking-form-section">
+                        <div className="section-label-row">
+                            <label className="section-heading">
+                                1. Session Duration
+                            </label>
+                            <span className="section-selected-value">{duration} minutes selected</span>
+                        </div>
 
-                <button
-                    className="confirm-booking"
-                    onClick={createBooking}
-                    disabled={!canSubmit}
-                >
-                    {loading
-                        ? "Sending Request..."
-                        : mentorLoading
-                        ? "Loading Mentor..."
-                        : !isRateConfigured
-                        ? "Rate Not Configured — Cannot Book"
-                        : "Request Time Slot for Approval"}
-                </button>
-            </section>
+                        <div className="duration-pill-group">
+                            {[30, 45, 60, 90, 120].map((mins) => (
+                                <button
+                                    key={mins}
+                                    type="button"
+                                    className={`duration-pill-card ${duration === mins ? "active" : ""}`}
+                                    onClick={() => setDuration(mins)}
+                                    disabled={loading || mentorLoading}
+                                >
+                                    <span className="pill-mins">
+                                        {mins >= 60 ? (mins === 60 ? "1 hr" : `${mins / 60} hrs`) : `${mins} mins`}
+                                    </span>
+                                    <span className="pill-sub">
+                                        {mins === 30 ? "Quick intro" : mins === 60 ? "Standard deep-dive" : "Comprehensive"}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 2. INTERACTIVE DATE SELECTOR */}
+                    <div className="booking-form-section">
+                        <div className="section-label-row">
+                            <label className="section-heading">
+                                2. Select Date
+                            </label>
+                            {date ? (
+                                <span className="section-selected-value date-highlight">
+                                    🗓️ {date}
+                                </span>
+                            ) : (
+                                <span className="section-hint">Choose an upcoming date</span>
+                            )}
+                        </div>
+
+                        {/* Quick 14-day interactive selector */}
+                        <div className="date-chips-grid">
+                            {upcomingDays.map((d) => (
+                                <button
+                                    key={d.iso}
+                                    type="button"
+                                    className={`date-chip ${date === d.iso ? "active" : ""}`}
+                                    onClick={() => {
+                                        setDate(d.iso);
+                                        setShowCustomDate(false);
+                                    }}
+                                    disabled={loading || mentorLoading}
+                                >
+                                    <span className="date-chip-day">{d.dayLabel}</span>
+                                    <span className="date-chip-num">{d.dayNumber}</span>
+                                    <span className="date-chip-month">{d.monthLabel}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="custom-toggle-row">
+                            <button
+                                type="button"
+                                className="custom-toggle-btn"
+                                onClick={() => setShowCustomDate(!showCustomDate)}
+                            >
+                                {showCustomDate ? "▲ Hide calendar picker" : "▼ Pick a custom future date"}
+                            </button>
+                        </div>
+
+                        {showCustomDate && (
+                            <div className="custom-date-container">
+                                <label htmlFor="custom-date-input">Calendar Date:</label>
+                                <input
+                                    id="custom-date-input"
+                                    type="date"
+                                    value={date}
+                                    min={new Date().toISOString().split("T")[0]}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    disabled={loading || mentorLoading}
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 3. INTERACTIVE TIME SLOT SELECTOR */}
+                    <div className="booking-form-section">
+                        <div className="section-label-row">
+                            <label className="section-heading">
+                                3. Select Time Slot
+                            </label>
+                            {time ? (
+                                <span className="section-selected-value time-highlight">
+                                    ⏰ {formatTimeDisplay(time)} (IST)
+                                </span>
+                            ) : (
+                                <span className="section-hint">Select a time period below</span>
+                            )}
+                        </div>
+
+                        <div className="time-groups-wrapper">
+                            {timeSlotGroups.map((group) => (
+                                <div key={group.groupName} className="time-group-block">
+                                    <div className="time-group-header">
+                                        <span className="time-group-icon">{group.icon}</span>
+                                        <span className="time-group-title">{group.groupName}</span>
+                                    </div>
+
+                                    <div className="time-slots-grid">
+                                        {group.slots.map((s) => {
+                                            const isSelected = time === s.value;
+                                            const isPast = isSlotInPast(s.value);
+
+                                            return (
+                                                <button
+                                                    key={s.value}
+                                                    type="button"
+                                                    className={`time-slot-pill ${isSelected ? "active" : ""} ${isPast ? "slot-past" : ""}`}
+                                                    onClick={() => {
+                                                        setTime(s.value);
+                                                        setShowCustomTime(false);
+                                                    }}
+                                                    disabled={loading || mentorLoading || isPast}
+                                                    title={isPast ? "This slot has already passed today" : s.label}
+                                                >
+                                                    <span className="time-slot-text">{s.label}</span>
+                                                    {isPast && <span className="past-tag">Passed</span>}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="custom-toggle-row">
+                            <button
+                                type="button"
+                                className="custom-toggle-btn"
+                                onClick={() => setShowCustomTime(!showCustomTime)}
+                            >
+                                {showCustomTime ? "▲ Hide custom time input" : "▼ Enter custom time"}
+                            </button>
+                        </div>
+
+                        {showCustomTime && (
+                            <div className="custom-time-container">
+                                <label htmlFor="custom-time-input">Specify exact time:</label>
+                                <input
+                                    id="custom-time-input"
+                                    type="time"
+                                    value={time}
+                                    onChange={(e) => setTime(e.target.value)}
+                                    disabled={loading || mentorLoading}
+                                />
+                            </div>
+                        )}
+
+                        {/* LIVE AVAILABILITY FEEDBACK */}
+                        {date && time && (
+                            <div
+                                className={`slot-availability-banner ${
+                                    availability.checking
+                                        ? "checking"
+                                        : availability.available
+                                        ? "available"
+                                        : "unavailable"
+                                }`}
+                            >
+                                {availability.checking ? (
+                                    <span>⏳ Checking schedule availability with mentor...</span>
+                                ) : availability.available ? (
+                                    <span>✓ Slot is available! <strong>{date}</strong> at <strong>{formatTimeDisplay(time)}</strong> for {duration} mins.</span>
+                                ) : (
+                                    <span>⚠️ {availability.message || "Slot conflict: This time is already booked. Please pick another slot."}</span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 4. DISCUSSION TOPICS / MESSAGE */}
+                    <div className="booking-form-section">
+                        <label className="section-heading" htmlFor="booking-message-input">
+                            4. Topics &amp; Goals (Optional)
+                        </label>
+                        <p className="field-subtext">
+                            Help your mentor prepare by describing what you want to learn or discuss.
+                        </p>
+                        <textarea
+                            id="booking-message-input"
+                            className="booking-textarea"
+                            placeholder="e.g. I would like help troubleshooting a React state issue and learning best practices for system architecture."
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            disabled={loading || mentorLoading}
+                        />
+                    </div>
+
+                    {/* 5. SUBMIT ACTION */}
+                    <div className="booking-action-footer">
+                        <button
+                            className="request-booking-btn"
+                            onClick={createBooking}
+                            disabled={!canSubmit}
+                        >
+                            {loading
+                                ? "Submitting Request..."
+                                : mentorLoading
+                                ? "Loading Mentor Profile..."
+                                : !isRateConfigured
+                                ? "Rate Not Configured — Cannot Book"
+                                : !date
+                                ? "Select a Date to Continue"
+                                : !time
+                                ? "Select a Time Slot to Continue"
+                                : availability.available === false
+                                ? "Select an Available Time Slot"
+                                : "Request Time Slot for Approval →"}
+                        </button>
+
+                        <p className="booking-submit-disclaimer">
+                            🔒 <strong>No payment charged today.</strong> You only pay after your mentor confirms and approves this request.
+                        </p>
+                    </div>
+                </section>
+            </div>
         </main>
     );
 }
