@@ -858,7 +858,7 @@ function MyBookings({
 
         const duration = Number(booking.duration) || 60;
         const sessionEnded = getSessionEndDate(booking) <= Date.now();
-        const canLeaveReview = isCompleted && !alreadyReviewed && sessionEnded && !isMissed;
+        const canLeaveReview = (isCompleted || (isAccepted && sessionEnded)) && !alreadyReviewed;
 
         // Mentor's special rule: only until the mentor adds the link on accepted sessions
         const showMentorAddMeetingLink = isMentor && isAccepted && !booking.meetingUrl && !isMissed;
@@ -1627,7 +1627,7 @@ function MyBookings({
                     const sessionAmount = Number(detailsBooking.baseSessionAmount !== undefined ? detailsBooking.baseSessionAmount : detailsBooking.paymentAmount) || 0;
                     const isDetailsMissed = isMissedSession(detailsBooking);
                     const detailsSessionEnded = getSessionEndDate(detailsBooking) <= Date.now();
-                    const canDetailsReview = detailsBooking.status === "completed" && !reviewedBookings[detailsBooking._id] && detailsSessionEnded && !isDetailsMissed;
+                    const canDetailsReview = (detailsBooking.status === "completed" || (detailsBooking.status === "accepted" && detailsSessionEnded)) && !reviewedBookings[detailsBooking._id];
 
                     return (
                         <div className="session-details-modal-content">
@@ -1807,7 +1807,7 @@ function MyBookings({
                                     )}
 
                                     {/* Mark Complete on Accepted Sessions */}
-                                    {detailsBooking.status === "accepted" && !isDetailsMissed && (
+                                    {detailsBooking.status === "accepted" && (
                                         <button
                                             type="button"
                                             className="modal-action-complete-btn"

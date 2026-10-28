@@ -18,8 +18,7 @@ export default function AdminSidebar({
         { id: "overview", label: "Dashboard", icon: LayoutDashboard },
         { id: "members", label: "Members", icon: Users },
         { id: "payments", label: "Payments", icon: CreditCard },
-        { id: "sessions", label: "Sessions", icon: CalendarCheck2 },
-        { id: "profile", label: "My Profile", icon: User }
+        { id: "sessions", label: "Sessions", icon: CalendarCheck2 }
     ];
 
     return (
@@ -45,8 +44,7 @@ export default function AdminSidebar({
                     const Icon = item.icon;
                     const isActive =
                         activeSection === item.id ||
-                        (item.id === "members" && activeSection === "view-user") ||
-                        (item.id === "profile" && activeSection === "edit-profile");
+                        (item.id === "members" && activeSection === "view-user");
 
                     return (
                         <button

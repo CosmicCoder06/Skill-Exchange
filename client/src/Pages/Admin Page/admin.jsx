@@ -116,8 +116,7 @@ export default function AdminPage({ token, onLogout }) {
                 setActiveSection("payments");
             } else if (path === "/admin/members") {
                 setActiveSection("members");
-            } else if (path === "/admin/profile") {
-                setActiveSection("profile");
+
             }
         }
 
@@ -369,18 +368,7 @@ export default function AdminPage({ token, onLogout }) {
             description:
                 "Review scheduled sessions, booking statuses, and session meeting links.",
         },
-        profile: {
-            eyebrow: "ADMIN PROFILE",
-            title: "My profile",
-            description:
-                "View and edit your administrator profile details and avatar.",
-        },
-        "edit-profile": {
-            eyebrow: "ADMIN PROFILE",
-            title: "Edit profile",
-            description:
-                "Update your administrator details, profile photo, and bio.",
-        },
+
         "view-user": {
             eyebrow: "MEMBER DOSSIER",
             title: "User Profile",
@@ -570,50 +558,7 @@ export default function AdminPage({ token, onLogout }) {
                     )
                 )}
 
-                {activeSection === "profile" && (
-                    <div className="admin-profile-container">
-                        <div style={{ marginBottom: "16px" }}>
-                            <button
-                                type="button"
-                                className="admin-outline-button"
-                                onClick={() => handleSectionChange("overview")}
-                            >
-                                ← Back to Dashboard
-                            </button>
-                        </div>
-                        <ProfilePage
-                            token={token}
-                            onCompleteProfile={() => setActiveSection("edit-profile")}
-                            onDashboard={() => handleSectionChange("overview")}
-                            onLogout={onLogout}
-                            onHome={() => handleSectionChange("overview")}
-                        />
-                    </div>
-                )}
-
-                {activeSection === "edit-profile" && (
-                    <div className="admin-profile-container">
-                        <div style={{ marginBottom: "16px" }}>
-                            <button
-                                type="button"
-                                className="admin-outline-button"
-                                onClick={() => setActiveSection("profile")}
-                            >
-                                ← Back to Profile
-                            </button>
-                        </div>
-                        <CompleteProfile
-                            token={token}
-                            role="admin"
-                            onComplete={() => {
-                                showToast("Admin profile updated successfully!", "success");
-                                setActiveSection("profile");
-                            }}
-                            onLater={() => setActiveSection("profile")}
-                        />
-                    </div>
-                )}
-            </section>
+                </section>
         </main>
     );
 }

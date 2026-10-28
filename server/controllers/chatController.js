@@ -24,7 +24,7 @@ async function getActiveSessionInfo(participantA, participantB, bookingId = null
             return { isActive: false, activeSession: null, mostRecentPastSessionEnd: 0 }
         }
 
-        const bookings = await Booking.find(query).sort({ date: -1, time: -1 })
+        const bookings = await Booking.find(query).sort({ date: -1, time: -1 }).lean()
         const now = Date.now()
 
         let activeSession = null
@@ -37,7 +37,8 @@ async function getActiveSessionInfo(participantA, participantB, bookingId = null
             const durationMins = Number(b.duration) || 60
             const end = start + durationMins * 60 * 1000
 
-            if (now >= start && now <= end) {
+            // Unlocked from booking moment until session concludes
+            if (now <= end) {
                 activeSession = {
                     bookingId: b._id,
                     date: b.date,

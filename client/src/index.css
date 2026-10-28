@@ -66,3 +66,208 @@ select {
   }
 }
 /* @teamcosmiccoders */
+
+
+/* ========================================================
+   PROFILE PHOTO LIGHTBOX MODAL (CLEAN CIRCULAR VIEW)
+   ======================================================== */
+.profile-photo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: rgba(5, 12, 10, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: lightboxFadeIn 0.22s ease-out;
+}
+
+.profile-photo-lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 100000;
+}
+
+.profile-photo-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.profile-photo-lightbox-circle-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 90vw;
+  max-height: 90vh;
+  animation: lightboxScaleIn 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.profile-photo-lightbox-image {
+  width: min(340px, 75vw);
+  height: min(340px, 75vw);
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  border: 4px solid #10b981;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 8px rgba(16, 185, 129, 0.2);
+  background: #1e293b;
+  display: block;
+}
+
+.profile-photo-caption {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-photo-caption strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.profile-photo-caption span {
+  font-size: 0.9rem;
+  color: #a7f3d0 !important;
+  text-transform: capitalize;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes lightboxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes lightboxScaleIn {
+  from { transform: scale(0.88); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ========================================================
+   GLOBAL DARK THEME SUPPORT
+   ======================================================== */
+html[data-theme="dark"],
+html.dark,
+body.dark {
+  background-color: #0b1311 !important;
+  color: #e6f1ed !important;
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] body,
+body.dark {
+  background: #0b1311 !important;
+  color: #e6f1ed !important;
+}
+
+html[data-theme="dark"] .profile-workspace,
+html[data-theme="dark"] .app-premium-shell,
+html[data-theme="dark"] .home-page,
+html[data-theme="dark"] .discover-page,
+html[data-theme="dark"] .admin-page,
+html[data-theme="dark"] .bookings-page,
+html[data-theme="dark"] .chat-page,
+html[data-theme="dark"] .booking-calendar-section,
+html[data-theme="dark"] .other-profile-page {
+  background-color: #0b1311 !important;
+  color: #e6f1ed !important;
+}
+
+/* Sidebars and Navigation in Dark Mode */
+html[data-theme="dark"] .profile-sidebar,
+html[data-theme="dark"] .admin-sidebar,
+html[data-theme="dark"] .top-nav,
+html[data-theme="dark"] .chat-sidebar {
+  background: #111e1a !important;
+  border-color: #1e352e !important;
+  color: #e6f1ed !important;
+}
+
+/* Cards, Panels, Boxes in Dark Mode */
+html[data-theme="dark"] .booking-card,
+html[data-theme="dark"] .profile-card,
+html[data-theme="dark"] .admin-card,
+html[data-theme="dark"] .mentor-card,
+html[data-theme="dark"] .session-group-section,
+html[data-theme="dark"] .session-status-card,
+html[data-theme="dark"] .payment-summary-box,
+html[data-theme="dark"] .profile-main-card,
+html[data-theme="dark"] .profile-stat-box,
+html[data-theme="dark"] .other-profile-hero,
+html[data-theme="dark"] .other-profile-section,
+html[data-theme="dark"] .admin-stats-card,
+html[data-theme="dark"] .admin-table-container,
+html[data-theme="dark"] .chat-main,
+html[data-theme="dark"] .chat-thread,
+html[data-theme="dark"] .slots-offered-box,
+html[data-theme="dark"] .booking-detail-card,
+html[data-theme="dark"] .slot-option-card {
+  background: #13221e !important;
+  border-color: #1f3830 !important;
+  color: #e6f1ed !important;
+}
+
+/* Modal Content in Dark Mode */
+html[data-theme="dark"] .modal-content,
+html[data-theme="dark"] .modal-card,
+html[data-theme="dark"] .review-modal,
+html[data-theme="dark"] .session-details-modal-content {
+  background: #13221e !important;
+  border-color: #1f3830 !important;
+  color: #e6f1ed !important;
+}
+
+html[data-theme="dark"] .modal-overlay,
+html[data-theme="dark"] .modal-backdrop {
+  background: rgba(3, 7, 6, 0.82) !important;
+}
+
+/* Headings and Texts in Dark Mode */
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] strong {
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] p,
+html[data-theme="dark"] span,
+html[data-theme="dark"] label {
+  color: #c7ded6;
+}
+
+/* Inputs, Textareas, Selects in Dark Mode */
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background-color: #0c1814 !important;
+  border-color: #244137 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Table rows in Dark Mode */
+html[data-theme="dark"] tr:hover,
+html[data-theme="dark"] tbody tr:hover {
+  background-color: #182c27 !important;
+}

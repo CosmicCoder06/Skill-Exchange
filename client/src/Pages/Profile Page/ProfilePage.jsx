@@ -883,7 +883,7 @@ function ProfilePage({
                         >
                             <img
                                 className="profile-photo-lightbox-image"
-                                src={profile.avatarUrl}
+                                src={resolveImageUrl(profile.avatarUrl)}
                                 alt={`${profile.name}'s profile`}
                             />
                             <div className="profile-photo-caption">

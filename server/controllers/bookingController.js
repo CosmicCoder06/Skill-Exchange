@@ -735,10 +735,21 @@ const updateBookingStatus = async (req, res) => {
 
         if (requestedStatus === "completed") {
             if (!isMentor) {
-                return res.status(403).json({
-                    message:
-                        "Only the mentor can mark a session completed"
-                });
+                let sessionEnded = false;
+                if (booking.date && booking.time) {
+                    let d = new Date(`${booking.date}T${booking.time}`);
+                    if (Number.isNaN(d.getTime())) d = new Date(`${booking.date} ${booking.time}`);
+                    if (Number.isNaN(d.getTime())) d = new Date(booking.date);
+                    if (!Number.isNaN(d.getTime())) {
+                        const durationMins = Number(booking.duration) || 60;
+                        sessionEnded = (d.getTime() + durationMins * 60000) <= Date.now();
+                    }
+                }
+                if (!sessionEnded) {
+                    return res.status(403).json({
+                        message: "Only the mentor can mark a session completed before it concludes"
+                    });
+                }
             }
 
             if (booking.status !== "accepted") {

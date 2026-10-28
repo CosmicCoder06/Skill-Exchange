@@ -394,15 +394,32 @@ const createReview = async (req, res) => {
             });
         }
 
-        // Session must be completed
+        // Session must be completed or accepted session whose time has ended
         if (
             booking.status !==
             "completed"
         ) {
-            return res.status(400).json({
-                message:
-                    "You can review only a completed session"
-            });
+            let sessionEnded = false;
+            if (booking.date && booking.time) {
+                let d = new Date(`${booking.date}T${booking.time}`);
+                if (Number.isNaN(d.getTime())) d = new Date(`${booking.date} ${booking.time}`);
+                if (Number.isNaN(d.getTime())) d = new Date(booking.date);
+                if (!Number.isNaN(d.getTime())) {
+                    const durationMins = Number(booking.duration) || 60;
+                    sessionEnded = (d.getTime() + durationMins * 60000) <= Date.now();
+                }
+            }
+
+            if (booking.status === "accepted" && sessionEnded) {
+                booking.status = "completed";
+                booking.actionExpiresAt = null;
+                await booking.save();
+            } else {
+                return res.status(400).json({
+                    message:
+                        "You can review only a completed session"
+                });
+            }
         }
 
         // One review per booking per reviewer

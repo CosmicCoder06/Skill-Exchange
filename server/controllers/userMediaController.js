@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../Backend Configuration/Models/UserSchema/user");
 
 /**
@@ -7,6 +8,10 @@ const User = require("../Backend Configuration/Models/UserSchema/user");
 const getUserAvatar = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      res.setHeader("Content-Type", "image/svg+xml");
+      return res.status(200).send('<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect width="128" height="128" fill="#e2e8f0"/><text x="64" y="74" font-family="sans-serif" font-size="52" font-weight="bold" fill="#475569" text-anchor="middle" dominant-baseline="middle">U</text></svg>');
+    }
     const user = await User.findById(id).select("avatarUrl name").lean();
 
     if (!user || !user.avatarUrl) {

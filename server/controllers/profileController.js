@@ -344,7 +344,7 @@ const getUserProfile = async (req, res) => {
         }
 
         res.status(200).json({
-            profile: user
+            profile: sanitizeUserMedia(user)
         });
 
     } catch (error) {

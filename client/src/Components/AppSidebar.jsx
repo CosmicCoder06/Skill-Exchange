@@ -1,3 +1,4 @@
+import ThemeToggle from "./ThemeToggle";
 import "../Pages/Profile Page/ProfilePage.css";
 import { LogoMark } from "./common/Logo";
 
@@ -49,6 +50,10 @@ function AppSidebar({
                     <span className="sidebar-icon">⚙</span>
                     <span className="sidebar-text">Account</span>
                 </button>}
+            </div>
+
+            <div style={{ marginTop: "auto", display: "grid", placeItems: "center", padding: "8px 0" }}>
+                <ThemeToggle />
             </div>
 
             {showProfileControls && <button className="sidebar-item sidebar-logout" onClick={onLogout}>
