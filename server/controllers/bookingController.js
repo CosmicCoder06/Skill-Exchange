@@ -517,7 +517,7 @@ const createBooking = async (req, res) => {
 // GET MY BOOKINGS
 // =====================================================
 
-const listProjection = "_id date time duration status paymentStatus paymentAmount baseSessionAmount grossAmountWithGst learnerConvenienceFee mentorPlatformFee mentorEarnings totalAmountPaid topic notes meetingUrl cancellationReason createdAt updatedAt actionExpiresAt lastActionAt suggestedSlots razorpayOrderId razorpayPaymentId payoutStatus payoutReference payment.status payment.amount payment.platformFeePercent payment.platformFee payment.mentorPayout payment.razorpayOrderId payment.razorpayPaymentId payment.payoutRef payment.rejectReason payment.refundReason mentor learner";
+const listProjection = "_id date time duration status paymentStatus paymentAmount baseSessionAmount grossAmountWithGst learnerConvenienceFee mentorPlatformFee mentorEarnings totalAmountPaid topic message notes meetingUrl cancellationReason createdAt updatedAt actionExpiresAt lastActionAt suggestedSlots razorpayOrderId razorpayPaymentId payoutStatus payoutReference payment.status payment.amount payment.platformFeePercent payment.platformFee payment.mentorPayout payment.razorpayOrderId payment.razorpayPaymentId payment.payoutRef payment.rejectReason payment.refundReason mentor learner";
 
 const getBookings = async (req, res) => {
     try {

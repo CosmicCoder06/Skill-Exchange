@@ -200,6 +200,7 @@ function MyBookings({
     const [suggestSlotsBooking, setSuggestSlotsBooking] = useState(null);
     const [detailsBooking, setDetailsBooking] = useState(null);
     const [sessionTab, setSessionTab] = useState("active");
+    const [sectionPages, setSectionPages] = useState({});
     const [detailsReviews, setDetailsReviews] = useState({
         loading: false,
         learnerReview: null,
@@ -678,7 +679,8 @@ function MyBookings({
                 (booking) => {
                     const mentorId =
                         booking.mentor?._id ||
-                        booking.mentor?.id;
+                        booking.mentor?.id ||
+                        booking.mentor;
 
                     const isMentor =
                         String(
@@ -788,13 +790,13 @@ function MyBookings({
                 <div className="booking-grid">
                     {(() => {
                         const pageSize = 10;
-                        const page = sectionPages[id] || 1;
+                        const page = (sectionPages && sectionPages[id]) || 1;
                         return items.slice((page - 1) * pageSize, page * pageSize).map((booking) => renderBookingCard(booking));
                     })()}
                 </div>
                 {items.length > 10 && (() => {
                     const pageSize = 10;
-                    const page = sectionPages[id] || 1;
+                    const page = (sectionPages && sectionPages[id]) || 1;
                     const totalPages = Math.ceil(items.length / pageSize);
                     return (
                         <div className="section-pagination-bar" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "12px", marginTop: "16px" }}>
