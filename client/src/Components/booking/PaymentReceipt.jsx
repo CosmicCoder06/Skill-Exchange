@@ -492,10 +492,17 @@ export default function PaymentReceipt({
                     </div>
                     {sessionAmount > 0 && (
                         <>
-                            <div className="receipt-detail-item">
-                                <span className="item-label">Platform Fee ({bookingData.payment?.platformFeePercent || 10}%)</span>
-                                <strong className="item-val fee-deduct">-{formatCurrency(platformFee)}</strong>
-                            </div>
+                            {platformFee > 0 ? (
+                                <div className="receipt-detail-item">
+                                    <span className="item-label">Platform Fee ({bookingData.payment?.platformFeePercent || 0}%)</span>
+                                    <strong className="item-val fee-deduct">-{formatCurrency(platformFee)}</strong>
+                                </div>
+                            ) : (
+                                <div className="receipt-detail-item">
+                                    <span className="item-label">Platform Fee</span>
+                                    <strong className="item-val">₹0</strong>
+                                </div>
+                            )}
                             <div className="receipt-detail-item item-total-row">
                                 <span className="item-label">Net Mentor Payout</span>
                                 <strong className="item-val total-amount net-earnings">{formatCurrency(mentorPayout)}</strong>
@@ -577,7 +584,7 @@ export default function PaymentReceipt({
                 )}
 
                 <p className="mentor-fee-policy-footnote" style={{ marginTop: "12px", fontSize: "12px", color: "#64748b" }}>
-                    * Payments are collected securely via Razorpay and disbursed directly to you upon session completion.
+                    * Payments are collected securely via Razorpay and disbursed directly to you upon session completion with 0% platform deductions.
                 </p>
 
                 {error && <p className="receipt-error-alert" role="alert">{error}</p>}

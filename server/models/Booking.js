@@ -84,7 +84,7 @@ const bookingSchema = new mongoose.Schema(
                 default: 'awaiting_payment'
             },
             amount: { type: Number, default: 0, min: 0 },
-            platformFeePercent: { type: Number, default: 10 },
+            platformFeePercent: { type: Number, default: 0 },
             platformFee: { type: Number, default: 0, min: 0 },
             mentorPayout: { type: Number, default: 0, min: 0 },
             // Razorpay payment fields

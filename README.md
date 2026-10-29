@@ -29,15 +29,15 @@ The platform supports **learner**, **mentor**, and **administrator** roles. Sinc
 - Unlimited chat messaging automatically unlocked for the duration of a confirmed session, reverting to the free-message limit once the session ends
 
 ### Payments, Wallet & Receipts
-- Dynamic session pricing based on duration and hourly rate, with GST applied as per applicable rates
+- Dynamic session pricing based strictly on duration and hourly rate (0% platform fee, 0% application-level taxes, and ₹0 extra convenience fees)
 - **Skill Exchange Wallet** for both learners and mentors:
   - Simulated instant top-ups (no external payment gateway integrated yet)
   - Tracks **Earned Balance** (from completed sessions, withdrawable) separately from **Top-Up Balance** (manually loaded, spendable on sessions only)
 - Two ways to pay for a session:
   - **Wallet** — no extra charge
-  - **UPI/Card** — additional 3% convenience fee, which goes entirely to the platform
-- Separate, clearly formatted receipts for the booker and the host, itemizing session rate, GST, platform fee, and net payout
-- Host earnings (after a 3% platform fee) are credited to the host's wallet, pending manual settlement/withdrawal
+  - **Razorpay Checkout** (Cards, UPI, NetBanking) — 0% extra fees
+- Clear, transparent receipts for the booker and the host, displaying the exact session rate and 100% net payout to the mentor
+- Host earnings (full session rate without platform fee deductions) are credited to the host's wallet, pending manual settlement/withdrawal
 
 ---
 

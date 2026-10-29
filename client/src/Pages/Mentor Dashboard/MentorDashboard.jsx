@@ -350,7 +350,7 @@ function MentorDashboard({ token, onHome, onBookings }) {
                     <div className="mentor-fee-policy-note">
                         <div className="policy-icon-box">i</div>
                         <div className="policy-text">
-                            <strong>Platform Fee Policy (3%):</strong> Skill Exchange deducts a transparent 3% platform fee on verified completed sessions to maintain infrastructure, video room security, and dispute resolution. 18% GST collected on learner fees is paid to the government and is never deducted from your payout.
+                            <strong>Transparent Pricing Policy:</strong> Skill Exchange charges 0% platform fee and 0% application-level taxes. Mentors receive 100% of their session price.
                         </div>
                     </div>
 
@@ -435,9 +435,9 @@ function MentorDashboard({ token, onHome, onBookings }) {
                                         <tr>
                                             <th>Date & Time</th>
                                             <th>Learner</th>
-                                            <th>Gross Fee</th>
-                                            <th>Mentor Fee (3%)</th>
-                                            <th>Net Amount</th>
+                                            <th>Session Fee</th>
+                                            <th>Platform Fee</th>
+                                            <th>Earnings</th>
                                             <th>Payout Status</th>
                                         </tr>
                                     </thead>
@@ -460,7 +460,7 @@ function MentorDashboard({ token, onHome, onBookings }) {
                                                     <span className="fee-gross">₹{row.grossFee.toLocaleString("en-IN")}</span>
                                                 </td>
                                                 <td>
-                                                    <span className="fee-deduction">-₹{row.platformFee.toLocaleString("en-IN")}</span>
+                                                    <span className="fee-deduction">{row.platformFee > 0 ? `-₹${row.platformFee.toLocaleString("en-IN")}` : "₹0"}</span>
                                                 </td>
                                                 <td>
                                                     <span className="fee-net">₹{row.netAmount.toLocaleString("en-IN")}</span>

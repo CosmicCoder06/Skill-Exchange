@@ -460,7 +460,7 @@ const createBooking = async (req, res) => {
         const actionExpiresAt = new Date(now.getTime() + FOUR_HOURS_MS);
 
         const basePaise = Math.round((payment.baseSessionAmount || 0) * 100);
-        const mentorFeePaise = Math.round(basePaise * 0.03);
+        const mentorFeePaise = 0;
         const mentorPayoutPaise = basePaise - mentorFeePaise;
 
         // Create booking
@@ -894,6 +894,9 @@ const completeBookingPayment = async (req, res) => {
         booking.mentorPlatformFee = payment.mentorPlatformFee || 0;
         booking.mentorEarnings = payment.mentorEarnings || 0;
         booking.totalAmountPaid = payment.totalAmountPaid || payment.paymentAmount;
+        booking.grossPaise = Math.round(booking.baseSessionAmount * 100);
+        booking.mentorFeePaise = 0;
+        booking.mentorPayoutPaise = Math.round(booking.baseSessionAmount * 100);
         booking.status = "accepted"; // Booking confirmed upon payment!
         booking.actionExpiresAt = null;
         booking.lastActionAt = new Date();
@@ -951,7 +954,7 @@ const completeBookingPayment = async (req, res) => {
                 booking: booking._id,
                 mentorPlatformFee: payment.mentorPlatformFee,
                 learnerConvenienceFee: 0,
-                description: `Session earnings (3% platform fee deducted)`,
+                description: `Session earnings`,
                 paymentMethod: "wallet",
                 reference: payment.paymentReference
             });
@@ -972,7 +975,7 @@ const completeBookingPayment = async (req, res) => {
                 booking: booking._id,
                 mentorPlatformFee: payment.mentorPlatformFee,
                 learnerConvenienceFee: payment.learnerConvenienceFee || 0,
-                description: `Session earnings (3% platform fee deducted)`,
+                description: `Session earnings`,
                 paymentMethod: "upi",
                 reference: payment.paymentReference
             });

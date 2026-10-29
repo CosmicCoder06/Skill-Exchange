@@ -54,8 +54,8 @@ function getPayoutState(b) {
 
 /**
  * Calculates money values strictly in integer paise to eliminate floating-point artifacts:
- * - Platform Fee: 3% of base session amount (never applied to or including 18% GST)
- * - Net Mentor Payout: base session amount minus 3% platform fee
+ * - Platform Fee: ₹0 (0% platform fee)
+ * - Net Mentor Payout: 100% of base session amount
  */
 function calculatePayoutAmounts(b) {
   const base = Number(
@@ -102,7 +102,7 @@ function calculatePayoutAmounts(b) {
     // Canonical calculation: base minus 3% fee in paise
     const basePaise = Math.round(base * 100);
     grossPaise = basePaise;
-    mentorFeePaise = Math.round(basePaise * 0.03);
+    mentorFeePaise = 0;
     mentorPayoutPaise = basePaise - mentorFeePaise;
   }
 

@@ -21,8 +21,8 @@ export default function TermsPage({ onClose }) {
                 <h3>3. Session Bookings and Conduct</h3>
                 <p>Mentors and learners agree to conduct all scheduled video sessions respectfully and professionally. Any harassing, offensive, or abusive conduct may result in immediate suspension or permanent termination.</p>
 
-                <h3>4. Platform Fees</h3>
-                <p>SkillExchange applies a platform service fee to session transactions as displayed at the time of booking. Net payouts to mentors will reflect the agreed deduction.</p>
+                <h3>4. Platform Fees & Pricing</h3>
+                <p>SkillExchange charges 0% platform fees and 0% application-level taxes on session bookings. Learners pay only the mentor's stated session fee, and mentors receive 100% of their session earnings.</p>
 
                 <h3>5. Disclaimer of Warranties</h3>
                 <p>The platform is provided on an "as is" and "as available" basis without warranties of any kind.</p>

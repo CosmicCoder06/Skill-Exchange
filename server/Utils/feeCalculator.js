@@ -22,21 +22,18 @@ function calculateFees(amount, paymentMethod) {
     };
   }
 
-  // GST is 18% of the base session rate
-  const gstAmount = roundToTwo(baseSessionAmount * 0.18);
-  // Full fee including GST
-  const grossAmountWithGst = roundToTwo(baseSessionAmount + gstAmount);
-
-  // Mentor platform fee is 3% of the full fee (Session Fee + GST)
-  const mentorPlatformFee = roundToTwo(grossAmountWithGst * 0.03);
-  // Net payout = Full Fee (with GST) - Mentor Platform Fee
-  const mentorEarnings = roundToTwo(grossAmountWithGst - mentorPlatformFee);
-
-  // Learner convenience fee: 0 for wallet or free, 3% of full fee (with GST) for online methods
-  const learnerConvenienceFee = (paymentMethod === 'wallet' || paymentMethod === 'free')
-    ? 0
-    : roundToTwo(grossAmountWithGst * 0.03);
-  const totalAmountPaid = roundToTwo(grossAmountWithGst + learnerConvenienceFee);
+  // Consistent pricing rule:
+  // - Learner pays session price only
+  // - Application-level tax: ₹0
+  // - Platform fee: ₹0
+  // - Extra convenience/service fee: ₹0
+  // - Mentor earnings: 100% of session price
+  const gstAmount = 0;
+  const grossAmountWithGst = baseSessionAmount;
+  const mentorPlatformFee = 0;
+  const mentorEarnings = baseSessionAmount;
+  const learnerConvenienceFee = 0;
+  const totalAmountPaid = baseSessionAmount;
 
   return {
     baseSessionAmount,
@@ -71,7 +68,7 @@ function calculatePaymentDetails(mentor, body, duration = 60) {
 
   // Wallet payment
   if (body.paymentMethod === 'wallet') {
-    if (Number(body.quotedAmount) !== baseAmount && Number(body.quotedAmount) !== fees.grossAmountWithGst) {
+    if (body.quotedAmount !== undefined && Number(body.quotedAmount) !== baseAmount) {
       throw new Error('Mentor pricing changed. Refresh and review the amount before booking.');
     }
     const walletFees = calculateFees(baseAmount, 'wallet');
@@ -89,9 +86,7 @@ function calculatePaymentDetails(mentor, body, duration = 60) {
     const upiFees = calculateFees(baseAmount, 'upi');
     if (
       body.quotedAmount !== undefined &&
-      Number(body.quotedAmount) !== baseAmount &&
-      Number(body.quotedAmount) !== upiFees.grossAmountWithGst &&
-      Number(body.quotedAmount) !== upiFees.totalAmountPaid
+      Number(body.quotedAmount) !== baseAmount
     ) {
       throw new Error('Mentor pricing changed. Refresh and review the amount before booking.');
     }

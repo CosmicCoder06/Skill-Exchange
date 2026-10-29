@@ -535,7 +535,7 @@ export default function AdminPayments({ token }) {
                                                     ₹{group.netPayoutTotal.toLocaleString("en-IN")}
                                                 </div>
                                                 <small style={{ fontSize: "11px", color: "#94a3b8" }}>
-                                                    (Gross: ₹{group.grossTotal.toLocaleString("en-IN")} - 3% fee: ₹{group.feeTotal.toLocaleString("en-IN")})
+                                                    (Gross: ₹{group.grossTotal.toLocaleString("en-IN")}{group.feeTotal > 0 ? ` - Fee: ₹${group.feeTotal.toLocaleString("en-IN")}` : ""})
                                                 </small>
                                             </div>
 
@@ -588,7 +588,7 @@ export default function AdminPayments({ token }) {
                                                         <th>Learner</th>
                                                         <th>Date & Time</th>
                                                         <th>Gross Amount</th>
-                                                        <th>Platform Fee (3%)</th>
+                                                        <th>Platform Fee</th>
                                                         <th>Net Mentor Payout</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -709,7 +709,7 @@ export default function AdminPayments({ token }) {
                                             <td>{item.sessionDate} {item.sessionTime}</td>
                                             <td>
                                                 <strong style={{ color: "#176b4e" }}>₹{item.netAmount.toLocaleString("en-IN")}</strong>
-                                                <small style={{ display: "block", color: "#94a3b8" }}>Fee: ₹{item.platformFee}</small>
+                                                {item.platformFee > 0 && <small style={{ display: "block", color: "#94a3b8" }}>Fee: ₹{item.platformFee}</small>}
                                             </td>
                                             <td>
                                                 {item.payoutAt ? new Date(item.payoutAt).toLocaleDateString() : "—"}

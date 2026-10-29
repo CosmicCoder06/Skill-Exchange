@@ -227,7 +227,7 @@ export default function WalletModal({ token, onClose, onBalanceUpdated, initialT
             onClose={onClose}
             title="Skill Exchange Wallet"
             eyebrow="WALLET & BILLING"
-            subtitle="Load funds, avoid convenience fees, and manage payouts."
+            subtitle="Load funds and manage payouts."
             icon={<WalletIcon size={20} color="#176b4e" />}
             maxWidth="md"
             footer={
@@ -283,7 +283,7 @@ export default function WalletModal({ token, onClose, onBalanceUpdated, initialT
 
                     <div className="balance-perk-badge">
                         <span className="perk-star">★</span>
-                        <span>0% Convenience Fee on all session bookings with wallet</span>
+                        <span>0% Platform Fee & 0% Extra Charges on all session bookings</span>
                     </div>
                 </div>
 

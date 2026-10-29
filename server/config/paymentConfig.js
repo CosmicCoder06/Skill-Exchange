@@ -4,8 +4,8 @@
  */
 
 module.exports = {
-  // Platform fee percentage deducted from session price
-  platformFeePercent: Number(process.env.PLATFORM_FEE_PERCENT) || 10,
+  // Platform fee percentage deducted from session price (0% platform fee)
+  platformFeePercent: Number(process.env.PLATFORM_FEE_PERCENT) || 0,
 
   // Refund policies & rules
   refundRules: {
