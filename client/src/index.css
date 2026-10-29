@@ -264,3 +264,166 @@ html[data-theme="dark"] tr:hover,
 html[data-theme="dark"] tbody tr:hover {
   background-color: #182c27 !important;
 }
+/* ========================================================
+   GLOBAL DESIGN SYSTEM & THEME TOKENS
+   ======================================================== */
+:root {
+  --se-bg-main: #f7f8f4;
+  --se-bg-surface: #ffffff;
+  --se-bg-surface-elevated: #f0f4f1;
+  --se-bg-sidebar: #103d31;
+  --se-bg-input: #ffffff;
+  --se-text-primary: #10251d;
+  --se-text-secondary: #587067;
+  --se-text-muted: #718078;
+  --se-border-subtle: #dce2da;
+  --se-border-strong: #c2d2c6;
+  --se-accent: #176b4e;
+  --se-accent-hover: #115b43;
+  --se-accent-light: #e5f5eb;
+  --se-accent-text: #126143;
+  --logo-polygon-fill: #176b4e;
+  --logo-polygon-stroke: #176b4e;
+  --logo-highlight: #176b4e;
+}
+
+html[data-theme="dark"],
+html.dark,
+body.dark {
+  --se-bg-main: #06130d;
+  --se-bg-surface: #0f261c;
+  --se-bg-surface-elevated: #143327;
+  --se-bg-sidebar: #091a13;
+  --se-bg-input: #081711;
+  --se-text-primary: #f0fdf4;
+  --se-text-secondary: #a3bcaf;
+  --se-text-muted: #789689;
+  --se-border-subtle: rgba(255, 255, 255, 0.09);
+  --se-border-strong: rgba(52, 211, 153, 0.22);
+  --se-accent: #10b981;
+  --se-accent-hover: #059669;
+  --se-accent-light: rgba(16, 185, 129, 0.16);
+  --se-accent-text: #6ee7b7;
+  --logo-polygon-fill: #059669;
+  --logo-polygon-stroke: #34d399;
+  --logo-highlight: #34d399;
+  color-scheme: dark;
+  background-color: #06130d !important;
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] body,
+body.dark {
+  background: #06130d !important;
+  color: #f0fdf4 !important;
+}
+
+/* Global Container Backgrounds in Dark Mode */
+html[data-theme="dark"] :is(.profile-workspace, .app-premium-shell, .home-page, .discover-page, .admin-page, .bookings-page, .chat-page, .booking-calendar-section, .other-profile-page, .learner-studio, .mentor-studio, .login-page, .account-management-page) {
+  background-color: #06130d !important;
+  color: #f0fdf4 !important;
+}
+
+/* Sidebars and Navigation */
+html[data-theme="dark"] :is(.profile-sidebar, .admin-sidebar, .top-nav, .chat-sidebar) {
+  background: #091a13 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f0fdf4 !important;
+}
+
+/* Cards, Panels, and Surfaces */
+html[data-theme="dark"] :is(
+  .booking-card,
+  .profile-card,
+  .admin-card,
+  .mentor-card,
+  .session-group-section,
+  .session-status-card,
+  .payment-summary-box,
+  .profile-main-card,
+  .profile-stat-box,
+  .other-profile-hero,
+  .other-profile-section,
+  .admin-stats-card,
+  .admin-table-container,
+  .chat-main,
+  .chat-thread,
+  .slots-offered-box,
+  .booking-detail-card,
+  .slot-option-card,
+  .earnings-stat-card,
+  .curriculum-main-panel,
+  .curriculum-side-panel,
+  .session-summary-box,
+  .wallet-modal-card
+) {
+  background: #0f261c !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
+  color: #f0fdf4 !important;
+}
+
+/* Modals and Overlays */
+html[data-theme="dark"] :is(.modal-content, .modal-card, .review-modal, .session-details-modal-content, .ai-match-dialog > div) {
+  background: #0f261c !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+  color: #f0fdf4 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
+}
+
+html[data-theme="dark"] :is(.modal-overlay, .modal-backdrop) {
+  background: rgba(3, 10, 7, 0.85) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Typography Defaults */
+html[data-theme="dark"] :is(h1, h2, h3, h4, h5) {
+  color: #f0fdf4;
+}
+
+html[data-theme="dark"] :is(p, label) {
+  color: #a3bcaf;
+}
+
+/* Inputs, Textareas, Selects */
+html[data-theme="dark"] :is(input, textarea, select):not([type="checkbox"]):not([type="radio"]) {
+  background-color: #081711 !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] :is(input, textarea, select)::placeholder {
+  color: #648275 !important;
+}
+
+html[data-theme="dark"] :is(input, textarea, select):focus {
+  border-color: #34d399 !important;
+  outline: none;
+}
+
+/* Tables & Hover States */
+html[data-theme="dark"] :is(tr:hover td, tbody tr:hover td) {
+  background-color: #143327 !important;
+}
+
+/* Text Selection */
+html[data-theme="dark"] ::selection {
+  background: #144d37;
+  color: #ffffff;
+}
+
+/* Scrollbars */
+html[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #06130d;
+}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #143527;
+  border-radius: 4px;
+}
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #1c4836;
+}

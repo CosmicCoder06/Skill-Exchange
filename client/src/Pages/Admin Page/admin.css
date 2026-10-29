@@ -2131,8 +2131,12 @@
 
 /* The legacy dark theme inverts the app root. Keep the operational sidebar
    in its intended dark-green treatment instead of rendering it pale. */
-html[data-theme="dark"] .admin-sidebar {
-    filter: invert(1) hue-rotate(180deg);
+html[data-theme="dark"] .admin-sidebar,
+html.dark .admin-sidebar {
+    background: #091a13 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    filter: none !important;
 }
 
 @media (min-width: 801px) {
@@ -3734,4 +3738,229 @@ html[data-theme="dark"] .tone-learner .sum-icon-chip,
 html.dark .tone-learner .sum-icon-chip {
     background: rgba(124, 58, 237, 0.2) !important;
     color: #c084fc !important;
+}
+
+
+/* =========================================================
+   COMPREHENSIVE ADMIN CONSOLE DARK THEME OVERHAULS
+========================================================= */
+
+/* Admin Page & Main Workspace */
+html[data-theme="dark"] .admin-page,
+html.dark .admin-page {
+    background: #06130d !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .admin-workspace,
+html.dark .admin-workspace {
+    background: #06130d !important;
+}
+
+/* Sidebar Branding & Navigation */
+html[data-theme="dark"] .admin-brand,
+html.dark .admin-brand {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .admin-brand-copy strong,
+html.dark .admin-brand-copy strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-brand-copy small,
+html.dark .admin-brand-copy small {
+    color: #34d399 !important;
+    font-weight: 800;
+}
+
+html[data-theme="dark"] .admin-sidebar-label,
+html.dark .admin-sidebar-label {
+    color: #638879 !important;
+    font-weight: 800;
+}
+
+html[data-theme="dark"] .admin-nav-item,
+html.dark .admin-nav-item {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .admin-nav-item:hover,
+html.dark .admin-nav-item:hover {
+    background: rgba(255, 255, 255, 0.07) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-nav-item.is-active,
+html.dark .admin-nav-item.is-active {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+    box-shadow: inset 3px 0 0 #34d399 !important;
+}
+
+html[data-theme="dark"] .admin-protected,
+html.dark .admin-protected {
+    color: #8da99c !important;
+}
+
+html[data-theme="dark"] .admin-protected strong,
+html.dark .admin-protected strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-protected p,
+html.dark .admin-protected p {
+    color: #688578 !important;
+}
+
+html[data-theme="dark"] .admin-logout,
+html.dark .admin-logout {
+    background: #112820 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .admin-logout:hover,
+html.dark .admin-logout:hover {
+    background: #17382c !important;
+    color: #ffffff !important;
+    border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+/* Header & Administrator User Pill */
+html[data-theme="dark"] .admin-header,
+html.dark .admin-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .admin-heading h1,
+html.dark .admin-heading h1 {
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .admin-description,
+html.dark .admin-description {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .admin-eyebrow,
+html.dark .admin-eyebrow {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .admin-header-user,
+html.dark .admin-header-user {
+    padding: 6px 14px;
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+html[data-theme="dark"] .admin-header-user strong,
+html.dark .admin-header-user strong {
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+}
+
+html[data-theme="dark"] .admin-header-user span,
+html.dark .admin-header-user span {
+    color: #8da99c !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+}
+
+html[data-theme="dark"] .admin-avatar,
+html.dark .admin-avatar {
+    background: #153b2c !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(52, 211, 153, 0.3) !important;
+    font-weight: 900 !important;
+}
+
+/* Admin Stat Cards (Dashboard Overview) */
+html[data-theme="dark"] .admin-stat-card,
+html.dark .admin-stat-card {
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="dark"] .admin-stat-card:hover,
+html.dark .admin-stat-card:hover {
+    border-color: rgba(52, 211, 153, 0.4) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="dark"] .admin-stat-card.featured,
+html.dark .admin-stat-card.featured {
+    background: linear-gradient(145deg, #133527, #0d241b) !important;
+    border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+html[data-theme="dark"] .admin-stat-card > strong,
+html[data-theme="dark"] .admin-stat-number,
+html.dark .admin-stat-card > strong,
+html.dark .admin-stat-number {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-stat-card .admin-stat-content h3,
+html.dark .admin-stat-card .admin-stat-content h3 {
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .admin-stat-card .admin-stat-content p,
+html.dark .admin-stat-card .admin-stat-content p {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .admin-stat-icon-wrap,
+html.dark .admin-stat-icon-wrap {
+    background: #15382b !important;
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .admin-stat-arrow,
+html.dark .admin-stat-arrow {
+    color: #34d399 !important;
+}
+
+/* Governance / Modals / Dialogs */
+html[data-theme="dark"] .admin-governance-panel,
+html.dark .admin-governance-panel {
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .admin-overview-panel,
+html[data-theme="dark"] .admin-overview-table-card,
+html[data-theme="dark"] .admin-panel-card,
+html.dark .admin-overview-panel,
+html.dark .admin-overview-table-card,
+html.dark .admin-panel-card {
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .admin-overview-panel-header h3,
+html[data-theme="dark"] .table-card-head h4,
+html[data-theme="dark"] .admin-panel-header h3,
+html.dark .admin-overview-panel-header h3,
+html.dark .table-card-head h4,
+html.dark .admin-panel-header h3 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-overview-panel-header p,
+html[data-theme="dark"] .table-card-head p,
+html[data-theme="dark"] .admin-panel-header p,
+html.dark .admin-overview-panel-header p,
+html.dark .table-card-head p,
+html.dark .admin-panel-header p {
+    color: #9cb3a8 !important;
 }

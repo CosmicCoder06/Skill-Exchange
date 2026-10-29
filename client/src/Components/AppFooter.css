@@ -13,3 +13,12 @@
     }
 }
 /* @teamcosmiccoders */
+
+
+html[data-theme="dark"] .app-footer,
+html.dark .app-footer,
+body.dark .app-footer {
+    background: #06130d !important;
+    color: #8da99c !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}

@@ -601,3 +601,128 @@
     }
 }
 /* @teamcosmiccoders */
+
+
+/* =========================================================
+   DISCOVER PAGE DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .discover-page,
+html.dark .discover-page {
+    background: #06130d !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .discover-page .app-nav,
+html.dark .discover-page .app-nav {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .discover-page .app-logo,
+html.dark .discover-page .app-logo {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .discover-search,
+html.dark .discover-search {
+    background: #0c1e17 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+html[data-theme="dark"] .discover-search:focus-within,
+html.dark .discover-search:focus-within {
+    border-color: #34d399 !important;
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.25) !important;
+}
+
+html[data-theme="dark"] .discover-search input,
+html.dark .discover-search input {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .discover-search input::placeholder,
+html.dark .discover-search input::placeholder {
+    color: #648275 !important;
+}
+
+html[data-theme="dark"] .search-icon,
+html.dark .search-icon {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .search-shortcut,
+html.dark .search-shortcut {
+    background: #143527 !important;
+    color: #8da99c !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Person Rows & Mentors List */
+html[data-theme="dark"] .person-row,
+html.dark .person-row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .person-row:hover,
+html.dark .person-row:hover {
+    background: #0f271e !important;
+}
+
+html[data-theme="dark"] .person-number,
+html.dark .person-number {
+    color: #648275 !important;
+}
+
+html[data-theme="dark"] .person-avatar,
+html.dark .person-avatar {
+    background: #143528 !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(52, 211, 153, 0.25) !important;
+}
+
+html[data-theme="dark"] .person-name-line h3,
+html.dark .person-name-line h3 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .person-role,
+html.dark .person-role {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+html[data-theme="dark"] .person-bio,
+html.dark .person-bio {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .person-skills span,
+html.dark .person-skills span {
+    background: #143527 !important;
+    color: #a3bcaf !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .person-profile,
+html.dark .person-profile {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .person-profile:hover,
+html.dark .person-profile:hover {
+    color: #6ee7b7 !important;
+}
+
+html[data-theme="dark"] .person-message,
+html.dark .person-message {
+    background: #122c22 !important;
+    border: 1px solid rgba(52, 211, 153, 0.3) !important;
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .person-message:hover,
+html.dark .person-message:hover {
+    background: #059669 !important;
+    color: #ffffff !important;
+}

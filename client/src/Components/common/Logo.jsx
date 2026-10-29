@@ -15,8 +15,8 @@ export function LogoMark({ size = 36, className = "" }) {
       <title>Skill Exchange</title>
       <polygon
         points="50,2 98,33 80,98 20,98 2,33"
-        fill="#176b4e"
-        stroke="#176b4e"
+        fill="var(--logo-polygon-fill, #176b4e)"
+        stroke="var(--logo-polygon-stroke, #176b4e)"
         strokeWidth="2"
         strokeLinejoin="round"
       />
@@ -26,7 +26,7 @@ export function LogoMark({ size = 36, className = "" }) {
         fontFamily="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
         fontWeight="900"
         fontSize="40"
-        fill="#ffffff"
+        fill="var(--logo-text-fill, #ffffff)"
         textAnchor="middle"
         letterSpacing="-2"
       >
@@ -63,7 +63,7 @@ export default function Logo({
           }}
         >
           {text}
-          <span style={{ fontWeight: 500, color: "#176b4e" }}>
+          <span style={{ fontWeight: 500, color: "var(--logo-highlight, #176b4e)" }}>
             {textHighlight}
           </span>
         </span>

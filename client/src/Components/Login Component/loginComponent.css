@@ -501,3 +501,115 @@
     }
 }
 /* @teamcosmiccoders */
+
+
+/* =========================================================
+   LOGIN COMPONENT DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .login-page,
+html.dark .login-page {
+    background: #06130d !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .login-showcase,
+html.dark .login-showcase {
+    background: linear-gradient(155deg, #0d261b, #06170f) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .login-showcase::before,
+html[data-theme="dark"] .login-showcase::after,
+html.dark .login-showcase::before,
+html.dark .login-showcase::after {
+    background: #173b2c !important;
+    opacity: 0.45 !important;
+}
+
+html[data-theme="dark"] .login-showcase .brand,
+html.dark .login-showcase .brand {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .login-showcase h1,
+html.dark .login-showcase h1 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .login-showcase h1 span,
+html.dark .login-showcase h1 span {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .login-panel,
+html.dark .login-panel {
+    background: #0a1e16 !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .login-heading h1,
+html.dark .login-heading h1 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .login-heading p,
+html.dark .login-heading p {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .input-group label,
+html.dark .input-group label {
+    color: #a3bcaf !important;
+}
+
+html[data-theme="dark"] .input-wrapper,
+html.dark .input-wrapper {
+    background: #081711 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+html[data-theme="dark"] .input-wrapper input,
+html.dark .input-wrapper input {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .input-wrapper input::placeholder,
+html.dark .input-wrapper input::placeholder {
+    color: #648275 !important;
+}
+
+html[data-theme="dark"] .input-icon,
+html.dark .input-icon {
+    color: #729486 !important;
+}
+
+html[data-theme="dark"] .input-wrapper:focus-within,
+html.dark .input-wrapper:focus-within {
+    border-color: #34d399 !important;
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.25) !important;
+}
+
+html[data-theme="dark"] .login-button,
+html.dark .login-button {
+    background: #059669 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(5, 150, 105, 0.35) !important;
+}
+
+html[data-theme="dark"] .login-button:hover:not(:disabled),
+html.dark .login-button:hover:not(:disabled) {
+    background: #047857 !important;
+}
+
+html[data-theme="dark"] .login-footnote,
+html.dark .login-footnote {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .login-footnote a,
+html.dark .login-footnote a {
+    color: #34d399 !important;
+}

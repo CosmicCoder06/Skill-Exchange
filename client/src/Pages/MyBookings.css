@@ -2688,3 +2688,66 @@ body .bookings-page .booking-card:hover {
 
 
 
+
+
+/* =========================================================
+   MY BOOKINGS DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .bookings-page,
+html[data-theme="dark"] .bookings-container,
+html.dark .bookings-page,
+html.dark .bookings-container {
+    background: #06130d !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .bookings-header h1,
+html.dark .bookings-header h1 {
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .bookings-header p,
+html.dark .bookings-header p {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .booking-card,
+html.dark .booking-card {
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #f0fdf4 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="dark"] .booking-card:hover,
+html.dark .booking-card:hover {
+    border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+html[data-theme="dark"] .booking-card h3,
+html[data-theme="dark"] .booking-card h4,
+html.dark .booking-card h3,
+html.dark .booking-card h4 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .booking-card p,
+html.dark .booking-card p {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .booking-meta-item,
+html.dark .booking-meta-item {
+    color: #8da99c !important;
+}
+
+html[data-theme="dark"] .booking-meta-item strong,
+html.dark .booking-meta-item strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .empty-bookings-state,
+html.dark .empty-bookings-state {
+    color: #8da99c !important;
+}

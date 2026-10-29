@@ -198,3 +198,50 @@
         padding: 14px 18px;
     }
 }
+
+
+/* =========================================================
+   COMMON MODAL DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .modal-backdrop,
+html[data-theme="dark"] .modal-overlay,
+html.dark .modal-backdrop,
+html.dark .modal-overlay {
+    background: rgba(3, 10, 7, 0.85) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+html[data-theme="dark"] .modal-content,
+html[data-theme="dark"] .modal-card,
+html.dark .modal-content,
+html.dark .modal-card {
+    background: #0f271e !important;
+    border: 1px solid rgba(52, 211, 153, 0.25) !important;
+    color: #f0fdf4 !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
+}
+
+html[data-theme="dark"] .modal-header,
+html.dark .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .modal-header h2,
+html[data-theme="dark"] .modal-header h3,
+html.dark .modal-header h2,
+html.dark .modal-header h3 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .modal-close-btn,
+html.dark .modal-close-btn {
+    color: #8da99c !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .modal-close-btn:hover,
+html.dark .modal-close-btn:hover {
+    color: #ffffff !important;
+}
