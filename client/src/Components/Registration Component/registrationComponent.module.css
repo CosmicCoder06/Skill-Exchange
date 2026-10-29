@@ -482,3 +482,100 @@
         padding: 40px 20px 60px;
     }
 }
+
+
+/* =========================================================
+   REGISTRATION COMPONENT DARK THEME
+========================================================= */
+
+:global(html[data-theme="dark"]) .pageContainer,
+:global(html.dark) .pageContainer {
+    background: #06130d !important;
+    color: #f0fdf4 !important;
+}
+
+:global(html[data-theme="dark"]) .showcase,
+:global(html.dark) .showcase {
+    background: linear-gradient(155deg, #0d261b, #06170f) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #f0fdf4 !important;
+}
+
+:global(html[data-theme="dark"]) .formPanel,
+:global(html.dark) .formPanel {
+    background: #0a1e16 !important;
+    color: #f0fdf4 !important;
+}
+
+:global(html[data-theme="dark"]) .formPanel h1,
+:global(html[data-theme="dark"]) .formPanel h2,
+:global(html.dark) .formPanel h1,
+:global(html.dark) .formPanel h2 {
+    color: #ffffff !important;
+}
+
+:global(html[data-theme="dark"]) .formPanel p,
+:global(html.dark) .formPanel p {
+    color: #9cb3a8 !important;
+}
+
+:global(html[data-theme="dark"]) .inputGroup label,
+:global(html.dark) .inputGroup label {
+    color: #a3bcaf !important;
+}
+
+:global(html[data-theme="dark"]) .inputWrapper,
+:global(html.dark) .inputWrapper {
+    background: #081711 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+:global(html[data-theme="dark"]) .inputWrapper input,
+:global(html.dark) .inputWrapper input {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+:global(html[data-theme="dark"]) .inputWrapper input::placeholder,
+:global(html.dark) .inputWrapper input::placeholder {
+    color: #648275 !important;
+}
+
+:global(html[data-theme="dark"]) .inputWrapper:focus-within,
+:global(html.dark) .inputWrapper:focus-within {
+    border-color: #34d399 !important;
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.25) !important;
+}
+
+:global(html[data-theme="dark"]) .submitButton,
+:global(html.dark) .submitButton {
+    background: #059669 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(5, 150, 105, 0.35) !important;
+}
+
+:global(html[data-theme="dark"]) .submitButton:hover:not(:disabled),
+:global(html.dark) .submitButton:hover:not(:disabled) {
+    background: #047857 !important;
+}
+
+:global(html[data-theme="dark"]) .roleSelector button,
+:global(html.dark) .roleSelector button {
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #d1ded8 !important;
+}
+
+:global(html[data-theme="dark"]) .roleSelector button:hover,
+:global(html.dark) .roleSelector button:hover {
+    background: #143628 !important;
+    color: #ffffff !important;
+}
+
+:global(html[data-theme="dark"]) .roleSelector button.active,
+:global(html.dark) .roleSelector button.active {
+    background: #10b981 !important;
+    color: #06150e !important;
+    font-weight: 800 !important;
+    border-color: #10b981 !important;
+}

@@ -150,3 +150,232 @@
 .ledger-status-pill.refund { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 .ledger-status-pill.neutral { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
 .ledger-legacy-tag { display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; background: #fef3c7; color: #92400e; padding: 1px 5px; border-radius: 4px; margin-left: 5px; }
+
+
+/* =========================================================
+   MENTOR DASHBOARD & STUDIO DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .mentor-studio,
+html.dark .mentor-studio {
+    background: #06130d !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .mentor-hero,
+html.dark .mentor-hero {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .mentor-hero h1,
+html.dark .mentor-hero h1 {
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .mentor-hero h1 em,
+html.dark .mentor-hero h1 em {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .mentor-kicker,
+html[data-theme="dark"] .mentor-section-heading p,
+html.dark .mentor-kicker,
+html.dark .mentor-section-heading p {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .mentor-lede,
+html.dark .mentor-lede {
+    color: #9cb3a8 !important;
+}
+
+/* Tab Switcher */
+html[data-theme="dark"] .mentor-view-switcher,
+html.dark .mentor-view-switcher {
+    background: #0c1e17 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .mentor-tab-pill,
+html.dark .mentor-tab-pill {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .mentor-tab-pill:hover,
+html.dark .mentor-tab-pill:hover {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .mentor-tab-pill.active,
+html.dark .mentor-tab-pill.active {
+    background: #10b981 !important;
+    color: #06150e !important;
+    font-weight: 800 !important;
+}
+
+html[data-theme="dark"] .mentor-action-secondary,
+html.dark .mentor-action-secondary {
+    background: #102820 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .mentor-action-secondary:hover,
+html.dark .mentor-action-secondary:hover {
+    background: #15342a !important;
+    color: #ffffff !important;
+}
+
+/* Earnings Stat Cards */
+html[data-theme="dark"] .earnings-stat-card,
+html.dark .earnings-stat-card {
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="dark"] .earnings-stat-card.wallet-highlight,
+html.dark .earnings-stat-card.wallet-highlight {
+    background: #123326 !important;
+    border-color: rgba(52, 211, 153, 0.4) !important;
+}
+
+html[data-theme="dark"] .stat-kicker,
+html.dark .stat-kicker {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .stat-icon-wrap,
+html.dark .stat-icon-wrap {
+    background: #17382b !important;
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .stat-live-badge,
+html.dark .stat-live-badge {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .stat-badge-cal,
+html.dark .stat-badge-cal {
+    background: #17382b !important;
+    color: #6ee7b7 !important;
+}
+
+html[data-theme="dark"] .stat-amount,
+html.dark .stat-amount {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .stat-subtext,
+html.dark .stat-subtext {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .btn-card-action.topup,
+html.dark .btn-card-action.topup {
+    background: #153428 !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+html[data-theme="dark"] .btn-card-action.topup:hover,
+html.dark .btn-card-action.topup:hover {
+    background: #1c4535 !important;
+}
+
+html[data-theme="dark"] .btn-card-action.withdraw,
+html.dark .btn-card-action.withdraw {
+    background: #059669 !important;
+    color: #ffffff !important;
+    border-color: #059669 !important;
+}
+
+html[data-theme="dark"] .btn-card-action.withdraw:hover:not(:disabled),
+html.dark .btn-card-action.withdraw:hover:not(:disabled) {
+    background: #047857 !important;
+}
+
+/* Policy Note */
+html[data-theme="dark"] .mentor-fee-policy-note,
+html.dark .mentor-fee-policy-note {
+    background: #0e271d !important;
+    border-left: 4px solid #34d399 !important;
+    color: #d1ded8 !important;
+}
+
+html[data-theme="dark"] .policy-icon-box,
+html.dark .policy-icon-box {
+    background: #059669 !important;
+    color: #ffffff !important;
+}
+
+/* Ledger Section */
+html[data-theme="dark"] .earnings-ledger-section,
+html.dark .earnings-ledger-section {
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="dark"] .ledger-header-bar,
+html.dark .ledger-header-bar {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .ledger-header-bar h2,
+html.dark .ledger-header-bar h2 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .ledger-search-box,
+html.dark .ledger-search-box {
+    background: #0a1b14 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .ledger-search-box input,
+html.dark .ledger-search-box input {
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .filter-pill,
+html.dark .filter-pill {
+    background: #0a1b14 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .filter-pill:hover,
+html.dark .filter-pill:hover {
+    background: #143527 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .filter-pill.active,
+html.dark .filter-pill.active {
+    background: #10b981 !important;
+    color: #06150e !important;
+    border-color: #10b981 !important;
+}
+
+/* Table */
+html[data-theme="dark"] .ledger-table-container th,
+html.dark .ledger-table-container th {
+    background: #123326 !important;
+    color: #a3bcaf !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .ledger-table-container td,
+html.dark .ledger-table-container td {
+    color: #d1ded8 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="dark"] .ledger-table-container tbody tr:hover td,
+html.dark .ledger-table-container tbody tr:hover td {
+    background: #163b2c !important;
+}

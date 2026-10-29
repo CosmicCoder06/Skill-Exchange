@@ -1,28 +1,70 @@
 .theme-toggle {
     position: relative;
     flex-shrink: 0;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border: 1px solid rgba(23, 107, 78, 0.25);
     border-radius: 50%;
     background: #ffffff;
     color: #176b4e;
     cursor: pointer;
-    font-size: 19px;
-    line-height: 1;
-    box-shadow: 0 10px 26px rgba(7, 34, 23, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(7, 34, 23, 0.12);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .theme-toggle:hover {
-    background: #ffffff;
+    background: #f0f7f3;
+    border-color: #176b4e;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(7, 34, 23, 0.16);
 }
 
+.theme-toggle:focus-visible {
+    outline: 2px solid #34d399;
+    outline-offset: 2px;
+}
 
+.theme-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .theme-toggle-icon {
+    transform: rotate(15deg);
+}
+
+/* =========================================================
+   DARK THEME TOGGLE STYLING
+========================================================= */
+html[data-theme="dark"] .theme-toggle,
+html.dark .theme-toggle,
+body.dark .theme-toggle,
+.theme-toggle.is-dark {
+    background: #10261e;
+    border-color: rgba(52, 211, 153, 0.35);
+    color: #facc15;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 0 10px rgba(52, 211, 153, 0.12);
+}
+
+html[data-theme="dark"] .theme-toggle:hover,
+html.dark .theme-toggle:hover,
+body.dark .theme-toggle:hover,
+.theme-toggle.is-dark:hover {
+    background: #143529;
+    border-color: #34d399;
+    color: #fef08a;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(52, 211, 153, 0.25);
+}
 
 @media (max-width: 700px) {
     .theme-toggle {
-                width: 40px;
-        height: 40px;
+        width: 38px;
+        height: 38px;
     }
 }
 /* @teamcosmiccoders */

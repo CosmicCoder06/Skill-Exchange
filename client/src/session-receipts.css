@@ -54,3 +54,51 @@ body .login-page .showcase-content h1 { letter-spacing:-.045em; line-height:1.08
 body .login-page .login-heading p, body .login-page .register-text { color:#54665d; }
 body .login-page input { font-family:inherit; font-size:16px; color:#19352a; }
 body .login-page input:-webkit-autofill { -webkit-text-fill-color:#19352a; }
+
+
+/* =========================================================
+   SESSION RECEIPTS & PAYMENT MODALS DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .receipt-container,
+html[data-theme="dark"] .payment-receipt-box,
+html.dark .receipt-container,
+html.dark .payment-receipt-box {
+    background: #0f271e !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .receipt-header h2,
+html[data-theme="dark"] .receipt-header h3,
+html.dark .receipt-header h2,
+html.dark .receipt-header h3 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .receipt-header p,
+html.dark .receipt-header p {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .receipt-line-item,
+html.dark .receipt-line-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #d1ded8 !important;
+}
+
+html[data-theme="dark"] .receipt-line-item strong,
+html.dark .receipt-line-item strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .receipt-total-row,
+html.dark .receipt-total-row {
+    border-top: 2px solid rgba(52, 211, 153, 0.3) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .receipt-total-amount,
+html.dark .receipt-total-amount {
+    color: #34d399 !important;
+}

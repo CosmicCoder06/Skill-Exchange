@@ -692,3 +692,65 @@
 .btn-close-footer:hover {
     background: #eef3f0;
 }
+
+
+/* =========================================================
+   WALLET MODAL DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .wallet-modal-card,
+html[data-theme="dark"] .wallet-container,
+html.dark .wallet-modal-card,
+html.dark .wallet-container {
+    background: #0f271e !important;
+    border: 1px solid rgba(52, 211, 153, 0.25) !important;
+    color: #f0fdf4 !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
+}
+
+html[data-theme="dark"] .wallet-header h2,
+html.dark .wallet-header h2 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .wallet-header p,
+html.dark .wallet-header p {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .wallet-balance-box,
+html.dark .wallet-balance-box {
+    background: #143527 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .wallet-balance-amount,
+html.dark .wallet-balance-amount {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .wallet-balance-label,
+html.dark .wallet-balance-label {
+    color: #8da99c !important;
+}
+
+html[data-theme="dark"] .wallet-tx-item,
+html.dark .wallet-tx-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #d1ded8 !important;
+}
+
+html[data-theme="dark"] .wallet-tx-item:hover,
+html.dark .wallet-tx-item:hover {
+    background: #133326 !important;
+}
+
+html[data-theme="dark"] .wallet-tx-desc,
+html.dark .wallet-tx-desc {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .wallet-tx-date,
+html.dark .wallet-tx-date {
+    color: #8da99c !important;
+}

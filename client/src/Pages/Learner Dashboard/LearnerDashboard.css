@@ -992,3 +992,202 @@
         font-size: 15px;
     }
 }
+
+
+/* =========================================================
+   LEARNER DASHBOARD & STUDIO DARK THEME
+========================================================= */
+
+html[data-theme="dark"] .learner-studio,
+html[data-theme="dark"] .learner-dashboard,
+html.dark .learner-studio,
+html.dark .learner-dashboard {
+    background: #06130d !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .learner-hero,
+html.dark .learner-hero {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .learner-hero h1,
+html.dark .learner-hero h1 {
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .learner-hero h1 em,
+html.dark .learner-hero h1 em {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .learner-kicker,
+html.dark .learner-kicker {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .learner-lede,
+html.dark .learner-lede {
+    color: #9cb3a8 !important;
+}
+
+/* Action Buttons */
+html[data-theme="dark"] .learner-action-primary,
+html.dark .learner-action-primary {
+    background: #059669 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3) !important;
+}
+
+html[data-theme="dark"] .learner-action-primary:hover,
+html.dark .learner-action-primary:hover {
+    background: #047857 !important;
+}
+
+html[data-theme="dark"] .learner-action-secondary,
+html.dark .learner-action-secondary {
+    background: #102820 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .learner-action-secondary:hover,
+html.dark .learner-action-secondary:hover {
+    background: #15342a !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .hero-upcoming-bubble,
+html.dark .hero-upcoming-bubble {
+    background: #143528 !important;
+    color: #34d399 !important;
+}
+
+/* Tab Switcher */
+html[data-theme="dark"] .learner-view-switcher,
+html.dark .learner-view-switcher {
+    background: #0c1e17 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .learner-tab-pill,
+html.dark .learner-tab-pill {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .learner-tab-pill:hover,
+html.dark .learner-tab-pill:hover {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .learner-tab-pill.active,
+html.dark .learner-tab-pill.active {
+    background: #10b981 !important;
+    color: #06150e !important;
+    font-weight: 800 !important;
+}
+
+/* Scoreline Stats */
+html[data-theme="dark"] .learner-scoreline,
+html.dark .learner-scoreline {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .learner-scoreline > div,
+html.dark .learner-scoreline > div {
+    border-left-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .learner-scoreline strong,
+html.dark .learner-scoreline strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .learner-scoreline span,
+html.dark .learner-scoreline span {
+    color: #8da99c !important;
+}
+
+/* Workbench & Headings */
+html[data-theme="dark"] .learner-workbench,
+html.dark .learner-workbench {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .learner-section-heading h2,
+html.dark .learner-section-heading h2 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .learner-skill-row strong,
+html.dark .learner-skill-row strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .learner-skill-row span,
+html.dark .learner-skill-row span {
+    color: #8da99c !important;
+}
+
+html[data-theme="dark"] .learner-skill-track,
+html.dark .learner-skill-track {
+    background: #143327 !important;
+}
+
+html[data-theme="dark"] .learner-skill-track i,
+html.dark .learner-skill-track i {
+    background: #34d399 !important;
+}
+
+/* Curriculum Panels & Cards */
+html[data-theme="dark"] .curriculum-main-panel,
+html[data-theme="dark"] .curriculum-side-panel,
+html.dark .curriculum-main-panel,
+html.dark .curriculum-side-panel {
+    background: #0f261c !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme="dark"] .panel-header-bar,
+html.dark .panel-header-bar {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .panel-header-bar h2,
+html.dark .panel-header-bar h2 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .curriculum-item,
+html.dark .curriculum-item {
+    background: #133326 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="dark"] .curriculum-info strong,
+html.dark .curriculum-info strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .curriculum-info p,
+html.dark .curriculum-info p {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .btn-find-mentor,
+html.dark .btn-find-mentor {
+    background: #059669 !important;
+    color: #ffffff !important;
+}
+
+/* Loading Box */
+html[data-theme="dark"] .learner-loading-box h2,
+html.dark .learner-loading-box h2 {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .learner-loading-box p,
+html.dark .learner-loading-box p {
+    color: #9cb3a8 !important;
+}
