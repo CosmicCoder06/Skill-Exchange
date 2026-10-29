@@ -104,10 +104,10 @@ export default function AdminSessions({ token }) {
                                         <td><Calendar size={13} style={{ verticalAlign: "middle", marginRight: 4 }} />{s.date} {s.time}</td>
                                         <td>{s.duration || 60}m</td>
                                         <td><span className={`status-tag ${s.status}`}>{s.status}</span></td>
-                                        <td><span className="payment-tag">{s.paymentStatus || s.payment?.status || "—"}</span></td>
+                                        <td><span className={`payment-tag ${s.paymentStatus || s.payment?.status || ""}`}>{s.paymentStatus || s.payment?.status || "—"}</span></td>
                                         <td>
                                             {s.meetingUrl ? (
-                                                <a href={s.meetingUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "#176b4e", fontWeight: 650 }}>
+                                                <a href={s.meetingUrl} target="_blank" rel="noreferrer" className="admin-meet-link">
                                                     <Video size={13} /> Link
                                                 </a>
                                             ) : (

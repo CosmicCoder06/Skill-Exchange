@@ -323,7 +323,9 @@ async function settleMentorPayouts({ bookingIds, reference, note, adminId }) {
 /**
  * Admin: Get Payout History with search and date filters
  */
-async function getPayoutHistory({ search, startDate, endDate, page = 1, limit = 20 }) {
+async function getPayoutHistory(options = {}) {
+  const opts = typeof options === "number" ? { limit: options } : (options || {});
+  const { search, startDate, endDate, page = 1, limit = 20 } = opts;
   const query = {
     $or: [{ payoutStatus: "paid" }, { "payment.status": "paid_out" }],
   };
@@ -698,7 +700,9 @@ module.exports = {
   settleMentorPayouts,
   getPayoutHistory,
   getRefundsList,
+  getRefundEligibleBookings: getRefundsList,
   processRazorpayRefund,
+  processRefund: processRazorpayRefund,
   getAdminPaymentStats,
   getMentorEarningsSummary,
 };

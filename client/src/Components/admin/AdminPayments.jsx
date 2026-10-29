@@ -23,6 +23,8 @@ import {
     ExternalLink
 } from "lucide-react";
 
+const formatINR = (val) => (Number(val) || 0).toLocaleString("en-IN");
+
 export default function AdminPayments({ token }) {
     const [tab, setTab] = useState("all-payments"); // "all-payments" | "payouts" | "payout-history" | "refunds"
     const [payments, setPayments] = useState([]);
@@ -76,18 +78,30 @@ export default function AdminPayments({ token }) {
                     page: pagination.page,
                     limit: pagination.limit
                 });
-                setPayments(res.payments || []);
-                if (res.stats) setStats(res.stats);
-                if (res.pagination) setPagination(res.pagination);
+                const paymentsList = Array.isArray(res?.payments) ? res.payments : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+                setPayments(paymentsList);
+                if (res?.stats) setStats(res.stats);
+                if (res?.pagination) setPagination(res.pagination);
             } else if (tab === "payouts") {
                 const res = await getAdminPayouts(token);
-                setMentorGroups(res.mentorGroups || []);
+                const groups = Array.isArray(res?.mentorGroups) ? res.mentorGroups : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+                setMentorGroups(groups);
             } else if (tab === "payout-history") {
                 const res = await getAdminPayoutHistory(token, { search: historySearch });
-                setPayoutHistory(res.history || []);
+                const historyList = Array.isArray(res?.history)
+                    ? res.history
+                    : Array.isArray(res?.history?.history)
+                    ? res.history.history
+                    : Array.isArray(res?.data)
+                    ? res.data
+                    : Array.isArray(res)
+                    ? res
+                    : [];
+                setPayoutHistory(historyList);
             } else if (tab === "refunds") {
                 const res = await getAdminRefunds(token);
-                setRefundsList(res.refunds || []);
+                const refunds = Array.isArray(res?.refunds) ? res.refunds : Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+                setRefundsList(refunds);
             }
         } catch (err) {
             setError(err.message || "Failed to load payment data");
@@ -231,8 +245,13 @@ export default function AdminPayments({ token }) {
         );
     }
 
-    const totalPendingPayouts = mentorGroups.reduce((acc, m) => acc + m.sessionsCount, 0);
-    const activeRefundsDueCount = refundsList.filter((r) => !r.isRefunded).length;
+    const safePayments = Array.isArray(payments) ? payments : [];
+    const safeMentorGroups = Array.isArray(mentorGroups) ? mentorGroups : [];
+    const safePayoutHistory = Array.isArray(payoutHistory) ? payoutHistory : [];
+    const safeRefundsList = Array.isArray(refundsList) ? refundsList : [];
+
+    const totalPendingPayouts = safeMentorGroups.reduce((acc, m) => acc + (Number(m?.sessionsCount) || 0), 0);
+    const activeRefundsDueCount = safeRefundsList.filter((r) => r && !r.isRefunded).length;
 
     return (
         <section className="admin-content-section">
@@ -268,7 +287,7 @@ export default function AdminPayments({ token }) {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", margin: "20px 0" }}>
                 <div style={{ background: "var(--card-bg, #ffffff)", border: "1px solid var(--border, #e2e8f0)", borderRadius: "10px", padding: "16px" }}>
                     <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>TOTAL COLLECTED</span>
-                    <h3 style={{ margin: "6px 0 0", fontSize: "24px", color: "#176b4e" }}>₹{stats.totalCollected?.toLocaleString("en-IN") || 0}</h3>
+                    <h3 style={{ margin: "6px 0 0", fontSize: "24px", color: "#176b4e" }}>₹{formatINR(stats?.totalCollected) || 0}</h3>
                     <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8" }}>Paid & active (excludes cancelled/refunded)</p>
                 </div>
                 <div style={{ background: "var(--card-bg, #ffffff)", border: "1px solid var(--border, #e2e8f0)", borderRadius: "10px", padding: "16px" }}>
@@ -422,7 +441,7 @@ export default function AdminPayments({ token }) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {payments.map((p) => {
+                                    {safePayments.map((p) => {
                                         const amt = Number(p.payment?.amount || p.baseSessionAmount || p.grossAmountWithGst || p.paymentAmount || 0);
                                         const rzpId = p.razorpayPaymentId || p.payment?.razorpayPaymentId || "—";
                                         return (
@@ -443,7 +462,7 @@ export default function AdminPayments({ token }) {
                                                     <small style={{ color: "#64748b" }}>{p.time} ({p.duration}m)</small>
                                                 </td>
                                                 <td>
-                                                    <strong style={{ color: "#176b4e" }}>₹{amt.toLocaleString("en-IN")}</strong>
+                                                    <strong style={{ color: "#176b4e" }}>₹{formatINR(amt)}</strong>
                                                 </td>
                                                 <td>
                                                     {rzpId !== "—" ? (
@@ -479,7 +498,7 @@ export default function AdminPayments({ token }) {
                     </div>
                 ) : (
                     <div style={{ display: "grid", gap: "20px" }}>
-                        {mentorGroups.map((group) => {
+                        {safeMentorGroups.map((group) => {
                             const isExpanded = Boolean(expandedMentors[group.mentorId]);
                             return (
                                 <div
@@ -532,10 +551,10 @@ export default function AdminPayments({ token }) {
                                             <div style={{ textAlign: "right" }}>
                                                 <div style={{ fontSize: "11px", color: "#64748b", textTransform: "uppercase" }}>{group.sessionsCount} session(s)</div>
                                                 <div style={{ fontSize: "20px", fontWeight: 800, color: "#176b4e" }}>
-                                                    ₹{group.netPayoutTotal.toLocaleString("en-IN")}
+                                                    ₹{formatINR(group?.netPayoutTotal)}
                                                 </div>
                                                 <small style={{ fontSize: "11px", color: "#94a3b8" }}>
-                                                    (Gross: ₹{group.grossTotal.toLocaleString("en-IN")}{group.feeTotal > 0 ? ` - Fee: ₹${group.feeTotal.toLocaleString("en-IN")}` : ""})
+                                                    (Gross: ₹{formatINR(group?.grossTotal)}{group.feeTotal > 0 ? ` - Fee: ₹${formatINR(group?.feeTotal)}` : ""})
                                                 </small>
                                             </div>
 
@@ -603,10 +622,10 @@ export default function AdminPayments({ token }) {
                                                             <td>
                                                                 {s.date} • {s.time} ({s.duration}m)
                                                             </td>
-                                                            <td>₹{s.grossAmount.toLocaleString("en-IN")}</td>
-                                                            <td>₹{s.platformFee.toLocaleString("en-IN")}</td>
+                                                            <td>₹{formatINR(s?.grossAmount)}</td>
+                                                            <td>₹{formatINR(s?.platformFee)}</td>
                                                             <td>
-                                                                <strong style={{ color: "#176b4e" }}>₹{s.netAmount.toLocaleString("en-IN")}</strong>
+                                                                <strong style={{ color: "#176b4e" }}>₹{formatINR(s?.netAmount)}</strong>
                                                                 {s.isLegacy && (
                                                                     <span style={{ marginLeft: "6px", fontSize: "10px", background: "#fef3c7", color: "#b45309", padding: "1px 5px", borderRadius: "3px" }}>
                                                                         Legacy
@@ -666,7 +685,7 @@ export default function AdminPayments({ token }) {
 
                     {loading ? (
                         <div className="admin-loading"><div className="admin-spinner" /><p>Loading payout history…</p></div>
-                    ) : payoutHistory.length === 0 ? (
+                    ) : safePayoutHistory.length === 0 ? (
                         <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
                             No settled payouts recorded yet.
                         </div>
@@ -685,7 +704,7 @@ export default function AdminPayments({ token }) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {payoutHistory.map((item) => (
+                                    {safePayoutHistory.map((item) => (
                                         <tr key={item.bookingId}>
                                             <td>
                                                 <code style={{ background: "#edf7f2", color: "#087456", padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
@@ -708,7 +727,7 @@ export default function AdminPayments({ token }) {
                                             </td>
                                             <td>{item.sessionDate} {item.sessionTime}</td>
                                             <td>
-                                                <strong style={{ color: "#176b4e" }}>₹{item.netAmount.toLocaleString("en-IN")}</strong>
+                                                <strong style={{ color: "#176b4e" }}>₹{formatINR(item?.netAmount)}</strong>
                                                 {item.platformFee > 0 && <small style={{ display: "block", color: "#94a3b8" }}>Fee: ₹{item.platformFee}</small>}
                                             </td>
                                             <td>
@@ -731,7 +750,7 @@ export default function AdminPayments({ token }) {
             {tab === "refunds" && (
                 loading ? (
                     <div className="admin-loading"><div className="admin-spinner" /><p>Loading refunds queue…</p></div>
-                ) : refundsList.length === 0 ? (
+                ) : safeRefundsList.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "48px 24px", color: "#64748b" }}>
                         <CheckCircle size={36} color="#059669" style={{ marginBottom: "12px" }} />
                         <h3 style={{ margin: "0 0 6px", color: "#10261f" }}>No pending refunds!</h3>
@@ -752,7 +771,7 @@ export default function AdminPayments({ token }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {refundsList.map((r) => (
+                                {safeRefundsList.map((r) => (
                                     <tr key={r.bookingId}>
                                         <td><strong>#{String(r.bookingId).slice(-6).toUpperCase()}</strong></td>
                                         <td>
@@ -761,7 +780,7 @@ export default function AdminPayments({ token }) {
                                         </td>
                                         <td>{r.mentorName}</td>
                                         <td>{r.date}</td>
-                                        <td><strong style={{ color: "#176b4e" }}>₹{r.amount.toLocaleString("en-IN")}</strong></td>
+                                        <td><strong style={{ color: "#176b4e" }}>₹{formatINR(r?.amount)}</strong></td>
                                         <td>
                                             <span style={{ fontSize: "12px", color: "#64748b" }}>{r.cancellationReason}</span>
                                         </td>
@@ -871,7 +890,7 @@ export default function AdminPayments({ token }) {
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #e2e8f0", paddingTop: "8px", marginTop: "8px" }}>
                                 <span style={{ fontSize: "14px", fontWeight: 700, color: "#10261f" }}>Total Net Payout:</span>
-                                <strong style={{ fontSize: "18px", color: "#176b4e" }}>₹{settleModal.netTotal.toLocaleString("en-IN")}</strong>
+                                <strong style={{ fontSize: "18px", color: "#176b4e" }}>₹{formatINR(settleModal?.netTotal)}</strong>
                             </div>
                         </div>
 
