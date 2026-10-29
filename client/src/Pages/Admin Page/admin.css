@@ -3282,3 +3282,456 @@ html[data-theme="dark"] .admin-back-btn {
     color: #e2e8e5 !important;
 }
 
+
+
+/* =========================================================
+   SESSION & BOOKING ACTIVITY SUMMARY (ADMIN USER PROFILE)
+========================================================= */
+
+.sessions-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 16px 0 24px;
+}
+
+.session-summary-box {
+    display: flex;
+    flex-direction: column;
+    padding: 18px 20px;
+    border-radius: 12px;
+    border: 1px solid #dce7e1;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(18, 48, 38, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.session-summary-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(18, 48, 38, 0.08);
+}
+
+.summary-box-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.sum-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.sum-icon-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.sum-val {
+    font-size: 28px;
+    font-weight: 850;
+    line-height: 1.1;
+    color: #10261f;
+    margin-bottom: 6px;
+}
+
+.sum-val.text-green {
+    color: #059669;
+}
+
+.sum-desc {
+    font-size: 12px;
+    color: #6b8277;
+    font-weight: 500;
+}
+
+/* Tone variants */
+.tone-total .sum-icon-chip {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.tone-completed .sum-icon-chip {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.tone-mentor .sum-icon-chip {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.tone-learner .sum-icon-chip {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+/* =========================================================
+   STATUS & PAYMENT TAGS (ADMIN SESSIONS & TABLES)
+========================================================= */
+
+.status-tag,
+.payment-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+/* Completed / Paid / Confirmed */
+.status-tag.completed,
+.status-tag.confirmed,
+.payment-tag.paid,
+.payment-tag.confirmed,
+.payment-tag.verified {
+    background: #dcfce7;
+    color: #15803d;
+    border-color: #bbf7d0;
+}
+
+/* Pending / In-progress / Awaiting */
+.status-tag.pending,
+.status-tag.in_progress,
+.payment-tag.awaiting_payment,
+.payment-tag.unpaid,
+.payment-tag.pending {
+    background: #fef3c7;
+    color: #b45309;
+    border-color: #fde68a;
+}
+
+/* Cancelled / Failed / Rejected */
+.status-tag.cancelled,
+.status-tag.rejected,
+.payment-tag.failed,
+.payment-tag.cancelled {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+/* Refunded / Paid-out */
+.status-tag.refunded,
+.payment-tag.refunded,
+.payment-tag.paid_out {
+    background: #e0e7ff;
+    color: #4338ca;
+    border-color: #c7d2fe;
+}
+
+.admin-meet-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #176b4e;
+    font-weight: 650;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.admin-meet-link:hover {
+    color: #0a4632;
+    text-decoration: underline;
+}
+
+.admin-upi-chip {
+    display: inline-block;
+    background: #edf7f2;
+    color: #087456;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* =========================================================
+   COMPREHENSIVE DARK THEME SUITE FOR ADMIN CONSOLE
+========================================================= */
+
+html[data-theme="dark"] .admin-page,
+html.dark .admin-page,
+body.dark .admin-page {
+    --card-bg: #11261f;
+    --border: rgba(255, 255, 255, 0.12);
+    --admin-panel-bg: #11261f;
+    --admin-toolbar-bg: #153228;
+    --admin-input-bg: #0c1c17;
+    --admin-table-th: #163429;
+    --admin-table-hover: #18382c;
+    --admin-text-main: #f0fdf4;
+    --admin-text-sub: #9cb3a8;
+}
+
+/* Panel & Containers */
+html[data-theme="dark"] .admin-users-panel,
+html.dark .admin-users-panel {
+    background: #11261f !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Filter Toolbar */
+html[data-theme="dark"] .admin-users-toolbar,
+html.dark .admin-users-toolbar {
+    background: #153228 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8e5 !important;
+}
+
+html[data-theme="dark"] .admin-users-toolbar select,
+html.dark .admin-users-toolbar select {
+    background: #0c1c17 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .admin-users-toolbar select:focus,
+html.dark .admin-users-toolbar select:focus {
+    border-color: #34d399 !important;
+    outline: none;
+}
+
+/* Search Bar */
+html[data-theme="dark"] .admin-search,
+html.dark .admin-search {
+    background: #0c1c17 !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #f0fdf4 !important;
+}
+
+html[data-theme="dark"] .admin-search input,
+html.dark .admin-search input {
+    color: #f0fdf4 !important;
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .admin-search input::placeholder,
+html.dark .admin-search input::placeholder {
+    color: #648275 !important;
+}
+
+html[data-theme="dark"] .admin-search span,
+html.dark .admin-search span {
+    color: #729486 !important;
+}
+
+/* Outline Buttons */
+html[data-theme="dark"] .admin-outline-button,
+html.dark .admin-outline-button {
+    background: #163228 !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: #a7f3d0 !important;
+}
+
+html[data-theme="dark"] .admin-outline-button:hover,
+html.dark .admin-outline-button:hover {
+    background: #1d4032 !important;
+    color: #ffffff !important;
+    border-color: #34d399 !important;
+}
+
+/* Admin Users Table */
+html[data-theme="dark"] .admin-users-table th,
+html.dark .admin-users-table th {
+    background: #163429 !important;
+    color: #95b5a6 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .admin-users-table td,
+html.dark .admin-users-table td {
+    color: #d1ded8 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+html[data-theme="dark"] .admin-users-table td strong,
+html.dark .admin-users-table td strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-users-table td small,
+html.dark .admin-users-table td small {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .admin-users-table tbody tr:hover,
+html.dark .admin-users-table tbody tr:hover {
+    background: #18382c !important;
+}
+
+html[data-theme="dark"] .admin-users-table tbody tr.is-self,
+html.dark .admin-users-table tbody tr.is-self {
+    background: #163b2f !important;
+}
+
+/* Admin Sessions Table */
+html[data-theme="dark"] .admin-sessions-overview-table th,
+html.dark .admin-sessions-overview-table th {
+    background: #163429 !important;
+    color: #95b5a6 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="dark"] .admin-sessions-overview-table td,
+html.dark .admin-sessions-overview-table td {
+    color: #d1ded8 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+html[data-theme="dark"] .admin-sessions-overview-table td strong,
+html.dark .admin-sessions-overview-table td strong {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .admin-sessions-overview-table td small,
+html.dark .admin-sessions-overview-table td small {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .admin-sessions-overview-table tbody tr:hover td,
+html.dark .admin-sessions-overview-table tbody tr:hover td {
+    background: #18382c !important;
+}
+
+/* Meeting Link & Chips */
+html[data-theme="dark"] .admin-meet-link,
+html.dark .admin-meet-link {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .admin-meet-link:hover,
+html.dark .admin-meet-link:hover {
+    color: #6ee7b7 !important;
+}
+
+html[data-theme="dark"] .admin-upi-chip,
+html.dark .admin-upi-chip,
+html[data-theme="dark"] .admin-page code,
+html.dark .admin-page code {
+    background: #18362b !important;
+    color: #6ee7b7 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Status Tags in Dark Mode */
+html[data-theme="dark"] .status-tag.completed,
+html[data-theme="dark"] .status-tag.confirmed,
+html[data-theme="dark"] .payment-tag.paid,
+html[data-theme="dark"] .payment-tag.confirmed,
+html[data-theme="dark"] .payment-tag.verified,
+html.dark .status-tag.completed,
+html.dark .status-tag.confirmed,
+html.dark .payment-tag.paid,
+html.dark .payment-tag.confirmed,
+html.dark .payment-tag.verified {
+    background: rgba(16, 185, 129, 0.18) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html[data-theme="dark"] .status-tag.pending,
+html[data-theme="dark"] .status-tag.in_progress,
+html[data-theme="dark"] .payment-tag.awaiting_payment,
+html[data-theme="dark"] .payment-tag.unpaid,
+html[data-theme="dark"] .payment-tag.pending,
+html.dark .status-tag.pending,
+html.dark .status-tag.in_progress,
+html.dark .payment-tag.awaiting_payment,
+html.dark .payment-tag.unpaid,
+html.dark .payment-tag.pending {
+    background: rgba(245, 158, 11, 0.18) !important;
+    color: #fde68a !important;
+    border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html[data-theme="dark"] .status-tag.cancelled,
+html[data-theme="dark"] .status-tag.rejected,
+html[data-theme="dark"] .payment-tag.failed,
+html[data-theme="dark"] .payment-tag.cancelled,
+html.dark .status-tag.cancelled,
+html.dark .status-tag.rejected,
+html.dark .payment-tag.failed,
+html.dark .payment-tag.cancelled {
+    background: rgba(239, 68, 68, 0.18) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+html[data-theme="dark"] .status-tag.refunded,
+html[data-theme="dark"] .payment-tag.refunded,
+html[data-theme="dark"] .payment-tag.paid_out,
+html.dark .status-tag.refunded,
+html.dark .payment-tag.refunded,
+html.dark .payment-tag.paid_out {
+    background: rgba(99, 102, 241, 0.18) !important;
+    color: #a5b4fc !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+/* User Profile Session Summary Cards in Dark Mode */
+html[data-theme="dark"] .session-summary-box,
+html.dark .session-summary-box {
+    background: #11261f !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] .sum-label,
+html.dark .sum-label {
+    color: #9cb3a8 !important;
+}
+
+html[data-theme="dark"] .sum-val,
+html.dark .sum-val {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .sum-val.text-green,
+html.dark .sum-val.text-green {
+    color: #34d399 !important;
+}
+
+html[data-theme="dark"] .sum-desc,
+html.dark .sum-desc {
+    color: #8da99c !important;
+}
+
+html[data-theme="dark"] .tone-total .sum-icon-chip,
+html.dark .tone-total .sum-icon-chip {
+    background: rgba(2, 132, 199, 0.2) !important;
+    color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .tone-completed .sum-icon-chip,
+html.dark .tone-completed .sum-icon-chip {
+    background: rgba(22, 163, 74, 0.2) !important;
+    color: #4ade80 !important;
+}
+
+html[data-theme="dark"] .tone-mentor .sum-icon-chip,
+html.dark .tone-mentor .sum-icon-chip {
+    background: rgba(217, 119, 6, 0.2) !important;
+    color: #fbbf24 !important;
+}
+
+html[data-theme="dark"] .tone-learner .sum-icon-chip,
+html.dark .tone-learner .sum-icon-chip {
+    background: rgba(124, 58, 237, 0.2) !important;
+    color: #c084fc !important;
+}

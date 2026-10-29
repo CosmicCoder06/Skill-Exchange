@@ -355,25 +355,37 @@ export default function AdminUserProfile({
 
                 {sessionsSummary && (
                     <div className="sessions-summary-grid">
-                        <div className="session-summary-box">
-                            <span className="sum-label">TOTAL SESSIONS</span>
+                        <div className="session-summary-box tone-total">
+                            <div className="summary-box-top">
+                                <span className="sum-label">Total Sessions</span>
+                                <div className="sum-icon-chip"><Calendar size={15} /></div>
+                            </div>
                             <strong className="sum-val">{sessionsSummary.totalSessions || 0}</strong>
-                            <small>Booked across platform</small>
+                            <span className="sum-desc">Booked across platform</span>
                         </div>
-                        <div className="session-summary-box">
-                            <span className="sum-label">COMPLETED</span>
+                        <div className="session-summary-box tone-completed">
+                            <div className="summary-box-top">
+                                <span className="sum-label">Completed</span>
+                                <div className="sum-icon-chip"><CheckCircle2 size={15} /></div>
+                            </div>
                             <strong className="sum-val text-green">{sessionsSummary.completedSessions || 0}</strong>
-                            <small>Successfully delivered</small>
+                            <span className="sum-desc">Successfully delivered</span>
                         </div>
-                        <div className="session-summary-box">
-                            <span className="sum-label">AS MENTOR</span>
+                        <div className="session-summary-box tone-mentor">
+                            <div className="summary-box-top">
+                                <span className="sum-label">As Mentor</span>
+                                <div className="sum-icon-chip"><GraduationCap size={15} /></div>
+                            </div>
                             <strong className="sum-val">{sessionsSummary.asMentor?.total || 0}</strong>
-                            <small>{sessionsSummary.asMentor?.completed || 0} completed</small>
+                            <span className="sum-desc">{sessionsSummary.asMentor?.completed || 0} completed</span>
                         </div>
-                        <div className="session-summary-box">
-                            <span className="sum-label">AS LEARNER</span>
+                        <div className="session-summary-box tone-learner">
+                            <div className="summary-box-top">
+                                <span className="sum-label">As Learner</span>
+                                <div className="sum-icon-chip"><BookOpen size={15} /></div>
+                            </div>
                             <strong className="sum-val">{sessionsSummary.asLearner?.total || 0}</strong>
-                            <small>{sessionsSummary.asLearner?.completed || 0} completed</small>
+                            <span className="sum-desc">{sessionsSummary.asLearner?.completed || 0} completed</span>
                         </div>
                     </div>
                 )}

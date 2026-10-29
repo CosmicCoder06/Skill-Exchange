@@ -144,12 +144,17 @@ async function settlePayouts(req, res) {
 async function getPayoutHistory(req, res) {
   try {
     const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 50, 1), 200);
-    const history = await payoutService.getPayoutHistory(limit);
+    const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+    const search = (req.query.search || "").trim();
+    const result = await payoutService.getPayoutHistory({ limit, page, search });
+    const historyList = Array.isArray(result) ? result : (Array.isArray(result?.history) ? result.history : []);
+    const pagination = result?.pagination || { page, limit, total: historyList.length, pages: 1 };
 
     return res.json({
       success: true,
-      count: history.length,
-      history,
+      count: historyList.length,
+      history: historyList,
+      pagination,
     });
   } catch (error) {
     console.error("getPayoutHistory error:", error);
