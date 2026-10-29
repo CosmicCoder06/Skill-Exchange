@@ -18,6 +18,7 @@ import AdminPage from "./Pages/Admin Page/admin";
 
 import LearnerDashboard from "./Pages/Learner Dashboard/LearnerDashboard";
 import MentorDashboard from "./Pages/Mentor Dashboard/MentorDashboard";
+import AppFooter from "./Components/AppFooter";
 
 import { SocketProvider } from "./context/SocketContext";
 
@@ -388,41 +389,50 @@ function App() {
     if (!token) {
         if (showRegister) {
             return (
-                <RegistrationPage
-                    onBackHome={() => {
-                        setShowRegister(false);
-                        setShowLogin(false);
-                    }}
-                    onBackToLogin={() => {
-                        setShowRegister(false);
-                        setShowLogin(true);
-                    }}
-                    onRegistered={() => {
-                        setShowRegister(false);
-                        setShowLogin(true);
-                    }}
-                />
+                <>
+                    <RegistrationPage
+                        onBackHome={() => {
+                            setShowRegister(false);
+                            setShowLogin(false);
+                        }}
+                        onBackToLogin={() => {
+                            setShowRegister(false);
+                            setShowLogin(true);
+                        }}
+                        onRegistered={() => {
+                            setShowRegister(false);
+                            setShowLogin(true);
+                        }}
+                    />
+                    <AppFooter />
+                </>
             );
         }
 
         if (showLogin) {
             return (
-                <LoginPage
-                    onLogin={handleLogin}
-                    onCreateAccount={() => {
-                        setShowLogin(false);
-                        setShowRegister(true);
-                    }}
-                />
+                <>
+                    <LoginPage
+                        onLogin={handleLogin}
+                        onCreateAccount={() => {
+                            setShowLogin(false);
+                            setShowRegister(true);
+                        }}
+                    />
+                    <AppFooter />
+                </>
             );
         }
 
         return (
-            <HomePage
-                publicMode
-                onLogin={() => setShowLogin(true)}
-                onRegister={() => setShowRegister(true)}
-            />
+            <>
+                <HomePage
+                    publicMode
+                    onLogin={() => setShowLogin(true)}
+                    onRegister={() => setShowRegister(true)}
+                />
+                <AppFooter />
+            </>
         );
     }
 
@@ -657,6 +667,7 @@ function App() {
                     }
                 />
             )}
+            {page !== "chat" && page !== "admin" && <AppFooter />}
             </div>
 
             {globalModal && (

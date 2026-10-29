@@ -92,6 +92,15 @@ const settingRoutes = require("./routes/settingRoutes");
 const activityLogRoutes = require("./routes/activityLogRoutes");
 
 // =========================
+// Error Handling Middleware Imports
+// =========================
+
+const {
+    notFound,
+    errorHandler,
+} = require("./Backend Configuration/Configuration Folders/Middleware Configuration/errorMiddleware");
+
+// =========================
 // Middleware
 // =========================
 
@@ -178,6 +187,13 @@ app.use("/api", activityLogRoutes);
 // authorization middleware applies to every request that reaches it.
 app.use('/api', require('./routes/paymentRoutes'));
 app.use("/api", adminRoutes);
+
+// =========================
+// Centralized Error Handlers
+// =========================
+
+app.use(notFound);
+app.use(errorHandler);
 
 // =========================
 // Socket.io

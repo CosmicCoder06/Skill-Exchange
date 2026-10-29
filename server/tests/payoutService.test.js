@@ -119,7 +119,7 @@ test("getPayoutState accurately identifies all payout lifecycle states", () => {
   );
 });
 
-test("calculatePayoutAmounts enforces integer paise, 3% base deduction, and zero GST to mentor", () => {
+test("calculatePayoutAmounts enforces integer paise, 0% platform fee, and 100% mentor payout", () => {
   // Scenario 1: New booking with base rate ₹100, 3% platform fee = ₹3, mentor payout = ₹97
   // Even if grossAmountWithGst was ₹118, GST must NOT enter mentor calculation
   const booking1 = {
@@ -131,10 +131,10 @@ test("calculatePayoutAmounts enforces integer paise, 3% base deduction, and zero
 
   assert.equal(amounts1.gross, 100);
   assert.equal(amounts1.grossPaise, 10000);
-  assert.equal(amounts1.platformFee, 3);
-  assert.equal(amounts1.mentorFeePaise, 300);
-  assert.equal(amounts1.net, 97);
-  assert.equal(amounts1.mentorPayoutPaise, 9700);
+  assert.equal(amounts1.platformFee, 0);
+  assert.equal(amounts1.mentorFeePaise, 0);
+  assert.equal(amounts1.net, 100);
+  assert.equal(amounts1.mentorPayoutPaise, 10000);
 
   // Scenario 2: Stored integer paise fields take precedence
   const booking2 = {

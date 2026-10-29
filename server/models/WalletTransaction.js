@@ -38,12 +38,12 @@ const walletTransactionSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Booking"
         },
-        // Mentor platform fee (3% deducted from mentor payout)
+        // Mentor platform fee (0% platform fee)
         mentorPlatformFee: {
             type: Number,
             default: 0
         },
-        // Learner convenience fee (3% added to external UPI/direct payment, pure platform revenue)
+        // Learner convenience fee (0% extra charges)
         learnerConvenienceFee: {
             type: Number,
             default: 0
