@@ -434,4 +434,4 @@ Skill Exchange was developed as a comprehensive engineering project at **GLA Uni
 
 ## 📜 License
 
-This project is licensed under the [MIT License](LICENSE) for educational and collaborative development.
+
