@@ -11,3 +11,31 @@ coverage/
 demo_issues.txt
 recordings_raw/
 *.mp4
+
+# Generated presentations, documents and exports
+*.pptx
+*.docx
+*.pdf
+*.html
+!client/index.html
+
+# Presentation & slide image exports
+*_exports/
+slide_exports/
+
+# Presentation generation and export scripts
+*.py
+
+# Scratch and automation helper scripts in root
+capture_*.js
+check_*.js
+debug_login.js
+dump_form.js
+fix_profiles.js
+make_logo.js
+ping_render.js
+recapture_chat.js
+record_skill_exchange_demo.ps1
+seed_*.js
+setup_profiles.js
+test_*.js
