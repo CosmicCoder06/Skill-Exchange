@@ -69,7 +69,7 @@ function BookingPage({
                 let profData = null;
                 try {
                     profData = profText ? JSON.parse(profText) : null;
-                } catch {}
+                } catch { /* ignore json parse error */ }
 
                 if (profRes.ok && (profData?.profile || profData?.user)) {
                     if (active) {
@@ -87,7 +87,7 @@ function BookingPage({
                 let listData = null;
                 try {
                     listData = listText ? JSON.parse(listText) : null;
-                } catch {}
+                } catch { /* ignore json parse error */ }
 
                 const match = listData?.mentors?.find((m) => String(m._id || m.id) === String(mentorId));
                 if (match && active) {
