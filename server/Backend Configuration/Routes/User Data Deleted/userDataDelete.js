@@ -9,3 +9,4 @@ const verifyToken=require("../../Configuration Folders/Middleware Configuration/
 router.delete("/user/delete/:id", verifyToken, deletedUser)
 
 module.exports= router;
+// @teamcosmiccoders

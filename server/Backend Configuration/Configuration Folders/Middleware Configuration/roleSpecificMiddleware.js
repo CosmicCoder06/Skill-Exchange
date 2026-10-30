@@ -3,9 +3,41 @@
 
 const authorize = (...allowedRoles) => {
     return (req, res, next) => {
-        if (!req.user || !allowedRoles.includes(req.user.role)) {
+        if (!req.user) {
+            return res.status(401).json({
+                message: "User is not authenticated",
+            });
+        }
+
+        const userRole =
+            String(req.user.role || "")
+                .trim()
+                .toLowerCase();
+
+        const normalizedAllowedRoles =
+            allowedRoles.map((role) =>
+                String(role)
+                    .trim()
+                    .toLowerCase()
+            );
+
+        if (
+            !userRole ||
+            !normalizedAllowedRoles.includes(userRole)
+        ) {
+            console.error(
+                "Authorization failed:",
+                {
+                    userRole,
+                    allowedRoles:
+                        normalizedAllowedRoles,
+                    userId: req.user.id,
+                }
+            );
+
             return res.status(403).json({
-                message: "Is action ke liye permission nahi hai"
+                message:
+                    "Is action ke liye permission nahi hai",
             });
         }
 
@@ -14,3 +46,4 @@ const authorize = (...allowedRoles) => {
 };
 
 module.exports = authorize;
+// @teamcosmiccoders

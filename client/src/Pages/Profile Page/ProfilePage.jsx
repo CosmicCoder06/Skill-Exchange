@@ -1,17 +1,23 @@
+import { resolveImageUrl } from '../../utils/imageUrl';
 import { useEffect, useState } from "react";
 import "./ProfilePage.css";
 
 function ProfilePage({
     token,
     profileStatus,
+    initialProfile,
+    onProfileUpdated,
     onHome,
+    onDashboard,
     onLogout,
     onMessagesClick,
     onBookings,
     onCompleteProfile
 }) {
-    const [profile, setProfile] = useState(null);
-    const [profileComplete, setProfileComplete] = useState(false);
+    const [profile, setProfile] = useState(initialProfile || null);
+    const [profileComplete, setProfileComplete] = useState(
+        profileStatus === true || Boolean(initialProfile?.bio)
+    );
 
     const [reviewsData, setReviewsData] = useState({
         stats: {
@@ -34,96 +40,77 @@ function ProfilePage({
     const [showPhoto, setShowPhoto] = useState(false);
 
     useEffect(() => {
-        async function fetchProfile() {
-            try {
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/profile/me`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.message || "Unable to load profile"
-                    );
-                }
-
-                setProfile(data.profile);
-
-                setProfileComplete(
-                    data.profileComplete === true
-                );
-            } catch (error) {
-                console.error(
-                    "Profile fetch error:",
-                    error
-                );
-            }
+        if (initialProfile) {
+            setProfile(initialProfile);
+            setProfileComplete(
+                profileStatus === true || Boolean(initialProfile?.bio)
+            );
         }
-
-        if (token) {
-            fetchProfile();
-        }
-    }, [token]);
+    }, [initialProfile, profileStatus]);
 
     useEffect(() => {
-        async function fetchReviews() {
+        if (!token) return;
+
+        let isMounted = true;
+        async function loadProfileAndReviews() {
+            setReviewsLoading(true);
+
+            const profilePromise = !initialProfile
+                ? fetch(`${import.meta.env.VITE_API_URL}/profile/me`, {
+                      headers: { Authorization: `Bearer ${token}` }
+                  }).then((res) => (res.ok ? res.json() : null))
+                : Promise.resolve(null);
+
+            const reviewsPromise = fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then((res) => (res.ok ? res.json() : null));
+
             try {
-                setReviewsLoading(true);
+                const [profData, revData] = await Promise.all([
+                    profilePromise,
+                    reviewsPromise
+                ]);
 
-                const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/reviews`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.message || "Unable to load reviews"
-                    );
+                if (isMounted && profData?.profile) {
+                    setProfile(profData.profile);
+                    setProfileComplete(profData.profileComplete === true);
+                    if (onProfileUpdated) onProfileUpdated(profData.profile);
                 }
 
-                setReviewsData({
-                    stats: data.stats || {
-                        average: 0,
-                        totalReceived: 0,
-                        totalGiven: 0,
-                        distribution: {
-                            5: 0,
-                            4: 0,
-                            3: 0,
-                            2: 0,
-                            1: 0
-                        }
-                    },
-                    reviews: Array.isArray(data.reviews)
-                        ? data.reviews
-                        : []
-                });
+                if (isMounted && revData) {
+                    setReviewsData({
+                        stats: revData.stats || {
+                            average: 0,
+                            totalReceived: 0,
+                            totalGiven: 0,
+                            distribution: {
+                                5: 0,
+                                4: 0,
+                                3: 0,
+                                2: 0,
+                                1: 0
+                            }
+                        },
+                        reviews: Array.isArray(revData.reviews)
+                            ? revData.reviews
+                            : []
+                    });
+                }
             } catch (error) {
-                console.error(
-                    "Reviews fetch error:",
-                    error
-                );
+                console.error("Profile/Reviews load error:", error);
             } finally {
-                setReviewsLoading(false);
+                if (isMounted) {
+                    setReviewsLoading(false);
+                }
             }
         }
 
-        if (token) {
-            fetchReviews();
-        }
-    }, [token]);
+        loadProfileAndReviews();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [token, initialProfile]);
 
     if (!profile) {
         return (
@@ -161,9 +148,7 @@ function ProfilePage({
         stats.totalReceived || 0;
 
     const ratingPercentage = (rating) => {
-        if (!totalReviews) {
-            return 0;
-        }
+        if (!totalReviews) return 0;
 
         return Math.round(
             (distribution[rating] / totalReviews) * 100
@@ -175,9 +160,7 @@ function ProfilePage({
             "Delete your account permanently? This cannot be undone."
         );
 
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         try {
             setDeleting(true);
@@ -216,115 +199,41 @@ function ProfilePage({
     return (
         <main className="profile-page">
 
-            {/* =========================================
-                COLLAPSIBLE SIDEBAR
-            ========================================= */}
-
-            <aside className="profile-sidebar">
-
-                <button
-                    className="sidebar-logo"
-                    onClick={onHome}
-                >
-                    ↗
-                </button>
-
-                <div className="sidebar-navigation">
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onHome}
-                    >
-                        <span className="sidebar-icon">
-                            ⌂
-                        </span>
-
-                        <span className="sidebar-text">
-                            Home
-                        </span>
-                    </button>
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onMessagesClick}
-                    >
-                        <span className="sidebar-icon">
-                            ◇
-                        </span>
-
-                        <span className="sidebar-text">
-                            Messages
-                        </span>
-                    </button>
-
-                    <button
-                        className="sidebar-item"
-                        onClick={onBookings}
-                    >
-                        <span className="sidebar-icon">
-                            ▣
-                        </span>
-
-                        <span className="sidebar-text">
-                            My Sessions
-                        </span>
-                    </button>
-
-                    <button
-                        className="sidebar-item active"
-                    >
-                        <span className="sidebar-icon">
-                            ●
-                        </span>
-
-                        <span className="sidebar-text">
-                            Profile
-                        </span>
-                    </button>
-
-                </div>
-
-                <button
-                    className="sidebar-item sidebar-logout"
-                    onClick={onLogout}
-                >
-                    <span className="sidebar-icon">
-                        ↪
-                    </span>
-
-                    <span className="sidebar-text">
-                        Logout
-                    </span>
-                </button>
-
-            </aside>
-
-
-            {/* =========================================
-                MAIN WORKSPACE
-            ========================================= */}
-
             <section className="profile-workspace">
-
-                {/* TOP HEADER */}
 
                 <header className="profile-header">
 
-                    <div className="profile-brand">
-
-                        <strong>
-                            MY SPACE
-                        </strong>
+                    <div
+                        className="profile-brand"
+                        onClick={onHome}
+                        role="button"
+                        tabIndex={0}
+                        title="Go to Home"
+                    >
+                        <strong>MY SPACE</strong>
 
                         <span>
                             {String(profile.role || "learner").toLowerCase() === "mentor"
                                 ? "Your mentor profile"
                                 : "Your learning profile"}
                         </span>
-
                     </div>
 
                     <div className="profile-header-actions">
+
+                        <button
+                            className="profile-header-link"
+                            onClick={onHome}
+                        >
+                            Home <span>→</span>
+                        </button>
+
+                        <button
+                            className="profile-header-link"
+                            onClick={onDashboard}
+                        >
+                            Dashboard <span>→</span>
+                        </button>
 
                         <button
                             className="profile-header-link"
@@ -340,14 +249,18 @@ function ProfilePage({
                             My Sessions <span>→</span>
                         </button>
 
+                        <button
+                            className="profile-header-logout"
+                            onClick={onLogout}
+                            title="Log out"
+                        >
+                            <span className="profile-logout-icon">↪</span>
+                            Logout
+                        </button>
+
                     </div>
 
                 </header>
-
-
-                {/* =========================================
-                    COVER IMAGE
-                ========================================= */}
 
                 <section
                     className={
@@ -359,7 +272,7 @@ function ProfilePage({
                         profile.coverImageUrl
                             ? {
                                   backgroundImage:
-                                      `url("${profile.coverImageUrl}")`
+                                      `url("${resolveImageUrl(profile.coverImageUrl)}")`
                               }
                             : {}
                     }
@@ -372,9 +285,7 @@ function ProfilePage({
                         onClick={onCompleteProfile}
                     >
                         ✎
-                        <span>
-                            Change cover
-                        </span>
+                        <span>Change cover</span>
                     </button>
 
                     {!profile.coverImageUrl && (
@@ -390,11 +301,6 @@ function ProfilePage({
                     )}
 
                 </section>
-
-
-                {/* =========================================
-                    PROFILE IDENTITY
-                ========================================= */}
 
                 <section className="profile-identity">
 
@@ -415,25 +321,23 @@ function ProfilePage({
                         onKeyDown={(event) => {
                             if (
                                 profile.avatarUrl &&
-                                (event.key === "Enter" || event.key === " ")
+                                (event.key === "Enter" ||
+                                    event.key === " ")
                             ) {
                                 event.preventDefault();
                                 setShowPhoto(true);
                             }
                         }}
                     >
-
-                        <div className="profile-photo-fallback-letter">
-                            {initials}
-                        </div>
-
                         {profile.avatarUrl ? (
                             <img
                                 className="profile-photo"
-                                src={profile.avatarUrl}
+                                src={resolveImageUrl(profile.avatarUrl)}
                                 alt={`${profile.name}'s profile`}
                                 onError={(event) => {
-                                    event.currentTarget.style.display = "none";
+                                    event.currentTarget.style.display =
+                                        "none";
+
                                     event.currentTarget.parentElement.classList.add(
                                         "profile-photo-failed"
                                     );
@@ -446,7 +350,6 @@ function ProfilePage({
                         )}
 
                     </div>
-
 
                     <div className="profile-main-info">
 
@@ -465,22 +368,15 @@ function ProfilePage({
                             </span>
 
                             <span className="profile-role">
-                                {profile.role ||
-                                    "Learner"}
+                                {profile.role || "Learner"}
                             </span>
 
                         </div>
 
-                        <h1>
-                            {profile.name}
-                        </h1>
-
-                        <p>
-                            {profile.email}
-                        </p>
+                        <h1>{profile.name}</h1>
+                        <p>{profile.email}</p>
 
                     </div>
-
 
                     <div className="profile-actions">
 
@@ -497,76 +393,48 @@ function ProfilePage({
 
                 </section>
 
-
-                {/* =========================================
-                    PROFILE STATISTICS
-                ========================================= */}
-
                 <section className="profile-stats">
 
                     <div className="stat-item">
-
                         <strong>
                             {stats.average
                                 ? stats.average.toFixed(1)
                                 : "—"}
                         </strong>
 
-                        <span>
-                            Average Rating
-                        </span>
-
+                        <span>Average Rating</span>
                     </div>
 
                     <div className="stat-item">
-
                         <strong>
                             {stats.totalReceived || 0}
                         </strong>
 
-                        <span>
-                            Reviews Received
-                        </span>
-
+                        <span>Reviews Received</span>
                     </div>
 
                     <div className="stat-item">
-
                         <strong>
                             {stats.totalGiven || 0}
                         </strong>
 
-                        <span>
-                            Reviews Given
-                        </span>
-
+                        <span>Reviews Given</span>
                     </div>
 
                     <div className="stat-item">
-
                         <strong>
                             {teachingSkills.length +
                                 learningSkills.length}
                         </strong>
 
-                        <span>
-                            Skills Listed
-                        </span>
-
+                        <span>Skills Listed</span>
                     </div>
 
                 </section>
 
-
-                {/* =========================================
-                    PROFILE CONTENT
-                ========================================= */}
-
                 <section className="profile-content">
 
                     <div className="profile-content-main">
-
-                        {/* ABOUT */}
 
                         <section className="profile-section">
 
@@ -576,9 +444,7 @@ function ProfilePage({
 
                             <div className="section-body">
 
-                                <h2>
-                                    A little about me
-                                </h2>
+                                <h2>A little about me</h2>
 
                                 <p className="profile-bio">
                                     {profile.bio ||
@@ -601,9 +467,6 @@ function ProfilePage({
 
                         </section>
 
-
-                        {/* SKILLS */}
-
                         <section className="profile-section">
 
                             <div className="section-label">
@@ -620,9 +483,7 @@ function ProfilePage({
 
                                     <div className="skill-column">
 
-                                        <p>
-                                            I CAN HELP WITH
-                                        </p>
+                                        <p>I CAN HELP WITH</p>
 
                                         {teachingSkills.length ? (
                                             <div className="skill-list">
@@ -645,12 +506,9 @@ function ProfilePage({
 
                                     </div>
 
-
                                     <div className="skill-column">
 
-                                        <p>
-                                            I WANT TO LEARN
-                                        </p>
+                                        <p>I WANT TO LEARN</p>
 
                                         {learningSkills.length ? (
                                             <div className="skill-list">
@@ -679,9 +537,6 @@ function ProfilePage({
 
                         </section>
 
-
-                        {/* COMMUNITY FEEDBACK */}
-
                         <section className="profile-reviews-section">
 
                             <div className="reviews-heading">
@@ -704,9 +559,7 @@ function ProfilePage({
                                             : "—"}
                                     </strong>
 
-                                    <span>
-                                        ★★★★★
-                                    </span>
+                                    <span>★★★★★</span>
 
                                     <small>
                                         {totalReviews
@@ -722,21 +575,21 @@ function ProfilePage({
 
                             </div>
 
-
                             {reviewsLoading ? (
                                 <div className="reviews-empty">
                                     Loading ratings...
                                 </div>
                             ) : (
                                 <>
-
                                     {totalReviews > 0 && (
                                         <div className="rating-breakdown">
 
                                             {[5, 4, 3, 2, 1].map(
                                                 (star) => {
                                                     const count =
-                                                        distribution[star] || 0;
+                                                        distribution[
+                                                            star
+                                                        ] || 0;
 
                                                     return (
                                                         <div
@@ -769,7 +622,6 @@ function ProfilePage({
                                         </div>
                                     )}
 
-
                                     {reviewsData.reviews.length > 0 ? (
                                         <div className="reviews-list">
 
@@ -786,7 +638,9 @@ function ProfilePage({
                                                                 {review
                                                                     .reviewer
                                                                     ?.name
-                                                                    ?.charAt(0)
+                                                                    ?.charAt(
+                                                                        0
+                                                                    )
                                                                     ?.toUpperCase() ||
                                                                     "U"}
                                                             </div>
@@ -824,7 +678,6 @@ function ProfilePage({
 
                                                         </div>
 
-
                                                         <div className="review-stars">
                                                             {"★".repeat(
                                                                 review.rating
@@ -841,7 +694,9 @@ function ProfilePage({
                                                         {review.comment && (
                                                             <p className="review-comment">
                                                                 “
-                                                                {review.comment}
+                                                                {
+                                                                    review.comment
+                                                                }
                                                                 ”
                                                             </p>
                                                         )}
@@ -853,6 +708,7 @@ function ProfilePage({
                                         </div>
                                     ) : (
                                         <div className="reviews-empty">
+
                                             <div>⭐</div>
 
                                             <h3>
@@ -864,20 +720,15 @@ function ProfilePage({
                                                 to start building your
                                                 reputation.
                                             </p>
+
                                         </div>
                                     )}
-
                                 </>
                             )}
 
                         </section>
 
                     </div>
-
-
-                    {/* =========================================
-                        RIGHT INFORMATION PANEL
-                    ========================================= */}
 
                     <aside className="profile-side-content">
 
@@ -889,9 +740,7 @@ function ProfilePage({
 
                             <div className="detail-row">
 
-                                <span>
-                                    Availability
-                                </span>
+                                <span>Availability</span>
 
                                 <strong>
                                     {profile.availability
@@ -904,9 +753,7 @@ function ProfilePage({
 
                             <div className="detail-row">
 
-                                <span>
-                                    Hourly rate
-                                </span>
+                                <span>Hourly rate</span>
 
                                 <strong>
                                     {profile.hourlyRate
@@ -918,9 +765,7 @@ function ProfilePage({
 
                             <div className="detail-row">
 
-                                <span>
-                                    Member since
-                                </span>
+                                <span>Member since</span>
 
                                 <strong>
                                     {profile.createdAt
@@ -940,12 +785,19 @@ function ProfilePage({
 
                         </section>
 
-
                         <section className="side-section">
 
                             <p className="side-label">
                                 QUICK ACTIONS
                             </p>
+
+                            <button
+                                className="side-action"
+                                onClick={onDashboard}
+                            >
+                                Dashboard
+                                <span>→</span>
+                            </button>
 
                             <button
                                 className="side-action"
@@ -972,7 +824,6 @@ function ProfilePage({
                             </button>
 
                         </section>
-
 
                         <section className="side-section">
 
@@ -1026,19 +877,24 @@ function ProfilePage({
                             ×
                         </button>
 
-                        <img
-                            className="profile-photo-lightbox-image"
-                            src={profile.avatarUrl}
-                            alt={`${profile.name}'s profile`}
-                            onClick={(event) =>
-                                event.stopPropagation()
-                            }
-                        />
+                        <div
+                            className="profile-photo-lightbox-circle-wrapper"
+                            onClick={(event) => event.stopPropagation()}
+                        >
+                            <img
+                                className="profile-photo-lightbox-image"
+                                src={resolveImageUrl(profile.avatarUrl)}
+                                alt={`${profile.name}'s profile`}
+                            />
+                            <div className="profile-photo-caption">
+                                <strong>{profile.name}</strong>
+                                <span>{profile.role || "Member"}</span>
+                            </div>
+                        </div>
                     </div>
                 )}
 
             </section>
-
         </main>
     );
 }

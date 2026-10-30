@@ -1,10 +1,69 @@
 const mongoose = require("mongoose")
 const Conversation = require("../models/Conversation")
 const Message = require("../models/Message")
+const Booking = require("../models/Booking")
 const User = require("../Backend Configuration/Models/UserSchema/user")
 
 const PARTICIPANT_FIELDS =
     "name email role avatarUrl"
+
+async function getActiveSessionInfo(participantA, participantB, bookingId = null) {
+    try {
+        const query = {
+            status: "accepted"
+        }
+
+        if (bookingId && mongoose.isValidObjectId(bookingId)) {
+            query._id = bookingId
+        } else if (participantA && participantB) {
+            query.$or = [
+                { mentor: participantA, learner: participantB },
+                { mentor: participantB, learner: participantA }
+            ]
+        } else {
+            return { isActive: false, activeSession: null, mostRecentPastSessionEnd: 0 }
+        }
+
+        const bookings = await Booking.find(query).sort({ date: -1, time: -1 }).lean()
+        const now = Date.now()
+
+        let activeSession = null
+        let mostRecentPastSessionEnd = 0
+
+        for (const b of bookings) {
+            if (!b.date || !b.time) continue
+            const start = new Date(`${b.date}T${b.time}`).getTime()
+            if (Number.isNaN(start)) continue
+            const durationMins = Number(b.duration) || 60
+            const end = start + durationMins * 60 * 1000
+
+            // Unlocked from booking moment until session concludes
+            if (now <= end) {
+                activeSession = {
+                    bookingId: b._id,
+                    date: b.date,
+                    time: b.time,
+                    duration: durationMins,
+                    endTime: end
+                }
+                break
+            }
+
+            if (now > end && end > mostRecentPastSessionEnd) {
+                mostRecentPastSessionEnd = end
+            }
+        }
+
+        return {
+            isActive: Boolean(activeSession),
+            activeSession,
+            mostRecentPastSessionEnd
+        }
+    } catch (err) {
+        console.error("getActiveSessionInfo error:", err)
+        return { isActive: false, activeSession: null, mostRecentPastSessionEnd: 0 }
+    }
+}
 
 function isParticipant(
     conversation,
@@ -108,9 +167,21 @@ async function listConversations(
                 unreadIds.map(String)
             )
 
+        // Admin accounts are intentionally not part of the member messaging
+        // experience. Hide legacy conversations too, not only new ones.
+        const memberConversations =
+            conversations.filter(
+                (conversation) =>
+                    conversation.participants.every(
+                        (participant) =>
+                            participant &&
+                            participant.role !== "admin"
+                    )
+            )
+
         return res.json({
             conversations:
-                conversations.map(
+                memberConversations.map(
                     (conversation) => ({
                         ...conversation,
                         __unread:
@@ -186,17 +257,35 @@ async function createConversation(
                 })
         }
 
-        const participantExists =
-            await User.exists({
-                _id: participantId,
-            })
+        const [senderIsMember, participantExists] =
+            await Promise.all([
+                User.exists({
+                    _id: req.user.id,
+                    role: { $ne: "admin" },
+                    isActive: true,
+                }),
+                User.exists({
+                    _id: participantId,
+                    role: { $ne: "admin" },
+                    isActive: true,
+                }),
+            ])
+
+        if (!senderIsMember) {
+            return res
+                .status(403)
+                .json({
+                    message:
+                        "Admin accounts are not available for member messaging",
+                })
+        }
 
         if (!participantExists) {
             return res
                 .status(404)
                 .json({
                     message:
-                        "Participant not found",
+                        "Participant is not available for messaging",
                 })
         }
 
@@ -335,8 +424,25 @@ async function getMessages(
                 .limit(100)
                 .lean()
 
+        const participantIds = conversation.participants.map((p) => String(p._id || p));
+        const otherParticipantId = participantIds.find((id) => id !== String(req.user.id)) || participantIds[0];
+        const sessionInfo = await getActiveSessionInfo(req.user.id, otherParticipantId, conversation.bookingId);
+
+        const messageFilter = {
+            conversation: conversation._id,
+            inActiveSession: { $ne: true }
+        };
+        if (sessionInfo.mostRecentPastSessionEnd > 0) {
+            messageFilter.createdAt = { $gt: new Date(sessionInfo.mostRecentPastSessionEnd) };
+        }
+        const currentFreeCount = await Message.countDocuments(messageFilter);
+
         return res.json({
             messages,
+            isSessionActive: sessionInfo.isActive,
+            activeSession: sessionInfo.activeSession,
+            freeMessageCount: currentFreeCount,
+            maxFreeMessages: 5,
         })
     } catch (error) {
         console.error(
@@ -384,12 +490,20 @@ async function persistMessage({
         throw error
     }
 
-    if (!conversation.bookingId) {
-        const messageCount =
-            await Message.countDocuments({
-                conversation:
-                    conversation._id,
-            })
+    const participantIds = conversation.participants.map((p) => String(p._id || p));
+    const otherParticipantId = participantIds.find((id) => id !== String(senderId)) || participantIds[0];
+    const sessionInfo = await getActiveSessionInfo(senderId, otherParticipantId, conversation.bookingId);
+
+    if (!sessionInfo.isActive) {
+        const messageFilter = {
+            conversation: conversation._id,
+            inActiveSession: { $ne: true }
+        };
+        if (sessionInfo.mostRecentPastSessionEnd > 0) {
+            messageFilter.createdAt = { $gt: new Date(sessionInfo.mostRecentPastSessionEnd) };
+        }
+
+        const messageCount = await Message.countDocuments(messageFilter);
 
         if (messageCount >= 5) {
             const error =
@@ -408,6 +522,7 @@ async function persistMessage({
             sender: senderId,
             content: cleanContent,
             readBy: [senderId],
+            inActiveSession: Boolean(sessionInfo.isActive),
         })
 
     conversation.lastMessage =
@@ -912,3 +1027,4 @@ module.exports = {
     persistMessage,
     sendMessage,
 }
+// @teamcosmiccoders

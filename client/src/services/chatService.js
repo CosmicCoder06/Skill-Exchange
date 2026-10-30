@@ -23,7 +23,7 @@ export async function fetchMessages(conversationId) {
     const response = await api.get(
         `/conversations/${conversationId}/messages`
     )
-    return response.data.messages || []
+    return response.data
 }
 
 export async function createConversation(
@@ -100,3 +100,4 @@ export async function fetchUsers() {
     const response = await api.get("/getData")
     return response.data.data || []
 }
+// @teamcosmiccoders

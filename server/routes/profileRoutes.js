@@ -5,12 +5,22 @@ const verifyToken = require("../Backend Configuration/Configuration Folders/Midd
 const {
     getMyProfile,
     updateProfile,
-    getUserProfile
+    getUserProfile,
+    deactivateMyAccount
 } = require("../controllers/profileController");
 
+const {
+    getUserAvatar,
+    getUserCover
+} = require("../controllers/userMediaController");
 
 const router = express.Router();
 
+// Public media asset endpoints with browser caching
+router.get("/users/:id/avatar", getUserAvatar);
+router.get("/users/:id/cover", getUserCover);
+router.get("/profile/:id/avatar", getUserAvatar);
+router.get("/profile/:id/cover", getUserCover);
 
 // Get logged in user's profile
 router.get(
@@ -19,7 +29,6 @@ router.get(
     getMyProfile
 );
 
-
 // Update logged in user's profile
 router.put(
     "/profile/update",
@@ -27,6 +36,7 @@ router.put(
     updateProfile
 );
 
+router.put("/account/deactivate", verifyToken, deactivateMyAccount);
 
 // View other user's profile
 router.get(
@@ -35,5 +45,5 @@ router.get(
     getUserProfile
 );
 
-
 module.exports = router;
+// @teamcosmiccoders

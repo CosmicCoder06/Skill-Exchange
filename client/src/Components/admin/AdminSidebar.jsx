@@ -1,24 +1,24 @@
+import ThemeToggle from "../ThemeToggle";
+import {
+    LayoutDashboard,
+    Users,
+    CreditCard,
+    CalendarCheck2,
+    User,
+    Shield
+} from "lucide-react";
+import { LogoMark } from "../common/Logo";
+
 export default function AdminSidebar({
     activeSection,
     onSectionChange,
-    onLogout,
+    onLogout
 }) {
-    const items = [
-        {
-            id: "overview",
-            label: "Overview",
-            icon: "⌂",
-        },
-        {
-            id: "members",
-            label: "Members",
-            icon: "♙",
-        },
-        {
-            id: "reports",
-            label: "Reports",
-            icon: "◒",
-        },
+    const navItems = [
+        { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+        { id: "members", label: "Members", icon: Users },
+        { id: "payments", label: "Payments", icon: CreditCard },
+        { id: "sessions", label: "Sessions", icon: CalendarCheck2 }
     ];
 
     return (
@@ -26,68 +26,53 @@ export default function AdminSidebar({
             <button
                 type="button"
                 className="admin-brand"
-                onClick={() =>
-                    onSectionChange("overview")
-                }
-                aria-label="SkillExchange Admin"
+                onClick={() => onSectionChange("overview")}
             >
-                <span className="admin-brand-mark">
-                    SE
-                </span>
-
-                <span className="admin-brand-copy">
-                    <strong>
-                        SkillExchange
-                    </strong>
-
-                    <small>
-                        ADMIN
-                    </small>
-                </span>
+                <div className="admin-brand-mark" style={{ background: "transparent", border: 0, padding: 0 }}>
+                    <LogoMark size={34} />
+                </div>
+                <div className="admin-brand-copy">
+                    <strong>SkillExchange</strong>
+                    <small>ADMIN CONSOLE</small>
+                </div>
             </button>
 
-            <p className="admin-sidebar-label">
-                ADMIN WORKSPACE
-            </p>
+            <div className="admin-sidebar-label">NAVIGATION</div>
 
-            <nav className="admin-navigation">
-                {items.map((item) => (
-                    <button
-                        key={item.id}
-                        type="button"
-                        className={
-                            activeSection === item.id
-                                ? "admin-nav-item is-active"
-                                : "admin-nav-item"
-                        }
-                        onClick={() =>
-                            onSectionChange(item.id)
-                        }
-                    >
-                        <span>
-                            {item.icon}
-                        </span>
+            <nav className="admin-navigation" aria-label="Admin Navigation">
+                {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive =
+                        activeSection === item.id ||
+                        (item.id === "members" && activeSection === "view-user");
 
-                        <strong>
+                    return (
+                        <button
+                            key={item.id}
+                            type="button"
+                            className={`admin-nav-item ${isActive ? "is-active" : ""}`}
+                            onClick={() => onSectionChange(item.id)}
+                            aria-current={isActive ? "page" : undefined}
+                        >
+                            <span><Icon size={18} strokeWidth={2.2} /></span>
                             {item.label}
-                        </strong>
-                    </button>
-                ))}
+                        </button>
+                    );
+                })}
             </nav>
 
             <div className="admin-sidebar-bottom">
                 <div className="admin-protected">
-                    <span>✦</span>
-
+                    <span><Shield size={16} /></span>
                     <div>
-                        <strong>
-                            Protected workspace
-                        </strong>
-
-                        <p>
-                            Admin access only
-                        </p>
+                        <strong>SECURE SESSION</strong>
+                        <p>Authorized Admin Access</p>
                     </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px", padding: "0 8px" }}>
+                    <span style={{ fontSize: "12px", color: "#8eb9a8", fontWeight: 600 }}>Theme</span>
+                    <ThemeToggle />
                 </div>
 
                 <button
@@ -95,7 +80,7 @@ export default function AdminSidebar({
                     className="admin-logout"
                     onClick={onLogout}
                 >
-                    ↪ Log out
+                    Log Out
                 </button>
             </div>
         </aside>

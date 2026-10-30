@@ -23,3 +23,4 @@ function fillDailySeries(rows, days = 7, now = new Date()) {
 
 module.exports = { escapeRegex, fillDailySeries, formatDateKey };
 
+// @teamcosmiccoders

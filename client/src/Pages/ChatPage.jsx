@@ -62,10 +62,6 @@ function addUnique(messages, incoming) {
 
 export default function ChatPage({
     token,
-    onLogout,
-    onHome,
-    onBack,
-    onProfile,
     onViewProfile,
     initialUserId,
 }) {
@@ -92,6 +88,11 @@ export default function ChatPage({
     const [typingUserId, setTypingUserId] = useState(null)
     const [menuOpen, setMenuOpen] = useState(false)
     const [creatingChat, setCreatingChat] = useState(false)
+    const [sessionInfo, setSessionInfo] = useState({
+        isActive: false,
+        activeSession: null,
+        freeCount: 0
+    })
 
     const typingTimer = useRef(null)
     const messagesEnd = useRef(null)
@@ -108,10 +109,8 @@ export default function ChatPage({
     )
 
     const isBookedChat = Boolean(selectedConversation?.bookingId)
-
-    const directMessageCount = messages.length
-    const directLimitReached =
-        !isBookedChat && directMessageCount >= 5
+    const isSessionActive = Boolean(sessionInfo.isActive)
+    const directLimitReached = !isSessionActive && sessionInfo.freeCount >= 5
 
     const refreshConversations = useCallback(async () => {
         const result = await fetchConversations()
@@ -204,9 +203,18 @@ export default function ChatPage({
 
     let active = true
 
-    fetchMessages(selectedId)
+        fetchMessages(selectedId)
             .then((result) => {
-                if (active) setMessages(result)
+                if (!active) return
+                const list = Array.isArray(result) ? result : (result?.messages || [])
+                setMessages(list)
+                if (result && !Array.isArray(result)) {
+                    setSessionInfo({
+                        isActive: Boolean(result.isSessionActive),
+                        activeSession: result.activeSession || null,
+                        freeCount: typeof result.freeMessageCount === "number" ? result.freeMessageCount : list.length,
+                    })
+                }
             })
             .catch((requestError) => {
                 if (active) {
@@ -392,7 +400,8 @@ export default function ChatPage({
                 result.filter(
                     (user) =>
                         String(user._id) !==
-                        String(currentUserId)
+                        String(currentUserId) &&
+                        user.role !== "admin"
                 )
             )
         } catch (requestError) {
@@ -478,13 +487,27 @@ export default function ChatPage({
                     return false
                 }
 
+                if (!isSessionActive) {
+                    setSessionInfo((prev) => ({
+                        ...prev,
+                        freeCount: prev.freeCount + 1,
+                    }))
+                }
+
                 return true
             }
 
             await sendMessage(selectedId, content)
-            const refreshed =
-                await fetchMessages(selectedId)
-            setMessages(refreshed)
+            const refreshed = await fetchMessages(selectedId)
+            const list = Array.isArray(refreshed) ? refreshed : (refreshed?.messages || [])
+            setMessages(list)
+            if (refreshed && !Array.isArray(refreshed)) {
+                setSessionInfo({
+                    isActive: Boolean(refreshed.isSessionActive),
+                    activeSession: refreshed.activeSession || null,
+                    freeCount: typeof refreshed.freeMessageCount === "number" ? refreshed.freeMessageCount : list.length,
+                })
+            }
             await refreshConversations()
             return true
         } catch (requestError) {
@@ -666,55 +689,7 @@ export default function ChatPage({
 
     return (
         <main className="chat-page">
-            <aside className="chat-nav" aria-label="Main navigation">
-                <button
-                    type="button"
-                    className="chat-brand-mark"
-                    onClick={onHome}
-                    aria-label="Skill Exchange home"
-                >
-                    SE
-                </button>
 
-                <nav className="chat-nav-links">
-                    <button
-                        type="button"
-                        onClick={onHome}
-                        title="Home"
-                    >
-                        <span>⌂</span>
-                        <small>Home</small>
-                    </button>
-
-                    <button
-                        type="button"
-                        className="is-active"
-                        title="Messages"
-                    >
-                        <span>◇</span>
-                        <small>Chats</small>
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={onProfile}
-                        title="Profile"
-                    >
-                        <span>◎</span>
-                        <small>Profile</small>
-                    </button>
-                </nav>
-
-                <button
-                    type="button"
-                    className="chat-nav-logout"
-                    onClick={onLogout}
-                    title="Log out"
-                >
-                    <span>↪</span>
-                    <small>Logout</small>
-                </button>
-            </aside>
 
             <section className="chat-main">
                 <header className="chat-topbar">
@@ -736,13 +711,6 @@ export default function ChatPage({
                                 : "Reconnecting"}
                         </span>
 
-                        <button
-                            type="button"
-                            className="back-link"
-                            onClick={onBack}
-                        >
-                            ← Back
-                        </button>
                     </div>
                 </header>
 
@@ -758,8 +726,8 @@ export default function ChatPage({
                     </div>
                 ) : null}
 
-                <section className="chat-workspace">
-                    <aside className="chat-sidebar">
+                <section className={`chat-workspace ${selectedConversation ? "has-selected" : "no-selected"}`}>
+                    <section className="chat-sidebar" aria-label="Conversations">
                         <div className="sidebar-title-row">
                             <div>
                                 <h2>Chats</h2>
@@ -850,7 +818,7 @@ export default function ChatPage({
                                 }
                             />
                         )}
-                    </aside>
+                    </section>
 
                     <section className="chat-thread">
                         {showNewChat ? (
@@ -941,6 +909,15 @@ export default function ChatPage({
                         ) : selectedConversation ? (
                             <>
                                 <header className="thread-header">
+                                    <button
+                                        type="button"
+                                        className="chat-mobile-back"
+                                        onClick={() => setSelectedId(null)}
+                                        aria-label="Back to conversations"
+                                        title="Back to conversations"
+                                    >
+                                        ←
+                                    </button>
                                     {showMessageSearch ? (
                                         <div className="thread-inline-search">
                                             <span
@@ -1016,6 +993,7 @@ export default function ChatPage({
                                                 </strong>
 
                                                 <span>
+                                                    <span className="thread-status-dot" aria-hidden="true" />
                                                     {isBookedChat
                                                         ? "Booked session chat"
                                                         : "Direct skill chat"}
@@ -1096,20 +1074,33 @@ export default function ChatPage({
                                     </div>
                                 </header>
 
-                                {!isBookedChat ? (
-                                    <div className="direct-limit-banner">
-                                        <strong>
-                                            Direct chat limit
-                                        </strong>
-
-                                        <span>
-                                            You can send and receive up to{" "}
-                                            <b>5 messages</b> with{" "}
-                                            <b>{contact?.name}</b>. Book a
-                                            session with{" "}
-                                            <b>{contact?.name}</b> to
-                                            continue the conversation.
-                                        </span>
+                                {isSessionActive ? (
+                                    <div className="active-session-unlimited-banner" role="status">
+                                        <div className="chat-notice-icon-box">
+                                            <span className="live-session-dot" />
+                                        </div>
+                                        <div className="active-session-text">
+                                            <strong>Active Session ({sessionInfo.activeSession?.duration || 60} mins) · Unlimited Messaging Unlocked</strong>
+                                            <span>Message limit is disabled during your live session.</span>
+                                        </div>
+                                    </div>
+                                ) : !isBookedChat ? (
+                                    <div className={`direct-limit-banner ${sessionInfo.freeCount >= 5 ? "is-reached" : "is-active"}`} role="note">
+                                        <div className="chat-notice-icon-box">
+                                            <span className="chat-notice-glyph" aria-hidden="true">
+                                                {sessionInfo.freeCount >= 5 ? "🔒" : "✦"}
+                                            </span>
+                                        </div>
+                                        <div className="direct-limit-body">
+                                            <strong>Direct chat limit</strong>
+                                            <p>
+                                                {sessionInfo.freeCount < 5 ? (
+                                                    <>You have <b>{5 - sessionInfo.freeCount} free messages</b> remaining with <b>{contact?.name}</b>. Book a session with <b>{contact?.name}</b> for unlimited messaging.</>
+                                                ) : (
+                                                    <>You've reached the 5-message limit with <b>{contact?.name}</b>. Book a session to unlock unlimited messaging during your session.</>
+                                                )}
+                                            </p>
+                                        </div>
                                     </div>
                                 ) : null}
 
@@ -1117,16 +1108,14 @@ export default function ChatPage({
                                     {visibleMessages.length ===
                                     0 ? (
                                         <div className="empty-thread">
-                                            <span>✦</span>
+                                            <div className="empty-thread-badge" aria-hidden="true">
+                                                <span className="empty-thread-icon">✦</span>
+                                            </div>
                                             <h3>
-                                                Start the
-                                                conversation
+                                                Start the conversation
                                             </h3>
                                             <p>
-                                                Ask a question,
-                                                share a resource,
-                                                or plan your next
-                                                session.
+                                                Ask a question, share a resource, or plan your next session.
                                             </p>
                                         </div>
                                     ) : (
@@ -1205,7 +1194,9 @@ export default function ChatPage({
                             </>
                         ) : (
                             <div className="empty-thread no-selection">
-                                <span>✦</span>
+                                <div className="empty-thread-badge" aria-hidden="true">
+                                    <span className="empty-thread-icon">💬</span>
+                                </div>
                                 <h2>
                                     Select a conversation
                                 </h2>
@@ -1222,3 +1213,4 @@ export default function ChatPage({
         </main>
     )
 }
+// @teamcosmiccoders

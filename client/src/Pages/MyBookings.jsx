@@ -5,6 +5,24 @@ import {
 } from "react";
 
 import BookingCalendar from "../Components/booking/BookingCalendar";
+import GoogleMeetLink from '../Components/booking/GoogleMeetLink';
+import PaymentReceipt from '../Components/booking/PaymentReceipt';
+import SuggestSlotsModal from '../Components/booking/SuggestSlotsModal';
+import Modal from "../Components/common/Modal";
+import SessionStatusCard from "../Components/booking/SessionStatusCard";
+import {
+    FileText,
+    MessageSquare,
+    Check,
+    Star,
+    Calendar,
+    CheckCircle2,
+    Clock,
+    AlertTriangle,
+    CreditCard,
+    Sparkles,
+    Layers
+} from "lucide-react";
 
 import "./MyBookings.css";
 
@@ -73,22 +91,36 @@ const getBookingPerson = (
     };
 };
 
-const getSessionDate = (booking) => {
-    if (!booking?.date) {
-        return Number.MAX_SAFE_INTEGER;
+const parseSessionDateTime = (dateStr, timeStr) => {
+    if (!dateStr) return null;
+    let d = new Date(`${dateStr}T${timeStr || "00:00"}`);
+    if (!Number.isNaN(d.getTime())) return d;
+    d = new Date(`${dateStr} ${timeStr || "00:00"}`);
+    if (!Number.isNaN(d.getTime())) return d;
+    d = new Date(dateStr);
+    if (!Number.isNaN(d.getTime())) return d;
+    return null;
+};
+
+const getSessionStartDate = (booking) => {
+    const d = parseSessionDateTime(booking?.date, booking?.time);
+    return d ? d.getTime() : Number.MAX_SAFE_INTEGER;
+};
+
+const getSessionEndDate = (booking) => {
+    const d = parseSessionDateTime(booking?.date, booking?.time);
+    if (!d) return Number.MAX_SAFE_INTEGER;
+    const durationMinutes = Number(booking?.duration) || 60;
+    return d.getTime() + durationMinutes * 60 * 1000;
+};
+
+const isMissedSession = (booking) => {
+    if (!booking) return false;
+    if (["completed", "rejected", "cancelled"].includes(booking?.status)) {
+        return false;
     }
-
-    const dateTime = new Date(
-        `${booking.date}T${
-            booking.time || "00:00"
-        }`
-    );
-
-    return Number.isNaN(
-        dateTime.getTime()
-    )
-        ? Number.MAX_SAFE_INTEGER
-        : dateTime.getTime();
+    const endMs = getSessionEndDate(booking);
+    return endMs !== Number.MAX_SAFE_INTEGER && endMs < Date.now();
 };
 
 const getCreatedDate = (booking) => {
@@ -101,54 +133,32 @@ const getCreatedDate = (booking) => {
         : date.getTime();
 };
 
+const getSessionTimestamp = (booking) => {
+    const d = parseSessionDateTime(booking?.date, booking?.time);
+    return d ? d.getTime() : 0;
+};
+
 const sortBookings = (bookings) => {
-    const priority = {
-        accepted: 1,
-        pending: 2,
-        completed: 3,
-        rejected: 4,
-        cancelled: 5
-    };
+    return [...bookings].sort((a, b) => {
+        const timeA = getSessionTimestamp(a);
+        const timeB = getSessionTimestamp(b);
 
-    return [...bookings].sort(
-        (a, b) => {
-            const priorityA =
-                priority[a.status] || 99;
-
-            const priorityB =
-                priority[b.status] || 99;
-
-            if (
-                priorityA !==
-                priorityB
-            ) {
-                return (
-                    priorityA -
-                    priorityB
-                );
-            }
-
-            if (
-                a.status ===
-                "accepted"
-            ) {
-                return (
-                    getSessionDate(a) -
-                    getSessionDate(b)
-                );
-            }
-
-            return (
-                getCreatedDate(b) -
-                getCreatedDate(a)
-            );
+        if (timeA > 0 && timeB > 0 && timeA !== timeB) {
+            return timeB - timeA;
         }
-    );
+        if (timeA > 0 && (!timeB || timeB === 0)) {
+            return -1;
+        }
+        if (timeB > 0 && (!timeA || timeA === 0)) {
+            return 1;
+        }
+
+        return getCreatedDate(b) - getCreatedDate(a);
+    });
 };
 
 function MyBookings({
     token,
-    onBack,
     onJoinSession
 }) {
     const [bookings, setBookings] =
@@ -159,6 +169,8 @@ function MyBookings({
 
     const [loading, setLoading] =
         useState(true);
+
+    const [refreshing, setRefreshing] = useState(false);
 
     const [error, setError] =
         useState("");
@@ -184,6 +196,16 @@ function MyBookings({
         selectedCalendarBooking,
         setSelectedCalendarBooking
     ] = useState(null);
+
+    const [suggestSlotsBooking, setSuggestSlotsBooking] = useState(null);
+    const [detailsBooking, setDetailsBooking] = useState(null);
+    const [sessionTab, setSessionTab] = useState("active");
+    const [sectionPages, setSectionPages] = useState({});
+    const [detailsReviews, setDetailsReviews] = useState({
+        loading: false,
+        learnerReview: null,
+        mentorReview: null
+    });
 
     const API =
         import.meta.env.VITE_API_URL;
@@ -220,8 +242,27 @@ function MyBookings({
                 setBookings(
                     Array.isArray(data)
                         ? data
-                        : []
+                        : (data.bookings || [])
                 );
+
+                // Populate reviewed bookings map in one batch query
+                try {
+                    const revRes = await fetch(`${API}/reviews/my-reviewed-bookings`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (revRes.ok) {
+                        const revData = await revRes.json();
+                        if (Array.isArray(revData.bookingIds)) {
+                            const revMap = {};
+                            revData.bookingIds.forEach((bId) => {
+                                if (bId) revMap[bId] = true;
+                            });
+                            setReviewedBookings((prev) => ({ ...prev, ...revMap }));
+                        }
+                    }
+                } catch {
+                    // Non-fatal
+                }
             } catch (error) {
                 console.error(
                     "Bookings fetch error:",
@@ -233,6 +274,54 @@ function MyBookings({
                 setLoading(false);
             }
         }, [API, token]);
+
+    const handleMeetingUrlUpdated = (bookingId, meetingUrl) => {
+        setBookings((prev) =>
+            prev.map((b) => (b._id === bookingId ? { ...b, meetingUrl } : b))
+        );
+        setRequests((prev) =>
+            prev.map((r) => (r._id === bookingId ? { ...r, meetingUrl } : r))
+        );
+        setDetailsBooking((prev) =>
+            prev && prev._id === bookingId ? { ...prev, meetingUrl } : prev
+        );
+    };
+
+    useEffect(() => {
+        if (!detailsBooking?._id) {
+            setDetailsReviews({ loading: false, learnerReview: null, mentorReview: null });
+            return;
+        }
+
+        let isMounted = true;
+        setDetailsReviews({ loading: true, learnerReview: null, mentorReview: null });
+
+        fetch(`${API}/reviews/booking/${detailsBooking._id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (isMounted && data) {
+                    setDetailsReviews({
+                        loading: false,
+                        learnerReview: data.learnerReview || null,
+                        mentorReview: data.mentorReview || null
+                    });
+                }
+            })
+            .catch((err) => {
+                console.error("Error fetching session details reviews:", err);
+                if (isMounted) {
+                    setDetailsReviews({ loading: false, learnerReview: null, mentorReview: null });
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, [detailsBooking?._id, API, token]);
 
     const fetchRequests =
         useCallback(async () => {
@@ -258,7 +347,7 @@ function MyBookings({
                 setRequests(
                     Array.isArray(data)
                         ? data
-                        : []
+                        : (data.requests || data.bookings || [])
                 );
             } catch (error) {
                 console.error(
@@ -267,6 +356,12 @@ function MyBookings({
                 );
             }
         }, [API, token]);
+
+    const refreshSessions = async () => {
+        setRefreshing(true);
+        await Promise.all([fetchBookings(), fetchRequests()]);
+        setRefreshing(false);
+    };
 
     useEffect(() => {
         if (!token) return;
@@ -326,25 +421,7 @@ function MyBookings({
             [API, token]
         );
 
-    useEffect(() => {
-        const completedBookings =
-            bookings.filter(
-                (booking) =>
-                    booking.status ===
-                    "completed"
-            );
 
-        completedBookings.forEach(
-            (booking) => {
-                checkReviewStatus(
-                    booking._id
-                );
-            }
-        );
-    }, [
-        bookings,
-        checkReviewStatus
-    ]);
 
     async function updateBooking(
         bookingId,
@@ -398,14 +475,67 @@ function MyBookings({
         }
     }
 
+    async function chooseSlot(bookingId, date, time) {
+        try {
+            const response = await fetch(`${API}/bookings/${bookingId}/choose-slot`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ date, time })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to select slot");
+            }
+
+            // Update local state directly so the status flips to approved and payment unlocks immediately
+            setBookings((prev) =>
+                prev.map((b) => (b._id === bookingId ? { ...b, ...data.booking } : b))
+            );
+
+            await Promise.all([fetchBookings(), fetchRequests()]);
+        } catch (error) {
+            console.error("Choose slot error:", error);
+            window.alert(error.message);
+        }
+    }
+
+    function formatTimeRemaining(expiresAt) {
+        if (!expiresAt) return null;
+        const diffMs = new Date(expiresAt).getTime() - Date.now();
+        if (diffMs <= 0) return "Action window expired";
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        if (hours === 0) return `${mins}m left`;
+        return `${hours}h ${mins}m left`;
+    }
+
     async function cancelBooking(
         bookingId
     ) {
-        if (
-            !window.confirm(
-                "Cancel this booking?"
-            )
-        ) {
+        const targetBooking =
+            bookings.find((b) => b._id === bookingId) ||
+            requests.find((r) => r._id === bookingId);
+
+        const mentorId =
+            targetBooking?.mentor?._id ||
+            targetBooking?.mentor?.id ||
+            targetBooking?.mentor;
+        const isMentor = String(mentorId) === String(currentUserId);
+        const wasAccepted = targetBooking?.status === "accepted";
+        const hasPayment =
+            Number(targetBooking?.paymentAmount) > 0 &&
+            targetBooking?.paymentMethod !== "free";
+
+        let confirmPrompt = "Cancel this booking?";
+        if (isMentor && wasAccepted && hasPayment) {
+            confirmPrompt = `⚠️ Cancellation Policy Warning:\n\nIf you cancel this confirmed session, the learner's payment of ₹${Number(targetBooking.paymentAmount).toLocaleString("en-IN")} will be refunded — and you will be responsible for covering that refund under the platform cancellation policy.\n\nAre you sure you want to proceed with cancellation?`;
+        }
+
+        if (!window.confirm(confirmPrompt)) {
             return;
         }
 
@@ -432,11 +562,17 @@ function MyBookings({
                 );
             }
 
+            if (data.learnerRefundDue) {
+                window.alert(
+                    "Session cancelled. Under platform policy, you are responsible for covering the learner's refund."
+                );
+            }
+
             setSelectedCalendarBooking(
                 null
             );
 
-            await fetchBookings();
+            await Promise.all([fetchBookings(), fetchRequests()]);
         } catch (error) {
             console.error(
                 "Cancel booking error:",
@@ -499,6 +635,23 @@ function MyBookings({
                 })
             );
 
+            if (detailsBooking && detailsBooking._id === reviewBooking._id) {
+                fetch(`${API}/reviews/booking/${reviewBooking._id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+                    .then((res) => (res.ok ? res.json() : null))
+                    .then((d) => {
+                        if (d) {
+                            setDetailsReviews({
+                                loading: false,
+                                learnerReview: d.learnerReview || null,
+                                mentorReview: d.mentorReview || null
+                            });
+                        }
+                    })
+                    .catch(() => {});
+            }
+
             setReviewBooking(null);
             setRating(5);
             setComment("");
@@ -526,7 +679,8 @@ function MyBookings({
                 (booking) => {
                     const mentorId =
                         booking.mentor?._id ||
-                        booking.mentor?.id;
+                        booking.mentor?.id ||
+                        booking.mentor;
 
                     const isMentor =
                         String(
@@ -549,27 +703,132 @@ function MyBookings({
             )
         );
 
+    const isSessionBooker = (b) => {
+        const mentorId = b.mentor?._id || b.mentor?.id || b.mentor;
+        return String(mentorId) !== String(currentUserId);
+    };
+
+    // 1. Payment Pending: Time slot approved awaiting payment, or alternate slots offered to booker
+    const paymentPendingSessions = mySessions.filter((b) => {
+        if (b.status === "approved") return true;
+        if (b.status === "slots_offered" && isSessionBooker(b)) return true;
+        return false;
+    });
+
+    // 2. Upcoming / Active: Confirmed & accepted sessions (not missed, not completed)
+    const upcomingSessions = mySessions.filter((b) => {
+        if (b.status === "accepted" && !isMissedSession(b)) return true;
+        if (b.status === "slots_offered" && !isSessionBooker(b)) return true;
+        return false;
+    });
+
+    // 3. Pending Approval: Requests awaiting mentor's decision
+    const pendingApprovalSessions = mySessions.filter((b) => {
+        return b.status === "pending" && isSessionBooker(b);
+    });
+
+    // 4. Completed Sessions
+    const completedSessions = mySessions.filter((b) => {
+        return b.status === "completed";
+    });
+
+    // 5. Cancelled / Declined / Missed Sessions
+    const cancelledSessions = mySessions.filter((b) => {
+        return b.status === "cancelled" || b.status === "rejected" || isMissedSession(b);
+    });
+
+    // Combined Active view (Payment Pending + Upcoming + Pending Approval)
+    const activeSessions = [
+        ...paymentPendingSessions,
+        ...upcomingSessions,
+        ...pendingApprovalSessions
+    ];
+
+    function renderSessionGroupSection({
+        id,
+        title,
+        subtitle,
+        icon: Icon,
+        count,
+        items,
+        emptyMessage,
+        isUrgent = false
+    }) {
+        if (items.length === 0 && emptyMessage) {
+            return (
+                <div className="tab-empty-state" key={id}>
+                    <div className="tab-empty-icon">
+                        <Icon size={32} />
+                    </div>
+                    <h4>{emptyMessage.title}</h4>
+                    <p>{emptyMessage.description}</p>
+                </div>
+            );
+        }
+
+        if (items.length === 0) return null;
+
+        return (
+            <div className={`session-group-section ${isUrgent ? "is-urgent-group" : ""}`} key={id}>
+                <div className="session-group-header">
+                    <div className="session-group-title-wrap">
+                        <div className={`session-group-icon-bubble ${isUrgent ? "urgent-bubble" : ""}`}>
+                            <Icon size={18} />
+                        </div>
+                        <div>
+                            <div className="session-group-heading-line">
+                                <h3>{title}</h3>
+                                <span className={`session-group-badge ${isUrgent ? "urgent" : ""}`}>
+                                    {count}
+                                </span>
+                            </div>
+                            {subtitle && <p className="session-group-subtext">{subtitle}</p>}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="booking-grid">
+                    {(() => {
+                        const pageSize = 10;
+                        const page = (sectionPages && sectionPages[id]) || 1;
+                        return items.slice((page - 1) * pageSize, page * pageSize).map((booking) => renderBookingCard(booking));
+                    })()}
+                </div>
+                {items.length > 10 && (() => {
+                    const pageSize = 10;
+                    const page = (sectionPages && sectionPages[id]) || 1;
+                    const totalPages = Math.ceil(items.length / pageSize);
+                    return (
+                        <div className="section-pagination-bar" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "12px", marginTop: "16px" }}>
+                            <button
+                                type="button"
+                                disabled={page <= 1}
+                                onClick={() => setSectionPages((p) => ({ ...p, [id]: Math.max(1, page - 1) }))}
+                                style={{ padding: "6px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: page <= 1 ? "not-allowed" : "pointer", opacity: page <= 1 ? 0.5 : 1 }}
+                            >
+                                Previous
+                            </button>
+                            <span style={{ fontSize: "13px", fontWeight: "600", color: "#475569" }}>
+                                Page {page} of {totalPages}
+                            </span>
+                            <button
+                                type="button"
+                                disabled={page >= totalPages}
+                                onClick={() => setSectionPages((p) => ({ ...p, [id]: Math.min(totalPages, page + 1) }))}
+                                style={{ padding: "6px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", background: "#fff", cursor: page >= totalPages ? "not-allowed" : "pointer", opacity: page >= totalPages ? 0.5 : 1 }}
+                            >
+                                Next
+                            </button>
+                        </div>
+                    );
+                })()}
+            </div>
+        );
+    }
+
     function renderBookingCard(
         booking
     ) {
-        const {
-            person,
-            role
-        } =
-            getBookingPerson(
-                booking,
-                currentUserId
-            );
-
-        const name =
-            person?.name ||
-            "Skill Exchange member";
-
-        const initial =
-            name
-                .charAt(0)
-                .toUpperCase();
-
         const isCompleted =
             booking.status ===
             "completed";
@@ -582,225 +841,174 @@ function MyBookings({
             booking.status ===
             "accepted";
 
+        const isMissed = isMissedSession(booking);
+
         const alreadyReviewed =
             reviewedBookings[
                 booking._id
             ] === true;
 
+        const isBooker =
+            String(booking.learner?._id || booking.learner?.id || booking.learner) ===
+            String(currentUserId);
+
+        const isMentor =
+            String(booking.mentor?._id || booking.mentor?.id || booking.mentor) ===
+            String(currentUserId);
+
+        const duration = Number(booking.duration) || 60;
+        const sessionEnded = getSessionEndDate(booking) <= Date.now();
+        const canLeaveReview = (isCompleted || (isAccepted && sessionEnded)) && !alreadyReviewed;
+
+        // Mentor's special rule: only until the mentor adds the link on accepted sessions
+        const showMentorAddMeetingLink = isMentor && isAccepted && !booking.meetingUrl && !isMissed;
+
         return (
-            <article className="booking-card">
-                <div className="booking-card-top">
-                    <div className="booking-person-avatar">
-                        {initial}
+            <article className="booking-card modern-session-card" key={booking._id}>
+                {/* 1. CARD TOP HEADER */}
+                <div className="card-top-bar">
+                    <div className="card-identity-group">
+                        <span className={`card-role-badge ${isBooker ? "is-booker" : "is-mentor"}`}>
+                            {isBooker ? "Booker Receipt" : "Host Invoice"}
+                        </span>
+                        <span className="card-invoice-number">#{booking._id.slice(-6).toUpperCase()}</span>
                     </div>
-
-                    <div className="booking-person-info">
-                        <h3>
-                            {name}
-                        </h3>
-
-                        {role && (
-                            <span className="booking-person-role">
-                                {role}
-                            </span>
-                        )}
-
-                        <p>
-                            Skill Exchange
-                            session
-                        </p>
-                    </div>
+                    <span className="card-duration-badge">⏱ {duration} mins</span>
                 </div>
 
-                <div className="booking-info">
-                    <div>
-                        <span>
-                            Date
-                        </span>
+                {/* 2. PAYMENT SUMMARY BOX */}
+                <PaymentReceipt
+                    key={`${booking._id}-${booking.paymentStatus}-${booking.status}`}
+                    booking={booking}
+                    token={token}
+                    currentUserId={currentUserId}
+                    onBookingUpdated={(updated) => {
+                        setBookings((prev) =>
+                            prev.map((b) => (b._id === updated._id ? { ...b, ...updated } : b))
+                        );
+                    }}
+                />
 
-                        <strong>
-                            {booking.date}
-                        </strong>
-                    </div>
+                {/* 3. SESSION STATUS BANNER */}
+                <SessionStatusCard
+                    booking={booking}
+                    isBooker={isBooker}
+                    isMissed={isMissed}
+                    alreadyReviewed={alreadyReviewed}
+                    onLeaveReview={canLeaveReview ? () => openReview(booking) : null}
+                    formatTimeRemaining={formatTimeRemaining}
+                />
 
-                    <div>
-                        <span>
-                            Time
-                        </span>
+                {/* 4. SLOTS OFFERED FLOW */}
+                {booking.status === "slots_offered" && isBooker && (
+                    <div className="slots-offered-box booker-view">
+                        <div className="slots-offered-header">
+                            <div>
+                                <span className="slots-kicker">ALTERNATE SLOTS PROPOSED</span>
+                                <h4>Choose an Available Slot</h4>
+                                <p>The mentor offered the following available slots matching your <strong>{duration} min</strong> session. Select any slot to proceed directly to payment.</p>
+                            </div>
+                            {booking.actionExpiresAt && (
+                                <span className="expiry-pill-badge">
+                                    ⏱ {formatTimeRemaining(booking.actionExpiresAt)}
+                                </span>
+                            )}
+                        </div>
 
-                        <strong>
-                            {booking.time}
-                        </strong>
-                    </div>
-                </div>
-
-                {booking.message && (
-                    <div className="booking-message">
-                        <span>
-                            Message
-                        </span>
-
-                        <p>
-                            {booking.message}
-                        </p>
-                    </div>
-                )}
-
-                <div className="booking-status-row">
-                    <span
-                        className={`booking-status ${booking.status}`}
-                    >
-                        {booking.status}
-                    </span>
-                </div>
-
-                {isAccepted && (
-                    <div className="booking-message">
-                        <span>
-                            Session status
-                        </span>
-
-                        <p>
-                            Your session is
-                            confirmed and
-                            ready to attend.
-                        </p>
-                    </div>
-                )}
-
-                {isPending && (
-                    <div className="booking-message">
-                        <span>
-                            Request status
-                        </span>
-
-                        <p>
-                            Waiting for
-                            mentor approval.
-                            Your session
-                            request has been
-                            sent successfully.
-                        </p>
+                        <div className="slots-selection-list">
+                            {Array.isArray(booking.suggestedSlots) && booking.suggestedSlots.map((slot, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`slot-option-card ${slot.isPreferred ? "highlighted-preferred-slot" : ""}`}
+                                >
+                                    <div className="slot-option-details">
+                                        {slot.isPreferred && (
+                                            <span className="recommended-slot-tag">
+                                                ★ Mentor's Recommended Slot
+                                            </span>
+                                        )}
+                                        <div className="slot-datetime-line">
+                                            <strong>📅 {slot.date}</strong>
+                                            <span>⏰ {slot.time} ({duration} mins)</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="select-and-pay-btn"
+                                        onClick={() => chooseSlot(booking._id, slot.date, slot.time)}
+                                    >
+                                        Select Slot & Pay →
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 
-                {booking.status ===
-                    "rejected" && (
-                    <div className="booking-message">
-                        <span>
-                            Request status
-                        </span>
-
-                        <p>
-                            The mentor
-                            declined this
-                            session request.
-                        </p>
+                {booking.status === "slots_offered" && !isBooker && (
+                    <div className="slots-offered-box mentor-view">
+                        <div className="slots-offered-header">
+                            <div>
+                                <span className="slots-kicker">SLOTS SHARED</span>
+                                <h4>Available Slots Shared with Learner</h4>
+                                <p>You shared {booking.suggestedSlots?.length || 0} alternate slots. The learner can pick any slot and proceed directly to payment without further confirmation from you.</p>
+                            </div>
+                            {booking.actionExpiresAt && (
+                                <span className="expiry-pill-badge">
+                                    ⏱ {formatTimeRemaining(booking.actionExpiresAt)}
+                                </span>
+                            )}
+                        </div>
+                        <div className="mentor-shared-slots-summary">
+                            {booking.suggestedSlots?.map((slot, idx) => (
+                                <span
+                                    key={idx}
+                                    className={`shared-slot-chip ${slot.isPreferred ? "is-favored" : ""}`}
+                                >
+                                    {slot.isPreferred ? "★ " : ""}{slot.date} at {slot.time}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 )}
 
-                {booking.status ===
-                    "cancelled" && (
-                    <div className="booking-message">
-                        <span>
-                            Session status
-                        </span>
-
-                        <p>
-                            This booking has
-                            been cancelled.
-                        </p>
+                {/* 5. MENTOR'S ADD MEETING LINK (Special Visibility: only until mentor adds the link) */}
+                {showMentorAddMeetingLink && (
+                    <div className="mentor-main-add-meet-box">
+                        <GoogleMeetLink
+                            key={`main-${booking._id}-${booking.meetingUrl || ''}`}
+                            booking={booking}
+                            token={token}
+                            currentUserId={currentUserId}
+                            onLinkSaved={(newUrl) => handleMeetingUrlUpdated(booking._id, newUrl)}
+                        />
                     </div>
                 )}
 
-                {isCompleted && (
-                    <div className="booking-message">
-                        <span>
-                            Session status
-                        </span>
-
-                        <p>
-                            Successful
-                            session completed.
-                        </p>
-                    </div>
-                )}
-
-                {isAccepted && (
+                {/* 6. MINIMAL MAIN CARD ACTIONS */}
+                <div className="card-actions-wrapper">
+                    {/* View Session Details button on ALL cards */}
                     <button
-                        className="join-session-button"
-                        onClick={() => {
-                            if (
-                                onJoinSession
-                            ) {
-                                onJoinSession(
-                                    booking
-                                );
-                            }
-                        }}
+                        type="button"
+                        className="btn-view-session-details"
+                        onClick={() => setDetailsBooking(booking)}
                     >
-                        Join Session →
+                        <FileText size={15} />
+                        <span>View Session Details</span>
                     </button>
-                )}
 
-                {isAccepted && (
-                    <button
-                        className="complete-session-button"
-                        onClick={() =>
-                            updateBooking(
-                                booking._id,
-                                "completed"
-                            )
-                        }
-                    >
-                        ✓ Mark Session
-                        Complete
-                    </button>
-                )}
-
-                {isCompleted &&
-                    !alreadyReviewed && (
+                    {/* Leave Review on Completed Sessions (only after session duration has ended) */}
+                    {canLeaveReview && (
                         <button
-                            className="review-session-button"
-                            onClick={() =>
-                                openReview(
-                                    booking
-                                )
-                            }
+                            type="button"
+                            className="btn-leave-review-action"
+                            onClick={() => openReview(booking)}
                         >
-                            ⭐ Leave Review
+                            <Star size={15} />
+                            <span>Leave Session Review ⭐</span>
                         </button>
                     )}
-
-                {isCompleted &&
-                    alreadyReviewed && (
-                        <div className="review-completed-box">
-                            <strong>
-                                ⭐ Review
-                                submitted
-                            </strong>
-
-                            <span>
-                                Thanks for
-                                sharing your
-                                experience.
-                            </span>
-                        </div>
-                    )}
-
-                {(isPending ||
-                    isAccepted) && (
-                    <button
-                        className="booking-cancel"
-                        onClick={() =>
-                            cancelBooking(
-                                booking._id
-                            )
-                        }
-                    >
-                        Cancel Booking
-                    </button>
-                )}
+                </div>
             </article>
         );
     }
@@ -831,13 +1039,6 @@ function MyBookings({
         <main className="bookings-page">
             <header className="bookings-header">
                 <div>
-                    <button
-                        className="back-btn"
-                        onClick={onBack}
-                    >
-                        ← Back
-                    </button>
-
                     <p className="bookings-eyebrow">
                         SESSIONS
                     </p>
@@ -856,12 +1057,10 @@ function MyBookings({
 
                 <button
                     className="refresh-bookings"
-                    onClick={() => {
-                        fetchBookings();
-                        fetchRequests();
-                    }}
+                    onClick={refreshSessions}
+                    disabled={refreshing}
                 >
-                    ↻ Refresh
+                    {refreshing ? "Refreshing…" : "↻ Refresh"}
                 </button>
             </header>
 
@@ -882,46 +1081,23 @@ function MyBookings({
                 />
             </section>
 
-            {/* SELECTED CALENDAR BOOKING */}
-
-            {selectedCalendarBooking && (
-                <section className="booking-section">
-                    <div className="section-heading">
-                        <div>
-                            <h2>
-                                Selected Session
-                            </h2>
-
-                            <p>
-                                {
-                                    selectedCalendarBooking.date
-                                }{" "}
-                                at{" "}
-                                {
-                                    selectedCalendarBooking.time
-                                }
-                            </p>
-                        </div>
-
-                        <button
-                            className="refresh-bookings"
-                            onClick={() =>
-                                setSelectedCalendarBooking(
-                                    null
-                                )
-                            }
-                        >
-                            Close
-                        </button>
-                    </div>
-
-                    <div className="booking-grid">
-                        {renderBookingCard(
-                            selectedCalendarBooking
-                        )}
-                    </div>
-                </section>
-            )}
+            {/* SELECTED CALENDAR BOOKING MODAL */}
+            <Modal
+                isOpen={Boolean(selectedCalendarBooking)}
+                onClose={() => setSelectedCalendarBooking(null)}
+                title="Session Details"
+                eyebrow="CALENDAR SESSION"
+                subtitle={
+                    selectedCalendarBooking
+                        ? `${selectedCalendarBooking.date} at ${selectedCalendarBooking.time}`
+                        : ""
+                }
+                maxWidth="md"
+            >
+                <div className="calendar-modal-booking-wrapper">
+                    {selectedCalendarBooking && renderBookingCard(selectedCalendarBooking)}
+                </div>
+            </Modal>
 
             {/* INCOMING REQUESTS */}
 
@@ -957,7 +1133,7 @@ function MyBookings({
                     </div>
                 ) : (
                     <div className="booking-grid">
-                        {requests.map(
+                        {sortBookings(requests).map(
                             (booking) => (
                                 <article
                                     className="booking-card"
@@ -965,6 +1141,18 @@ function MyBookings({
                                         booking._id
                                     }
                                 >
+                                    <div className="booking-card-header">
+                                        <span className="booking-card-kicker">SESSION REQUEST</span>
+                                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                            {booking.actionExpiresAt && (
+                                                <span className="action-expiry-chip" title="4-hour response window">
+                                                    ⏱ {formatTimeRemaining(booking.actionExpiresAt)}
+                                                </span>
+                                            )}
+                                            <span className="booking-status pending">Pending</span>
+                                        </div>
+                                    </div>
+
                                     <div className="booking-card-top">
                                         <div className="booking-person-avatar">
                                             {booking
@@ -990,11 +1178,7 @@ function MyBookings({
                                             </span>
 
                                             <p>
-                                                wants
-                                                to
-                                                learn
-                                                from
-                                                you
+                                                wants to learn from you
                                             </p>
                                         </div>
                                     </div>
@@ -1023,24 +1207,35 @@ function MyBookings({
                                                 }
                                             </strong>
                                         </div>
-                                    </div>
 
-                                    <div className="booking-status-row">
-                                        <span className="booking-status pending">
-                                            Pending
-                                        </span>
+                                        <div>
+                                            <span>
+                                                Duration
+                                            </span>
+
+                                            <strong>
+                                                {booking.duration || 60} mins
+                                            </strong>
+                                        </div>
+
+                                        <div>
+                                            <span>
+                                                Fee
+                                            </span>
+
+                                            <strong>
+                                                {Number(booking.paymentAmount) === 0 ? "Free" : `₹${(Number(booking.paymentAmount) || 0).toLocaleString("en-IN")}`}
+                                            </strong>
+                                        </div>
                                     </div>
 
                                     <div className="booking-message">
                                         <span>
-                                            Request
-                                            status
+                                            Time Slot Request
                                         </span>
 
                                         <p>
-                                            Waiting
-                                            for your
-                                            approval.
+                                            {booking.message || "Awaiting your approval for this requested time slot."}
                                         </p>
                                     </div>
 
@@ -1050,23 +1245,20 @@ function MyBookings({
                                             onClick={() =>
                                                 updateBooking(
                                                     booking._id,
-                                                    "accepted"
+                                                    "approved"
                                                 )
                                             }
                                         >
-                                            ✓ Accept
+                                            ✓ Approve Time Slot
                                         </button>
 
                                         <button
                                             className="booking-reject"
                                             onClick={() =>
-                                                updateBooking(
-                                                    booking._id,
-                                                    "rejected"
-                                                )
+                                                setSuggestSlotsBooking(booking)
                                             }
                                         >
-                                            Reject
+                                            Decline / Suggest Slots
                                         </button>
                                     </div>
                                 </article>
@@ -1078,164 +1270,608 @@ function MyBookings({
 
             {/* MY SESSIONS */}
 
-            <section className="booking-section">
+            <section className="booking-section sessions-grouped-section">
                 <div className="section-heading">
-                    <h2>
-                        My Sessions
-                    </h2>
+                    <div>
+                        <h2>My Sessions</h2>
+                        <p className="section-subtext">Manage, attend, and review your skill exchange sessions</p>
+                    </div>
 
                     <span className="booking-count">
                         {mySessions.length}
                     </span>
                 </div>
 
-                {mySessions.length ===
-                0 ? (
-                    <div className="empty-bookings">
-                        <div className="empty-icon">
-                            📅
-                        </div>
+                {/* SESSIONS FILTER TABS */}
+                <div className="sessions-tab-bar" role="tablist">
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "active" ? "active" : ""}`}
+                        onClick={() => setSessionTab("active")}
+                        role="tab"
+                        aria-selected={sessionTab === "active"}
+                    >
+                        <Sparkles size={14} />
+                        <span>Active</span>
+                        <span className="tab-count-badge">{activeSessions.length}</span>
+                    </button>
 
-                        <h3>
-                            No sessions yet
-                        </h3>
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "payment_pending" ? "active" : ""} ${paymentPendingSessions.length > 0 ? "has-urgent" : ""}`}
+                        onClick={() => setSessionTab("payment_pending")}
+                        role="tab"
+                        aria-selected={sessionTab === "payment_pending"}
+                    >
+                        <CreditCard size={14} />
+                        <span>Payment Pending</span>
+                        <span className={`tab-count-badge ${paymentPendingSessions.length > 0 ? "urgent-badge" : ""}`}>
+                            {paymentPendingSessions.length}
+                        </span>
+                    </button>
 
-                        <p>
-                            Book a mentor to
-                            start your
-                            learning
-                            journey.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="booking-grid">
-                        {mySessions.map(
-                            (booking) => (
-                                <div
-                                    key={
-                                        booking._id
-                                    }
-                                >
-                                    {renderBookingCard(
-                                        booking
-                                    )}
-                                </div>
-                            )
-                        )}
-                    </div>
-                )}
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "upcoming" ? "active" : ""}`}
+                        onClick={() => setSessionTab("upcoming")}
+                        role="tab"
+                        aria-selected={sessionTab === "upcoming"}
+                    >
+                        <Calendar size={14} />
+                        <span>Upcoming</span>
+                        <span className="tab-count-badge">{upcomingSessions.length}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "completed" ? "active" : ""}`}
+                        onClick={() => setSessionTab("completed")}
+                        role="tab"
+                        aria-selected={sessionTab === "completed"}
+                    >
+                        <CheckCircle2 size={14} />
+                        <span>Completed</span>
+                        <span className="tab-count-badge">{completedSessions.length}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "cancelled" ? "active" : ""}`}
+                        onClick={() => setSessionTab("cancelled")}
+                        role="tab"
+                        aria-selected={sessionTab === "cancelled"}
+                    >
+                        <AlertTriangle size={14} />
+                        <span>Cancelled / Declined</span>
+                        <span className="tab-count-badge">{cancelledSessions.length}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className={`session-tab-pill ${sessionTab === "all" ? "active" : ""}`}
+                        onClick={() => setSessionTab("all")}
+                        role="tab"
+                        aria-selected={sessionTab === "all"}
+                    >
+                        <Layers size={14} />
+                        <span>All</span>
+                        <span className="tab-count-badge">{mySessions.length}</span>
+                    </button>
+                </div>
+
+                {/* SESSIONS CONTENT BY TAB */}
+                <div className="sessions-tab-content">
+                    {sessionTab === "active" && (
+                        activeSessions.length === 0 ? (
+                            <div className="tab-empty-state">
+                                <div className="tab-empty-icon">✨</div>
+                                <h4>No active sessions right now</h4>
+                                <p>When you book sessions or have pending payments, they will appear right here.</p>
+                            </div>
+                        ) : (
+                            <>
+                                {renderSessionGroupSection({
+                                    id: "active-payment-pending",
+                                    title: "Action Required: Payment Pending",
+                                    subtitle: "Your mentor approved this time slot. Choose your payment method to finalize the booking.",
+                                    icon: CreditCard,
+                                    count: paymentPendingSessions.length,
+                                    items: paymentPendingSessions,
+                                    isUrgent: true
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "active-upcoming",
+                                    title: "Confirmed & Upcoming Sessions",
+                                    subtitle: "Confirmed sessions ready to attend. Access your meeting link and chat room below.",
+                                    icon: Calendar,
+                                    count: upcomingSessions.length,
+                                    items: upcomingSessions
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "active-pending-approval",
+                                    title: "Pending Mentor Approval",
+                                    subtitle: "Session requests sent to mentors awaiting approval or suggested alternative times.",
+                                    icon: Clock,
+                                    count: pendingApprovalSessions.length,
+                                    items: pendingApprovalSessions
+                                })}
+                            </>
+                        )
+                    )}
+
+                    {sessionTab === "payment_pending" && (
+                        renderSessionGroupSection({
+                            id: "tab-payment-pending",
+                            title: "Payment Pending",
+                            subtitle: "Sessions approved by mentors awaiting your payment confirmation.",
+                            icon: CreditCard,
+                            count: paymentPendingSessions.length,
+                            items: paymentPendingSessions,
+                            isUrgent: true,
+                            emptyMessage: {
+                                title: "No pending payments",
+                                description: "You are all caught up! No sessions are awaiting payment."
+                            }
+                        })
+                    )}
+
+                    {sessionTab === "upcoming" && (
+                        renderSessionGroupSection({
+                            id: "tab-upcoming",
+                            title: "Confirmed & Upcoming Sessions",
+                            subtitle: "Active sessions scheduled on your calendar.",
+                            icon: Calendar,
+                            count: upcomingSessions.length,
+                            items: upcomingSessions,
+                            emptyMessage: {
+                                title: "No upcoming sessions",
+                                description: "You have no scheduled sessions coming up. Explore mentors to start learning!"
+                            }
+                        })
+                    )}
+
+                    {sessionTab === "completed" && (
+                        renderSessionGroupSection({
+                            id: "tab-completed",
+                            title: "Completed Sessions",
+                            subtitle: "Past sessions successfully concluded. Share feedback and review your session history.",
+                            icon: CheckCircle2,
+                            count: completedSessions.length,
+                            items: completedSessions,
+                            emptyMessage: {
+                                title: "No completed sessions yet",
+                                description: "Once your sessions are completed, they will appear here so you can leave reviews and view receipts."
+                            }
+                        })
+                    )}
+
+                    {sessionTab === "cancelled" && (
+                        renderSessionGroupSection({
+                            id: "tab-cancelled",
+                            title: "Cancelled & Declined Sessions",
+                            subtitle: "Sessions that were declined by mentors, cancelled, or expired.",
+                            icon: AlertTriangle,
+                            count: cancelledSessions.length,
+                            items: cancelledSessions,
+                            emptyMessage: {
+                                title: "No cancelled sessions",
+                                description: "None of your sessions have been cancelled or declined."
+                            }
+                        })
+                    )}
+
+                    {sessionTab === "all" && (
+                        mySessions.length === 0 ? (
+                            <div className="tab-empty-state">
+                                <div className="tab-empty-icon">📅</div>
+                                <h4>No sessions yet</h4>
+                                <p>Book a mentor to begin your skill exchange journey.</p>
+                            </div>
+                        ) : (
+                            <>
+                                {renderSessionGroupSection({
+                                    id: "all-payment-pending",
+                                    title: "Payment Pending",
+                                    subtitle: "Approved slots awaiting payment",
+                                    icon: CreditCard,
+                                    count: paymentPendingSessions.length,
+                                    items: paymentPendingSessions,
+                                    isUrgent: true
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "all-upcoming",
+                                    title: "Confirmed & Upcoming",
+                                    subtitle: "Confirmed sessions ready to attend",
+                                    icon: Calendar,
+                                    count: upcomingSessions.length,
+                                    items: upcomingSessions
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "all-pending-approval",
+                                    title: "Pending Approval",
+                                    subtitle: "Awaiting mentor approval",
+                                    icon: Clock,
+                                    count: pendingApprovalSessions.length,
+                                    items: pendingApprovalSessions
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "all-completed",
+                                    title: "Completed Sessions",
+                                    subtitle: "Successfully concluded sessions",
+                                    icon: CheckCircle2,
+                                    count: completedSessions.length,
+                                    items: completedSessions
+                                })}
+
+                                {renderSessionGroupSection({
+                                    id: "all-cancelled",
+                                    title: "Cancelled & Declined",
+                                    subtitle: "Cancelled, declined, or expired sessions",
+                                    icon: AlertTriangle,
+                                    count: cancelledSessions.length,
+                                    items: cancelledSessions
+                                })}
+                            </>
+                        )
+                    )}
+                </div>
             </section>
 
-            {/* REVIEW MODAL */}
-
-            {reviewBooking && (
-                <div
-                    className="review-modal-overlay"
-                    onClick={() =>
-                        setReviewBooking(
-                            null
-                        )
-                    }
-                >
-                    <div
-                        className="review-modal"
-                        onClick={(event) =>
-                            event.stopPropagation()
-                        }
-                    >
-                        <button
-                            className="review-close"
-                            onClick={() =>
-                                setReviewBooking(
-                                    null
-                                )
-                            }
-                        >
-                            ×
-                        </button>
-
-                        <p className="bookings-eyebrow">
-                            SESSION REVIEW
-                        </p>
-
-                        <h2>
-                            How was your
-                            session?
-                        </h2>
-
-                        <p className="review-person">
-                            Share your
-                            experience with
-                            the other
-                            member.
-                        </p>
-
+            {/* SESSION REVIEW MODAL */}
+            <Modal
+                isOpen={Boolean(reviewBooking)}
+                onClose={() => setReviewBooking(null)}
+                title="How was your session?"
+                eyebrow="SESSION REVIEW"
+                subtitle={
+                    reviewBooking
+                        ? `Share your experience with ${getBookingPerson(reviewBooking, currentUserId).person?.name || "the other member"}.`
+                        : ""
+                }
+                maxWidth="sm"
+            >
+                <div className="se-review-modal-content">
+                    <div className="se-review-rating-block">
+                        <span className="se-review-rating-caption">Tap to Rate</span>
                         <div className="rating-stars">
-                            {[1, 2, 3, 4, 5].map(
-                                (star) => (
-                                    <button
-                                        key={
-                                            star
-                                        }
-                                        type="button"
-                                        className={
-                                            star <=
-                                            rating
-                                                ? "star active"
-                                                : "star"
-                                        }
-                                        onClick={() =>
-                                            setRating(
-                                                star
-                                            )
-                                        }
-                                    >
-                                        ★
-                                    </button>
-                                )
-                            )}
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    type="button"
+                                    className={star <= rating ? "star active" : "star"}
+                                    onClick={() => setRating(star)}
+                                    aria-label={`${star} star`}
+                                >
+                                    ★
+                                </button>
+                            ))}
                         </div>
-
-                        <p className="rating-label">
-                            {rating}/5
-                        </p>
-
-                        <textarea
-                            className="review-textarea"
-                            placeholder="Tell them what you liked about the session..."
-                            value={
-                                comment
-                            }
-                            onChange={(
-                                event
-                            ) =>
-                                setComment(
-                                    event
-                                        .target
-                                        .value
-                                )
-                            }
-                            maxLength={1000}
-                        />
-
-                        <button
-                            className="submit-review-button"
-                            disabled={
-                                submittingReview
-                            }
-                            onClick={
-                                submitReview
-                            }
-                        >
-                            {submittingReview
-                                ? "Submitting..."
-                                : "Submit Review ⭐"}
-                        </button>
+                        <span className="rating-label">
+                            {{
+                                1: "1 / 5 — Needs Improvement",
+                                2: "2 / 5 — Fair",
+                                3: "3 / 5 — Good",
+                                4: "4 / 5 — Very Good",
+                                5: "5 / 5 — Excellent"
+                            }[rating] || `${rating} / 5`}
+                        </span>
                     </div>
+
+                    <div className="se-review-input-group">
+                        <label htmlFor="session-review-text" className="se-review-textarea-label">
+                            Your Feedback & Comments
+                        </label>
+                        <textarea
+                            id="session-review-text"
+                            className="review-textarea"
+                            placeholder="Tell them what you liked about the session or areas to explore..."
+                            value={comment}
+                            onChange={(event) => setComment(event.target.value)}
+                            maxLength={1000}
+                            rows={4}
+                        />
+                        <span className="se-review-char-count">{comment.length} / 1000 characters</span>
+                    </div>
+
+                    <button
+                        className="submit-review-button"
+                        disabled={submittingReview}
+                        onClick={submitReview}
+                        type="button"
+                    >
+                        {submittingReview ? "Submitting…" : "Submit Review ⭐"}
+                    </button>
                 </div>
+            </Modal>
+
+            {suggestSlotsBooking && (
+                <SuggestSlotsModal
+                    booking={suggestSlotsBooking}
+                    token={token}
+                    onClose={() => setSuggestSlotsBooking(null)}
+                    onSuccess={async () => {
+                        setSuggestSlotsBooking(null);
+                        await Promise.all([fetchBookings(), fetchRequests()]);
+                    }}
+                    onDirectDecline={(bookingId) => {
+                        setSuggestSlotsBooking(null);
+                        updateBooking(bookingId, "rejected");
+                    }}
+                />
             )}
+
+            {/* VIEW SESSION DETAILS & PARTY MODAL */}
+            <Modal
+                isOpen={Boolean(detailsBooking)}
+                onClose={() => setDetailsBooking(null)}
+                title="Session Details"
+                eyebrow="SESSION OVERVIEW & PARTICIPANTS"
+                subtitle={
+                    detailsBooking
+                        ? `Booking ID: #${detailsBooking._id.slice(-8).toUpperCase()}`
+                        : ""
+                }
+                maxWidth="md"
+            >
+                {detailsBooking && (() => {
+                    const { person, role } = getBookingPerson(detailsBooking, currentUserId);
+                    const partnerName = person?.name || "Skill Exchange Member";
+                    const partnerInitial = partnerName.charAt(0).toUpperCase();
+                    const isBooker = String(detailsBooking.learner?._id || detailsBooking.learner?.id || detailsBooking.learner) === String(currentUserId);
+                    const duration = Number(detailsBooking.duration) || 60;
+                    const sessionAmount = Number(detailsBooking.baseSessionAmount !== undefined ? detailsBooking.baseSessionAmount : detailsBooking.paymentAmount) || 0;
+                    const isDetailsMissed = isMissedSession(detailsBooking);
+                    const detailsSessionEnded = getSessionEndDate(detailsBooking) <= Date.now();
+                    const canDetailsReview = (detailsBooking.status === "completed" || (detailsBooking.status === "accepted" && detailsSessionEnded)) && !reviewedBookings[detailsBooking._id];
+
+                    return (
+                        <div className="session-details-modal-content">
+                            {/* Session Party Profile */}
+                            <div className="details-partner-card">
+                                <div className="details-partner-avatar">
+                                    {partnerInitial}
+                                </div>
+                                <div className="details-partner-info">
+                                    <span className="details-role-kicker">{role ? `${role.toUpperCase()} PROFILE` : "SESSION PARTNER"}</span>
+                                    <h3 className="details-partner-name">{partnerName}</h3>
+                                    <p className="details-partner-sub">
+                                        {isBooker
+                                            ? "Your Mentor for this Skill Exchange session"
+                                            : "Learner attending this Skill Exchange session"}
+                                    </p>
+                                    {person?.email && (
+                                        <span className="details-partner-email">✉ {person.email}</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Schedule & Timing Grid */}
+                            <div className="details-schedule-section">
+                                <h4 className="details-section-title">Schedule & Booking Information</h4>
+                                <div className="details-info-grid">
+                                    <div className="details-info-card">
+                                        <span className="details-info-label">📅 Date</span>
+                                        <strong className="details-info-value">{detailsBooking.date || "Not set"}</strong>
+                                    </div>
+                                    <div className="details-info-card">
+                                        <span className="details-info-label">⏰ Time</span>
+                                        <strong className="details-info-value">{detailsBooking.time || "Not set"}</strong>
+                                    </div>
+                                    <div className="details-info-card">
+                                        <span className="details-info-label">⏱ Duration</span>
+                                        <strong className="details-info-value">{duration} minutes</strong>
+                                    </div>
+                                    <div className="details-info-card">
+                                        <span className="details-info-label">💳 Session Rate</span>
+                                        <strong className="details-info-value">{sessionAmount === 0 ? "Free" : `₹${sessionAmount.toLocaleString("en-IN")}`}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Session Note / Message if provided */}
+                            {detailsBooking.message && (
+                                <div className="details-message-section">
+                                    <h4 className="details-section-title">Session Message / Request Agenda</h4>
+                                    <div className="details-message-box">
+                                        <p>{detailsBooking.message}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Video Session Section (inside popup) */}
+                            {detailsBooking.status === "accepted" && (
+                                <div className="details-video-wrapper">
+                                    <h4 className="details-section-title">Video Session & Meeting Link</h4>
+                                    <GoogleMeetLink
+                                        key={`modal-meet-${detailsBooking._id}-${detailsBooking.meetingUrl || ''}`}
+                                        booking={detailsBooking}
+                                        token={token}
+                                        currentUserId={currentUserId}
+                                        onLinkSaved={(newUrl) => handleMeetingUrlUpdated(detailsBooking._id, newUrl)}
+                                    />
+                                </div>
+                            )}
+
+                            {/* Rating & Feedback / Session Reviews Section */}
+                            {(detailsBooking.status === "completed" || detailsReviews.learnerReview || detailsReviews.mentorReview) && (
+                                <div className="details-reviews-section">
+                                    <h4 className="details-section-title">Session Reviews & Ratings</h4>
+                                    {detailsReviews.loading ? (
+                                        <div className="details-reviews-loading">
+                                            <span>Loading reviews…</span>
+                                        </div>
+                                    ) : !detailsReviews.learnerReview && !detailsReviews.mentorReview ? (
+                                        <div className="details-no-reviews-box">
+                                            <span className="no-review-icon">⭐</span>
+                                            <p>No reviews submitted yet for this session.</p>
+                                        </div>
+                                    ) : (
+                                        <div className="details-reviews-container">
+                                            {/* Learner's Review Block */}
+                                            {detailsReviews.learnerReview && (
+                                                <div className="details-review-card learner-review-card">
+                                                    <div className="review-card-header">
+                                                        <div className="reviewer-meta">
+                                                            <span className="review-role-badge learner">Learner's Review</span>
+                                                            <strong className="reviewer-name">
+                                                                {detailsReviews.learnerReview.reviewer?.name || "Learner"}
+                                                            </strong>
+                                                        </div>
+                                                        <div className="review-rating-score">
+                                                            <span className="review-stars-visual">
+                                                                {"★".repeat(detailsReviews.learnerReview.rating)}
+                                                                {"☆".repeat(5 - detailsReviews.learnerReview.rating)}
+                                                            </span>
+                                                            <span className="review-numeric-score">{detailsReviews.learnerReview.rating}/5</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="review-card-body">
+                                                        <p className="review-comment-text">
+                                                            {detailsReviews.learnerReview.comment
+                                                                ? `“${detailsReviews.learnerReview.comment}”`
+                                                                : <em className="review-empty-note">No written feedback provided.</em>}
+                                                        </p>
+                                                    </div>
+                                                    {detailsReviews.learnerReview.createdAt && (
+                                                        <div className="review-card-footer">
+                                                            <span className="review-timestamp">
+                                                                Reviewed on {new Date(detailsReviews.learnerReview.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Mentor's Review Block */}
+                                            {detailsReviews.mentorReview && (
+                                                <div className="details-review-card mentor-review-card">
+                                                    <div className="review-card-header">
+                                                        <div className="reviewer-meta">
+                                                            <span className="review-role-badge mentor">Mentor's Review</span>
+                                                            <strong className="reviewer-name">
+                                                                {detailsReviews.mentorReview.reviewer?.name || "Mentor"}
+                                                            </strong>
+                                                        </div>
+                                                        <div className="review-rating-score">
+                                                            <span className="review-stars-visual">
+                                                                {"★".repeat(detailsReviews.mentorReview.rating)}
+                                                                {"☆".repeat(5 - detailsReviews.mentorReview.rating)}
+                                                            </span>
+                                                            <span className="review-numeric-score">{detailsReviews.mentorReview.rating}/5</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="review-card-body">
+                                                        <p className="review-comment-text">
+                                                            {detailsReviews.mentorReview.comment
+                                                                ? `“${detailsReviews.mentorReview.comment}”`
+                                                                : <em className="review-empty-note">No written feedback provided.</em>}
+                                                        </p>
+                                                    </div>
+                                                    {detailsReviews.mentorReview.createdAt && (
+                                                        <div className="review-card-footer">
+                                                            <span className="review-timestamp">
+                                                                Reviewed on {new Date(detailsReviews.mentorReview.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Session Action Buttons (inside popup) */}
+                            <div className="details-session-actions-section">
+                                <h4 className="details-section-title">Session Actions</h4>
+                                <div className="details-actions-buttons-row">
+                                    {/* Open Session Chat on Accepted Sessions */}
+                                    {detailsBooking.status === "accepted" && !isDetailsMissed && (
+                                        <button
+                                            type="button"
+                                            className="modal-action-chat-btn"
+                                            onClick={() => {
+                                                const b = detailsBooking;
+                                                setDetailsBooking(null);
+                                                if (onJoinSession) onJoinSession(b);
+                                            }}
+                                        >
+                                            <MessageSquare size={16} />
+                                            <span>Open Session Chat</span>
+                                        </button>
+                                    )}
+
+                                    {/* Mark Complete on Accepted Sessions */}
+                                    {detailsBooking.status === "accepted" && (
+                                        <button
+                                            type="button"
+                                            className="modal-action-complete-btn"
+                                            onClick={async () => {
+                                                const bId = detailsBooking._id;
+                                                setDetailsBooking(null);
+                                                await updateBooking(bId, "completed");
+                                            }}
+                                        >
+                                            <Check size={16} />
+                                            <span>Mark Session Complete</span>
+                                        </button>
+                                    )}
+
+                                    {/* Leave Review on Completed Sessions */}
+                                    {canDetailsReview && (
+                                        <button
+                                            type="button"
+                                            className="modal-action-review-btn"
+                                            onClick={() => {
+                                                const b = detailsBooking;
+                                                setDetailsBooking(null);
+                                                openReview(b);
+                                            }}
+                                        >
+                                            <Star size={16} />
+                                            <span>Leave Session Review ⭐</span>
+                                        </button>
+                                    )}
+
+                                    {/* Cancel Booking option */}
+                                    {["pending", "accepted"].includes(detailsBooking.status) && (
+                                        <button
+                                            type="button"
+                                            className="modal-action-cancel-btn"
+                                            onClick={async () => {
+                                                const bId = detailsBooking._id;
+                                                setDetailsBooking(null);
+                                                await cancelBooking(bId);
+                                            }}
+                                        >
+                                            Cancel Booking
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Close / Done button */}
+                            <div className="details-modal-actions">
+                                <button
+                                    type="button"
+                                    className="details-close-action-btn"
+                                    onClick={() => setDetailsBooking(null)}
+                                >
+                                    Close Details
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })()}
+            </Modal>
         </main>
     );
 }
 
 export default MyBookings;
+// @teamcosmiccoders

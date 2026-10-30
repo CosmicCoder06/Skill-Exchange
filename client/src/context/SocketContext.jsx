@@ -9,13 +9,16 @@ export function SocketProvider({ token, children }) {
     useEffect(() => {
         if (!token) return undefined;
 
+        const socketUrl = import.meta.env.VITE_SOCKET_URL || "http://localhost:5000";
         const instance = io(
-            import.meta.env.VITE_SOCKET_URL ||
-            "io(import.meta.env.VITE_SOCKET_URL)",
+            socketUrl,
             {
                 auth: {
                     token: token
-                }
+                },
+                transports: ['polling', 'websocket'],
+                reconnectionAttempts: 5,
+                timeout: 10000
             }
         );
 
@@ -32,8 +35,8 @@ export function SocketProvider({ token, children }) {
         };
 
         const handleConnectError = (error) => {
-            console.error(
-                "Socket connection error:",
+            console.warn(
+                "Socket connection notice:",
                 error.message
             );
         };
@@ -46,7 +49,11 @@ export function SocketProvider({ token, children }) {
             instance.off("connect", handleConnect);
             instance.off("disconnect", handleDisconnect);
             instance.off("connect_error", handleConnectError);
-            instance.disconnect();
+            if (instance.connected) {
+                instance.disconnect();
+            } else {
+                instance.close();
+            }
         };
     }, [token]);
 
@@ -64,3 +71,4 @@ export function SocketProvider({ token, children }) {
         </SocketContext.Provider>
     );
 }
+// @teamcosmiccoders

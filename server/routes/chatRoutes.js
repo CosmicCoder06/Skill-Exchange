@@ -14,7 +14,8 @@ const {
 
 const router = express.Router()
 
-router.use(verifyToken)
+router.use("/conversations", verifyToken)
+router.use("/messages", verifyToken)
 
 router
     .route("/conversations")
@@ -47,3 +48,4 @@ router.delete(
 )
 
 module.exports = router
+// @teamcosmiccoders

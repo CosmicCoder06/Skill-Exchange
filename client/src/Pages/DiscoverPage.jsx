@@ -1,6 +1,8 @@
+import { resolveImageUrl } from '../utils/imageUrl';
 import { useEffect, useMemo, useState } from "react";
 import "./HomePage.css";
 import "./Discover.css";
+import { LogoMark } from "../Components/common/Logo";
 
 function DiscoverPage({
     token,
@@ -18,7 +20,7 @@ function DiscoverPage({
         async function loadUsers() {
             try {
                 const response = await fetch(
-                    `${import.meta.env.VITE_API_URL}/getData`,
+                    `${import.meta.env.VITE_API_URL}/mentors?q=${encodeURIComponent(query)}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -51,8 +53,8 @@ function DiscoverPage({
                     );
                 }
 
-                const users = Array.isArray(data.data)
-                    ? data.data
+                const users = Array.isArray(data.mentors)
+                    ? data.mentors
                     : [];
 
                 const otherUsers = users.filter(
@@ -126,7 +128,7 @@ function DiscoverPage({
         }
 
         loadUsers();
-    }, [token]);
+    }, [token, query]);
 
     const matches = useMemo(() => {
         const search = query.toLowerCase().trim();
@@ -144,8 +146,9 @@ function DiscoverPage({
                 <button
                     className="app-logo"
                     onClick={onHome}
+                    aria-label="Skill Exchange home"
                 >
-                    <span className="logo-mark">↗</span>
+                    <LogoMark size={28} />
                     SkillExchange
                 </button>
 
@@ -173,14 +176,6 @@ function DiscoverPage({
             </nav>
 
             <header className="discover-header">
-                <button
-                    className="page-back"
-                    onClick={onHome}
-                >
-                    <span>←</span>
-                    Back home
-                </button>
-
                 <div className="discover-kicker">
                     <span></span>
                     COMMUNITY DIRECTORY
@@ -270,7 +265,7 @@ function DiscoverPage({
                                 <div className="person-avatar">
                                     {person.avatarUrl ? (
                                         <img
-                                            src={person.avatarUrl}
+                                            src={resolveImageUrl(person.avatarUrl)}
                                             alt=""
                                         />
                                     ) : (
@@ -318,6 +313,19 @@ function DiscoverPage({
                                                   }`
                                                 : "No reviews yet"}
                                         </span>
+
+                                        {person.role === "mentor" && (
+                                            <>
+                                                <span className="meta-divider">·</span>
+                                                <span style={{ fontWeight: 700, color: "#176b4e" }}>
+                                                    {person.hourlyRate === 0
+                                                        ? "Free"
+                                                        : person.hourlyRate > 0
+                                                        ? `₹${Number(person.hourlyRate).toLocaleString("en-IN")}/hr`
+                                                        : "Rate not set"}
+                                                </span>
+                                            </>
+                                        )}
 
                                         {teachingSkills.length >
                                             0 && (
@@ -390,3 +398,4 @@ function DiscoverPage({
 }
 
 export default DiscoverPage;
+// @teamcosmiccoders

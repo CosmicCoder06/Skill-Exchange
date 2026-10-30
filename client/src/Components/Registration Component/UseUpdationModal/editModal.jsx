@@ -33,6 +33,7 @@ function UpdateRegisterCard({ onClose, id }) {
                 name: "",
                 email: ""
             });
+
         } catch (error) {
             console.log(error);
         }

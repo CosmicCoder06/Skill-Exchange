@@ -282,6 +282,7 @@
 
 const Review = require("../models/Review");
 const Booking = require("../models/Booking");
+const { recordActivity } = require("../Utils/activityLogger");
 
 const getCurrentUserId = (req) => {
     return String(req.user._id || req.user.id);
@@ -382,28 +383,46 @@ const createReview = async (req, res) => {
         const mentorId =
             booking.mentor.toString();
 
-        // Only learner can review mentor
+        // Both learner and mentor can review each other
         if (
-            currentUserId !== learnerId
+            currentUserId !== learnerId &&
+            currentUserId !== mentorId
         ) {
             return res.status(403).json({
                 message:
-                    "Only the learner can review the mentor"
+                    "You are not part of this booking"
             });
         }
 
-        // Session must be completed
+        // Session must be completed or accepted session whose time has ended
         if (
             booking.status !==
             "completed"
         ) {
-            return res.status(400).json({
-                message:
-                    "You can review only a completed session"
-            });
+            let sessionEnded = false;
+            if (booking.date && booking.time) {
+                let d = new Date(`${booking.date}T${booking.time}`);
+                if (Number.isNaN(d.getTime())) d = new Date(`${booking.date} ${booking.time}`);
+                if (Number.isNaN(d.getTime())) d = new Date(booking.date);
+                if (!Number.isNaN(d.getTime())) {
+                    const durationMins = Number(booking.duration) || 60;
+                    sessionEnded = (d.getTime() + durationMins * 60000) <= Date.now();
+                }
+            }
+
+            if (booking.status === "accepted" && sessionEnded) {
+                booking.status = "completed";
+                booking.actionExpiresAt = null;
+                await booking.save();
+            } else {
+                return res.status(400).json({
+                    message:
+                        "You can review only a completed session"
+                });
+            }
         }
 
-        // One review per booking
+        // One review per booking per reviewer
         const existingReview =
             await Review.findOne({
                 booking: bookingId,
@@ -417,15 +436,28 @@ const createReview = async (req, res) => {
             });
         }
 
+        const reviewee =
+            currentUserId === learnerId
+                ? booking.mentor
+                : booking.learner;
+
         const review =
             await Review.create({
                 booking: bookingId,
                 reviewer: currentUserId,
-                reviewee: booking.mentor,
+                reviewee,
                 rating: numericRating,
                 comment:
                     comment?.trim() || ""
             });
+
+        recordActivity({
+            actor: currentUserId,
+            action: "review.created",
+            entityType: "Review",
+            entityId: review._id,
+            metadata: { bookingId, rating: numericRating }
+        });
 
         const populatedReview =
             await Review.findById(
@@ -621,20 +653,35 @@ const getBookingReview = async (
             });
         }
 
-        const review =
-            await Review.findOne({
+        const reviews =
+            await Review.find({
                 booking:
-                    req.params.bookingId,
-                reviewer:
-                    currentUserId
+                    req.params.bookingId
             }).populate(
                 "reviewer reviewee",
                 "name email role avatarUrl"
             );
 
+        const learnerId = (booking.learner?._id || booking.learner).toString();
+        const mentorId = (booking.mentor?._id || booking.mentor).toString();
+
+        const learnerReview = reviews.find(
+            (r) => (r.reviewer?._id || r.reviewer)?.toString() === learnerId
+        ) || null;
+
+        const mentorReview = reviews.find(
+            (r) => (r.reviewer?._id || r.reviewer)?.toString() === mentorId
+        ) || null;
+
+        const myReview = reviews.find(
+            (r) => (r.reviewer?._id || r.reviewer)?.toString() === currentUserId
+        ) || null;
+
         return res.json({
-            review:
-                review || null
+            review: myReview || null,
+            reviews,
+            learnerReview,
+            mentorReview
         });
 
     } catch (error) {
@@ -650,9 +697,45 @@ const getBookingReview = async (
     }
 };
 
+// =====================================================
+// GET BOOKING IDS REVIEWED BY CURRENT USER
+// =====================================================
+
+const getMyReviewedBookings = async (req, res) => {
+    try {
+        const currentUserId = getCurrentUserId(req);
+
+        const reviews = await Review.find({
+            reviewer: currentUserId
+        })
+            .select("booking")
+            .lean();
+
+        const bookingIds = reviews
+            .map((r) => r.booking?.toString())
+            .filter(Boolean);
+
+        return res.json({
+            bookingIds
+        });
+    } catch (error) {
+        console.error(
+            "Get my reviewed bookings error:",
+            error
+        );
+
+        return res.status(500).json({
+            message: "Unable to load reviewed bookings",
+            bookingIds: []
+        });
+    }
+};
+
 module.exports = {
     createReview,
     getMyReviews,
+    getMyReviewedBookings,
     getUserReviews,
     getBookingReview
 };
+// @teamcosmiccoders

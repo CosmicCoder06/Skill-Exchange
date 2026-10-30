@@ -1,10 +1,10 @@
+import { resolveImageUrl } from '../../utils/imageUrl';
 import { useEffect, useState } from "react";
 import "./OtherProfilePage.css";
 
 function OtherProfilePage({
     token,
     userId,
-    onBack,
     onMessages,
     onBookSession
 }) {
@@ -12,6 +12,7 @@ function OtherProfilePage({
     const [ratingData, setRatingData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [ratingLoading, setRatingLoading] = useState(true);
+    const [showPhoto, setShowPhoto] = useState(false);
 
     useEffect(() => {
         async function fetchProfile() {
@@ -79,9 +80,6 @@ function OtherProfilePage({
             <main className="other-profile-loading">
                 <p>Profile not found</p>
 
-                <button onClick={onBack}>
-                    Back
-                </button>
             </main>
         );
     }
@@ -118,23 +116,32 @@ function OtherProfilePage({
     return (
         <main className="other-profile-page">
             <header className="other-profile-topbar">
-                <button
-                    className="other-profile-back"
-                    onClick={onBack}
-                >
-                    ← Back
-                </button>
-
                 <span className="other-profile-label">
                     MEMBER PROFILE
                 </span>
             </header>
 
             <section className="other-profile-hero">
-                <div className="other-profile-avatar">
+                <div
+                    className={`other-profile-avatar ${profile.avatarUrl ? "clickable" : ""}`}
+                    onClick={() => {
+                        if (profile.avatarUrl) {
+                            setShowPhoto(true);
+                        }
+                    }}
+                    role={profile.avatarUrl ? "button" : undefined}
+                    tabIndex={profile.avatarUrl ? 0 : undefined}
+                    onKeyDown={(event) => {
+                        if (profile.avatarUrl && (event.key === "Enter" || event.key === " ")) {
+                            event.preventDefault();
+                            setShowPhoto(true);
+                        }
+                    }}
+                    title={profile.avatarUrl ? "Click to view profile picture" : ""}
+                >
                     {profile.avatarUrl ? (
                         <img
-                            src={profile.avatarUrl}
+                            src={resolveImageUrl(profile.avatarUrl)}
                             alt={`${profile.name}'s profile`}
                         />
                     ) : (
@@ -153,6 +160,25 @@ function OtherProfilePage({
                         Open to meaningful skill exchanges
                     </p>
 
+{profile.role === "mentor" && (
+                        <div className="other-profile-rate-badge" style={{ marginTop: "4px", marginBottom: "6px" }}>
+                            <span style={{
+                                display: "inline-block",
+                                padding: "3px 10px",
+                                borderRadius: "999px",
+                                background: "#e8f4ef",
+                                color: "#176b4e",
+                                fontSize: "12px",
+                                fontWeight: 700
+                            }}>
+                                {profile.hourlyRate === 0
+                                    ? "Free Sessions"
+                                    : profile.hourlyRate > 0
+                                    ? `₹${Number(profile.hourlyRate).toLocaleString("en-IN")}/hr`
+                                    : "Rate not set"}
+                            </span>
+                        </div>
+                    )}
                     <div className="profile-rating-summary">
                         <span className="rating-star">
                             ★
@@ -237,7 +263,7 @@ function OtherProfilePage({
                             </div>
                         </div>
 
-                        <div>
+                        {profile.role !== "mentor" && <div>
                             <p className="profile-eyebrow">
                                 I WANT TO LEARN
                             </p>
@@ -258,7 +284,7 @@ function OtherProfilePage({
                                     </span>
                                 )}
                             </div>
-                        </div>
+                        </div>}
                     </div>
                 </div>
 
@@ -427,8 +453,46 @@ function OtherProfilePage({
                     )}
                 </section>
             </section>
+
+            {showPhoto && profile.avatarUrl && (
+                <div
+                    className="profile-photo-lightbox"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Profile photo viewer"
+                    onClick={() => setShowPhoto(false)}
+                >
+                    <button
+                        type="button"
+                        className="profile-photo-lightbox-close"
+                        aria-label="Close profile photo"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            setShowPhoto(false);
+                        }}
+                    >
+                        ×
+                    </button>
+
+                    <div
+                        className="profile-photo-lightbox-circle-wrapper"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <img
+                            className="profile-photo-lightbox-image"
+                            src={resolveImageUrl(profile.avatarUrl)}
+                            alt={`${profile.name}'s profile`}
+                        />
+                        <div className="profile-photo-caption">
+                            <strong>{profile.name}</strong>
+                            <span>{profile.role || "Member"}</span>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
 
 export default OtherProfilePage;
+// @teamcosmiccoders

@@ -18,11 +18,16 @@ const User = require("../../Models/UserSchema/user")
 
     const updateUser=async (req,res)=>{
         try {
+            const { id } = req.params;
+            if (String(req.user?.id) !== String(id) && req.user?.role !== "admin") {
+                return res.status(403).json({ success: false, message: "Unauthorized to update this user" });
+            }
 
             const{name, email}=req.body
 
-            const updatedUser= await User.findByIdAndUpdate(req.params.id,
-                {name,email}
+            const updatedUser= await User.findByIdAndUpdate(id,
+                {name,email},
+                { new: true }
             )
 
             res.json({
@@ -30,11 +35,13 @@ const User = require("../../Models/UserSchema/user")
                 data:updatedUser
             })
 
-            console.log("data has been updated :" ,updateUser)
+            console.log("data has been updated :" ,updatedUser)
             
         } catch (error) {
             console.log(error)
+            res.status(500).json({ success: false, message: "Server error" });
         }
     }
 
     module.exports= updateUser
+// @teamcosmiccoders

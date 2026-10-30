@@ -3,6 +3,12 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
     {
+        // @deprecated: Legacy mentor payment QR image. Preserved for schema compatibility until Part B cleanup.
+        paymentQr: {
+            type: mongoose.Schema.Types.Mixed,
+            default: "",
+            select: false,
+        },
         // =========================
         // AUTH FIELDS
         // =========================
@@ -63,6 +69,12 @@ const userSchema = new mongoose.Schema(
             default: true,
         },
 
+        deactivationReason: {
+            type: String,
+            default: "",
+            trim: true,
+        },
+
         // =========================
         // PROFILE FIELDS
         // =========================
@@ -76,6 +88,12 @@ const userSchema = new mongoose.Schema(
         skillsToTeach: {
             type: [String],
             default: [],
+        },
+
+        teachingSkillLevels: {
+            type: Map,
+            of: String,
+            default: {},
         },
 
         skillsToLearn: {
@@ -92,6 +110,12 @@ const userSchema = new mongoose.Schema(
             type: Number,
             default: 0,
             min: 0,
+        },
+
+        payoutUpiId: {
+            type: String,
+            default: "",
+            trim: true,
         },
 
         // Profile picture
@@ -165,3 +189,4 @@ module.exports =
         "User",
         userSchema
     );
+// @teamcosmiccoders

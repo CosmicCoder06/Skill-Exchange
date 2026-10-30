@@ -1,17 +1,40 @@
+const { sanitizeUserMedia } = require('../Utils/mediaUrlHelper');
 const User = require("../Backend Configuration/Models/UserSchema/user");
+const { recordActivity } = require("../Utils/activityLogger");
+const { invalidateMatcherCache } = require("../services/matcherService");
 
 const hasValue = (value) =>
     typeof value === "string" && value.trim().length > 0;
 
 const hasSkill = (skills) =>
-    Array.isArray(skills) && skills.some(hasValue);
+    Array.isArray(skills) &&
+    skills.some(
+        (skill) =>
+            typeof skill === "string" &&
+            skill.trim().length > 0
+    );
 
-const calculateProfileComplete = (profile) => Boolean(
-    hasValue(profile.bio) &&
-    hasSkill(profile.skillsToTeach) &&
-    hasSkill(profile.skillsToLearn)
-);
+const cleanStringList = (value) => {
+    if (!Array.isArray(value)) {
+        return [];
+    }
 
+    return value
+        .filter((item) => typeof item === "string")
+        .map((item) => item.trim())
+        .filter(Boolean);
+};
+
+const calculateProfileComplete = (profile) => {
+    if (profile.role === "admin") {
+        return Boolean(hasValue(profile.bio) || hasValue(profile.avatarUrl));
+    }
+    return Boolean(
+        hasValue(profile.bio) &&
+        hasSkill(profile.skillsToTeach) &&
+        (profile.role === "mentor" || hasSkill(profile.skillsToLearn))
+    );
+};
 
 
 // ===============================
@@ -19,228 +42,346 @@ const calculateProfileComplete = (profile) => Boolean(
 // ===============================
 
 const getMyProfile = async (req, res) => {
-
     try {
-
+        console.time("getMyProfile");
         const user = await User.findById(req.user.id)
-            .select("-password -refreshToken");
-
+            .select("-password -refreshToken")
+            .lean();
 
         if (!user) {
-
             return res.status(404).json({
                 message: "User not found"
             });
-
         }
 
+        // Admin identities are operational-only and are not public profiles.
+        if (user.role === "admin" && String(user._id) !== String(req.user.id)) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
 
-
-        // The calculated fallback also supports profiles completed before the
-        // profileCompleted field was introduced.
-        const profileComplete = user.profileCompleted ||
+        const profileComplete =
+            user.profileCompleted ||
             calculateProfileComplete(user);
 
-
-
+        console.timeEnd("getMyProfile");
         res.status(200).json({
-
-            profile: user,
-
+            profile: sanitizeUserMedia(user),
             profileComplete
-
         });
-
-
 
     } catch (error) {
-
+        console.error("Get profile error:", error);
 
         res.status(500).json({
-
-            message:"Unable to fetch profile",
-
-            error:error.message
-
+            message: "Unable to fetch profile"
         });
-
-
     }
-
 };
-
-
-
 
 
 // ===============================
 // UPDATE PROFILE
 // ===============================
 
-const updateProfile = async (req,res)=>{
+const updateProfile = async (req, res) => {
+    try {
+        const {
+            name,
+            bio,
+            skillsToTeach,
+            teachingSkillLevels,
+            skillsToLearn,
+            availability,
+            hourlyRate,
+            avatarUrl,
+            coverImageUrl,
+            payoutUpiId
+        } = req.body;
 
+        // -------------------------
+        // Validate bio (allows partial/short bio without blocking)
+        // -------------------------
 
-    try{
-
-
-        const allowedFields=[
-
-            "bio",
-            "skillsToTeach",
-            "skillsToLearn",
-            "availability",
-            "hourlyRate",
-            "avatarUrl"
-
-        ];
-
-
-
-        const updates={};
-
-
-
-        allowedFields.forEach(field=>{
-
-
-            if(req.body[field] !== undefined){
-
-                updates[field]=req.body[field];
-
-            }
-
-
-        });
-
-        // The form validates these same required values before submitting.
-        // Save the result so logging in again always uses the same answer.
-        const profileComplete = calculateProfileComplete({
-            ...req.body,
-            skillsToTeach: updates.skillsToTeach,
-            skillsToLearn: updates.skillsToLearn
-        });
-
-        if (profileComplete) {
-            updates.profileCompleted = true;
+        if (
+            bio !== undefined &&
+            typeof bio !== "string"
+        ) {
+            return res.status(400).json({
+                message: "Bio must be a string."
+            });
         }
 
+        // -------------------------
+        // Validate teaching skills
+        // -------------------------
 
+        if (
+            skillsToTeach !== undefined &&
+            !Array.isArray(skillsToTeach)
+        ) {
+            return res.status(400).json({
+                message: "Teaching skills must be an array."
+            });
+        }
 
+        // -------------------------
+        // Validate learning skills
+        // -------------------------
 
-        const user = await User.findByIdAndUpdate(
+        if (
+            req.user.role !== "mentor" &&
+            req.user.role !== "admin" &&
+            skillsToLearn !== undefined &&
+            !Array.isArray(skillsToLearn)
+        ) {
+            return res.status(400).json({
+                message: "Learning skills must be an array."
+            });
+        }
 
-            req.user.id,
+        const cleanedSkillsToTeach =
+            skillsToTeach !== undefined
+                ? cleanStringList(skillsToTeach)
+                : undefined;
 
-            updates,
+        if (teachingSkillLevels !== undefined && (
+            !teachingSkillLevels || Array.isArray(teachingSkillLevels) || typeof teachingSkillLevels !== "object"
+        )) {
+            return res.status(400).json({ message: "Teaching skill levels must be an object." });
+        }
 
-            {
-                new:true
+        const cleanedSkillsToLearn =
+            skillsToLearn !== undefined
+                ? cleanStringList(skillsToLearn)
+                : undefined;
+
+        // Partial updates are allowed: users can save changes incrementally.
+        // calculateProfileComplete below will track whether profile is 100% complete without blocking save.
+
+        // -------------------------
+        // Validate availability
+        // -------------------------
+
+        if (
+            availability !== undefined &&
+            !Array.isArray(availability)
+        ) {
+            return res.status(400).json({
+                message: "Availability must be an array."
+            });
+        }
+
+        const cleanedAvailability =
+            availability !== undefined
+                ? cleanStringList(availability)
+                : undefined;
+
+        // -------------------------
+        // Validate hourly rate
+        // -------------------------
+
+        if (hourlyRate !== undefined && hourlyRate !== null && hourlyRate !== "") {
+            const numericRate = Number(hourlyRate);
+
+            if (
+                !Number.isFinite(numericRate) ||
+                numericRate < 0
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Hourly rate must be a valid non-negative number."
+                });
             }
+        }
 
-        )
-        .select("-password -refreshToken");
+        const existingUser =
+            await User.findById(req.user.id);
 
+        if (!existingUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
 
+        const updates = {};
 
+        if (name !== undefined && typeof name === "string" && name.trim()) {
+            updates.name = name.trim();
+        }
+
+        if (bio !== undefined) {
+            updates.bio = bio.trim();
+        }
+
+        if (cleanedSkillsToTeach !== undefined) {
+            updates.skillsToTeach =
+                cleanedSkillsToTeach;
+        }
+
+        if (teachingSkillLevels !== undefined) {
+            const allowedLevels = new Set(["Beginner", "Intermediate", "Advanced", "Expert"]);
+            const validSkills = new Set((cleanedSkillsToTeach || existingUser.skillsToTeach || []).map((skill) => String(skill).toLowerCase()));
+            updates.teachingSkillLevels = Object.fromEntries(
+                Object.entries(teachingSkillLevels)
+                    .filter(([skill, level]) => validSkills.has(String(skill).toLowerCase()) && allowedLevels.has(level))
+            );
+        }
+
+        if (existingUser.role === "mentor") {
+            updates.skillsToLearn = [];
+        } else if (cleanedSkillsToLearn !== undefined) {
+            updates.skillsToLearn =
+                cleanedSkillsToLearn;
+        }
+
+        if (cleanedAvailability !== undefined) {
+            updates.availability =
+                cleanedAvailability;
+        }
+
+        if (hourlyRate !== undefined) {
+            updates.hourlyRate =
+                Number(hourlyRate);
+        }
+
+        if (avatarUrl !== undefined) {
+            updates.avatarUrl =
+                typeof avatarUrl === "string"
+                    ? avatarUrl.trim()
+                    : "";
+        }
+
+        
+        if (payoutUpiId !== undefined) {
+            const trimmedUpi = String(payoutUpiId || "").trim();
+            if (trimmedUpi && !/^[\w.-]+@[\w.-]+$/.test(trimmedUpi)) {
+                return res.status(400).json({ message: "Invalid UPI ID format. Expected format: username@bank" });
+            }
+            updates.payoutUpiId = trimmedUpi;
+        }
+
+        if (coverImageUrl !== undefined) {
+            updates.coverImageUrl =
+                typeof coverImageUrl === "string"
+                    ? coverImageUrl.trim()
+                    : "";
+        }
+
+        const profileForCompletion = {
+            ...existingUser.toObject(),
+            ...updates
+        };
+
+        const profileComplete =
+            calculateProfileComplete(
+                profileForCompletion
+            );
+
+        updates.profileCompleted =
+            profileComplete;
+
+        // -------------------------
+        // Save with Mongoose
+        // validation enabled
+        // -------------------------
+
+        const user =
+            await User.findByIdAndUpdate(
+                req.user.id,
+                updates,
+                {
+                    new: true,
+                    runValidators: true
+                }
+            ).select("-password -refreshToken");
+
+        recordActivity({ actor: req.user.id, action: "profile.updated", entityType: "User", entityId: user._id });
+        invalidateMatcherCache(req.user.id);
 
         res.status(200).json({
-
-            message:"Profile updated successfully",
-
-            profile:user,
-
-            profileComplete: user.profileCompleted || profileComplete
-
+            message: "Profile updated successfully",
+            profile: sanitizeUserMedia(user),
+            profileComplete:
+                user.profileCompleted
         });
 
+    } catch (error) {
+        console.error(
+            "Profile update error:",
+            error
+        );
 
-
-    }
-    catch(error){
-
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                message: "Invalid profile data.",
+                error: error.message
+            });
+        }
 
         res.status(500).json({
-
-            message:"Profile update failed",
-
-            error:error.message
-
+            message: "Profile update failed"
         });
-
-
     }
-
-
 };
-
-
-
 
 
 // ===============================
 // GET OTHER USER PROFILE
 // ===============================
 
-const getUserProfile = async(req,res)=>{
-
-
-    try{
-
-
+const getUserProfile = async (req, res) => {
+    try {
         const user = await User.findById(req.params.id)
+            .select("-password -refreshToken")
+            .lean();
 
-        .select("-password -refreshToken");
-
-
-
-        if(!user){
-
+        if (!user) {
             return res.status(404).json({
-
-                message:"User not found"
-
+                message: "User not found"
             });
-
         }
 
-
-
         res.status(200).json({
-
-            profile:user
-
+            profile: sanitizeUserMedia(user)
         });
 
-
-
-    }
-    catch(error){
-
+    } catch (error) {
+        console.error(
+            "Get user profile error:",
+            error
+        );
 
         res.status(500).json({
+            message: "Unable to fetch profile"
+        });
+    }
+};
 
-            message:"Unable to fetch profile",
+const deactivateMyAccount = async (req, res) => {
+    try {
+        const reason = String(req.body?.reason || "").trim();
+        if (!reason) return res.status(400).json({ message: "A deactivation reason is required" });
 
-            error:error.message
-
+        await User.findByIdAndUpdate(req.user.id, {
+            isActive: false,
+            deactivationReason: reason,
+            refreshToken: null
         });
 
+        recordActivity({ actor: req.user.id, action: "account.deactivated", entityType: "User", entityId: req.user.id });
 
+        return res.status(200).json({ message: "Account deactivated" });
+    } catch (error) {
+        return res.status(500).json({ message: "Unable to deactivate account" });
     }
-
-
 };
 
 
-
-
-
-module.exports={
-
+module.exports = {
     getMyProfile,
-
     updateProfile,
-
-    getUserProfile
-
+    getUserProfile,
+    deactivateMyAccount
 };
